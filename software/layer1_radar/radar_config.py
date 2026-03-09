@@ -1,6 +1,6 @@
 """
 Radar configuration via CLI commands.
-
+test adrian
 Sends configuration commands to the IWR6843 over the config UART port.
 """
 
