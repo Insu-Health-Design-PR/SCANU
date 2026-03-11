@@ -1,27 +1,31 @@
 # Layer 2: Signal Processing
 
-## Objetivo
-Transformar tramas crudas de radar (Layer 1) en una representación numérica estable y calibrada para extracción de features.
+## Objective
+Transform raw radar frames from Layer 1 into a stable, calibrated numeric representation for feature extraction.
 
-## Entradas
-- `RadarFrame(frame_number, timestamp_ms, payload)` desde Layer 1.
+## Inputs
+- `RadarFrame(frame_number, timestamp_ms, payload)` from Layer 1.
 
-## Salidas
+## Outputs
 - `ProcessedFrame(frame_number, timestamp_ms, range_doppler, point_cloud)`.
 
-## Archivos `.py`
-- `frame_buffer.py`: buffer temporal con ventana fija para `RadarFrame`.
-- `calibration.py`: `BackgroundModel` con baseline exponencial.
-- `signal_processor.py`: pipeline mínimo determinístico de bytes a magnitud calibrada.
-- `__init__.py`: exports públicos.
+## Python Files
+- `frame_buffer.py`: fixed-size temporal window for `RadarFrame` objects.
+- `calibration.py`: `BackgroundModel` with exponential moving baseline.
+- `signal_processor.py`: deterministic pipeline from payload bytes to calibrated tensors.
+- `mockdata.py`: deterministic synthetic frame generators for integration and smoke tests.
+- `__init__.py`: public exports.
 
-## Flujo recomendado
-1. Layer 1 produce `RadarFrame` y se acumula opcionalmente en `FrameBuffer`.
-2. `SignalProcessor.process()` convierte `payload` a `np.ndarray` de magnitud.
-3. `BackgroundModel` actualiza baseline y resta fondo.
-4. Se emite `ProcessedFrame` para Layer 3.
+## Recommended Flow
+1. Layer 1 emits `RadarFrame` objects.
+2. Optionally accumulate recent frames with `FrameBuffer`.
+3. `SignalProcessor.process()` converts payload bytes to float magnitudes.
+4. `BackgroundModel` updates baseline and performs subtraction.
+5. `SignalProcessor` emits `ProcessedFrame` with 2D `range_doppler` and typed `point_cloud` (`N x 3`).
+6. Layer 3 consumes `ProcessedFrame` directly.
 
-## Criterio de salida (DoD)
-- API tipada y documentada.
-- Operación determinística sin dependencias de hardware.
-- `ProcessedFrame` conectable con Layer 3 en smoke tests.
+## Definition of Done (DoD)
+- Typed, documented, importable API.
+- Deterministic behavior without hardware dependencies.
+- Output contract is directly consumable by Layer 3.
+- Includes deterministic mock data helpers for test setup.
