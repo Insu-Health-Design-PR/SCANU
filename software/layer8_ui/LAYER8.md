@@ -1,28 +1,37 @@
 # Layer 8: UI / Backend Stream
 
-## Objetivo
-Exponer estado operativo y eventos de alerta para consumo de UI/servicios vía API y streaming.
+## Objective
+Expose operational status and alert events for UI/service consumption via API and streaming.
 
-## Entradas
-- Estado y score desde Layer 6/5.
-- `AlertPayload` desde Layer 7.
+## Inputs
+- Status and score from Layer 6/5.
 
-## Salidas
-- `SystemStatus` en formato `dict` para backend.
-- Eventos websocket codificados en JSON compacto.
+- `AlertPayload` from Layer 7.
 
-## Archivos `.py`
-- `backend_api.py`: almacenamiento del estado actual y última alerta.
-- `websocket_stream.py`: codificación de eventos para stream.
-- `__init__.py`: exports públicos.
+## Outputs
+- `SystemStatus` in `dict` format for the backend.
 
-## Flujo recomendado
-1. Actualizar estado con `BackendAPI.update_status()`.
-2. Publicar alertas con `BackendAPI.publish_alert()`.
-3. Exponer snapshot con `get_status()`.
-4. Publicar al canal en tiempo real vía `WebSocketStream.encode()`.
+- WebSocket events encoded in compact JSON.
 
-## Criterio de salida (DoD)
-- Estado y alertas accesibles como contratos simples.
-- Formato de stream JSON compacto y determinístico.
-- Integración completa con pipeline L2->L7 en smoke tests.
+## `.py` Files
+- `backend_api.py`: stores the current status and last alert.
+
+- `websocket_stream.py`: encodes events for the stream.
+
+- `__init__.py`: public exports.
+
+## Recommended Flow
+1. Update status with `BackendAPI.update_status()`.
+
+2. Publish alerts with `BackendAPI.publish_alert()`.
+
+3. Expose snapshot with `get_status()`.
+
+4. Publish to the channel in real time via `WebSocketStream.encode()`.
+
+## Exit Criteria (DoD)
+- Status and alerts accessible as simple contracts.
+
+- Compact and deterministic JSON stream format.
+
+- Full integration with L2->L7 pipeline in smoke tests.
