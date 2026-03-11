@@ -1,31 +1,43 @@
 # Layer 7: Alerts
 
-## Objetivo
-Construir, presentar, serializar y registrar alertas desde eventos de estado del sistema.
+## Objective
+Build, present, serialize, and log alerts from system state events.
 
-## Entradas
-- `StateEvent` desde Layer 6.
+## Inputs
+- `StateEvent` from Layer 6.
 
-## Salidas
+## Outputs
 - `AlertPayload(level, message, metadata)`.
-- Render textual para E-Ink.
-- Carga serializada para LoRa (`bytes`).
-- `EventRecord` persistido en memoria.
 
-## Archivos `.py`
-- `alert_manager.py`: construcción de payload normalizado.
-- `eink_driver.py`: render de payload a string.
-- `lora_sender.py`: serialización JSON compacta.
-- `event_logger.py`: logger en memoria con timestamp ISO UTC.
-- `__init__.py`: exports públicos.
+- Text render for E-Ink.
 
-## Flujo recomendado
-1. `AlertManager` transforma `StateEvent` en `AlertPayload`.
-2. `EInkDriver` genera mensaje visual.
-3. `LoRaSender` serializa evento para transporte.
-4. `EventLogger` registra histórico.
+- Serialized payload for LoRa (`bytes`).
 
-## Criterio de salida (DoD)
-- Payload consistente para múltiples canales.
-- Serialización compacta y estable.
-- Logging disponible para auditoría y smoke tests.
+- `EventRecord` persisted in memory.
+
+## `.py` Files
+- `alert_manager.py`: builds normalized payload.
+
+- `eink_driver.py`: renders payload to string.
+
+- `lora_sender.py`: compact JSON serialization.
+
+- `event_logger.py`: in-memory logger with ISO UTC timestamp.
+
+- `__init__.py`: public exports.
+
+## Recommended Flow
+1. `AlertManager` transforms `StateEvent` into `AlertPayload`.
+
+2. `EInkDriver` generates a visual message.
+
+3. `LoRaSender` serializes the event for transport.
+
+4. `EventLogger` logs the event history.
+
+## Exit Criteria (DoD)
+- Consistent payload across multiple channels.
+
+- Compact and stable serialization.
+
+- Logging available for auditing and smoke testing.

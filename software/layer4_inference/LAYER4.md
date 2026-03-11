@@ -1,26 +1,33 @@
 # Layer 4: AI Inference
 
-## Objetivo
-Aplicar inferencia liviana y scoring de anomalía para convertir features en una decisión interpretable.
+## Objective
+Apply lightweight inference and anomaly scoring to convert features into an interpretable decision.
 
-## Entradas
-- `FeatureBatch` desde Layer 3.
+## Inputs
+- `FeatureBatch` from Layer 3.
 
-## Salidas
+## Outputs
 - `InferenceResult(frame_number, timestamp_ms, raw_score, confidence)`.
+
 - `AnomalyDecision(frame_number, timestamp_ms, anomaly_score, confidence, is_anomaly)`.
 
-## Archivos `.py`
-- `inference_engine.py`: cálculo determinístico de `raw_score` y `confidence`.
-- `anomaly_scorer.py`: umbralización configurable (`threshold`) para decisión binaria.
-- `__init__.py`: exports públicos.
+## `.py` Files
+- `inference_engine.py`: deterministic calculation of `raw_score` and `confidence`.
 
-## Flujo recomendado
-1. `InferenceEngine.infer()` transforma vector de features en score continuo.
-2. `AnomalyScorer.evaluate()` combina score y confianza.
-3. Se emite `AnomalyDecision` para Layer 5.
+- `anomaly_scorer.py`: configurable thresholding for binary decisions.
 
-## Criterio de salida (DoD)
-- Inferencia determinística y de bajo costo.
-- Umbral configurable sin lógica pesada de producción.
-- Contratos listos para fusión multisensor.
+- `__init__.py`: public exports.
+
+## Recommended Flow
+1. `InferenceEngine.infer()` transforms the feature vector into a continuous score.
+
+` ... 2. `AnomalyScorer.evaluate()` combines score and confidence.
+
+3. `AnomalyDecision` is issued for Layer 5.
+
+## Exit Criteria (DoD)
+- Low-cost, deterministic inference.
+
+- Configurable threshold without heavy production logic.
+
+- Contracts ready for multisensor fusion.

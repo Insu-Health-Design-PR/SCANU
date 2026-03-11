@@ -1,26 +1,32 @@
 # Layer 5: Sensor Fusion
 
-## Objetivo
-Fusionar la señal de anomalía del modelo con triggers externos ligeros para robustecer el score final.
+## Objective
+Fuse the model's anomaly signal with lightweight external triggers to strengthen the final score.
 
-## Entradas
-- `AnomalyDecision` desde Layer 4.
-- `TriggerSignals(pir_motion, thermal_presence)` desde sensores auxiliares.
+## Inputs
+- `AnomalyDecision` from Layer 4.
+- `TriggerSignals(pir_motion, thermal_presence)` from auxiliary sensors.
 
-## Salidas
+## Outputs
 - `FusionResult(frame_number, timestamp_ms, fused_score, evidence)`.
 
-## Archivos `.py`
-- `sensor_fusion.py`: clases de triggers/resultado y fusión ponderada.
-- `__init__.py`: exports públicos.
+## `.py` Files
+- `sensor_fusion.py`: trigger/result classes and weighted fusion.
 
-## Flujo recomendado
-1. Recibir decisión de anomalía y triggers.
-2. Calcular `trigger_score` normalizado.
-3. Combinar con pesos (`model_weight`, `trigger_weight`).
-4. Entregar `FusionResult` a Layer 6.
+- `__init__.py`: public exports.
 
-## Criterio de salida (DoD)
-- Fusión reproducible y tipada.
-- Evidencia estructurada (`dict[str, float]`) para trazabilidad.
-- Integración directa con `StateMachine`.
+## Recommended Flow
+1. Receive anomaly decision and triggers.
+
+2. Calculate normalized `trigger_score`.
+
+3. Combine with weights (`model_weight`, `trigger_weight`).
+
+4. Deliver `FusionResult` to Layer 6.
+
+## Exit Criteria (DoD)
+- Reproducible and typed merge.
+
+- Structured evidence (`dict[str, float]`) for traceability.
+
+- Direct integration with `StateMachine`.

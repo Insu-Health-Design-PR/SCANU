@@ -1,25 +1,31 @@
 # Layer 3: Feature Representation
 
-## Objetivo
-Construir vectores de features compactos y determinísticos desde la salida procesada de Layer 2.
+## Objective
+Build compact and deterministic feature vectors from the processed output of Layer 2.
 
-## Entradas
-- `ProcessedFrame` desde Layer 2.
+## Inputs
+- `ProcessedFrame` from Layer 2.
 
-## Salidas
+## Outputs
 - `FeatureBatch(frame_number, timestamp_ms, vector)`.
 
-## Archivos `.py`
-- `feature_extractor.py`: extracción de estadísticas de `range_doppler` y tamaño de `point_cloud`.
-- `__init__.py`: exports públicos.
+## `.py` Files
+- `feature_extractor.py`: extracts statistics from `range_doppler` and `point_cloud` size.
 
-## Flujo recomendado
-1. Recibir `ProcessedFrame`.
-2. Calcular estadísticas (`mean`, `std`, `max`, `min`) de `range_doppler`.
-3. Agregar conteo de puntos del `point_cloud`.
-4. Entregar `FeatureBatch` a Layer 4.
+- `__init__.py`: public exports.
 
-## Criterio de salida (DoD)
-- Vector numérico tipado (`np.ndarray`) con forma estable.
-- Resultado reproducible con misma entrada.
-- Integración directa con `InferenceEngine`.
+## Recommended Flow
+1. Receive `ProcessedFrame`.
+
+2. Calculate statistics (`mean`, `std`, `max`, `min`) from `range_doppler`.
+
+3. Add point count from `point_cloud`.
+
+4. Deliver `FeatureBatch` to Layer 4.
+
+## Exit Criteria (DoD)
+- Typed numeric vector (`np.ndarray`) with stable form.
+
+- Reproducible result with the same input.
+
+- Direct integration with `InferenceEngine`.
