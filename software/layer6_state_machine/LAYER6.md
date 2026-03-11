@@ -1,26 +1,32 @@
 # Layer 6: State Machine
 
-## Objetivo
-Orquestar el comportamiento global del sistema mediante estados explícitos basados en score fusionado y fallas.
+## Objective
+To orchestrate the overall system behavior using explicit states based on fused scores and faults.
 
-## Entradas
-- `FusionResult` desde Layer 5.
-- Flag `has_fault` desde monitoreo interno.
+## Inputs
+- `FusionResult` from Layer 5.
+- `has_fault` flag from internal monitoring.
 
-## Salidas
+## Outputs
 - `StateEvent(previous_state, current_state, reason)`.
 
-## Archivos `.py`
-- `state_machine.py`: `SystemState` + transiciones determinísticas.
-- `__init__.py`: exports públicos.
+## .py Files
+- `state_machine.py`: `SystemState` + deterministic transitions.
 
-## Flujo recomendado
-1. Evaluar condición de falla (`FAULT` tiene prioridad).
-2. Evaluar umbral de alerta (`ALERT`).
-3. Si hay actividad baja, pasar por `TRIGGERED` y `SCANNING`.
-4. Sin actividad, volver a `IDLE`.
+- `__init__.py`: public exports.
 
-## Criterio de salida (DoD)
-- Estados explícitos y serializables.
-- Transiciones claras, sin ambigüedad.
-- Eventos utilizables por Layer 7 para notificación.
+## Recommended Flow
+1. Evaluate fault condition (`FAULT` has priority).
+
+2. Evaluate alert threshold (`ALERT`).
+
+3. If there is low activity, go through `TRIGGERED` and `SCANNING`.
+
+4. If there is no activity, return to `IDLE`.
+
+## Exit Criteria (DoD)
+- Explicit and serializable states.
+
+- Clear, unambiguous transitions.
+
+- Events usable by Layer 7 for notification.
