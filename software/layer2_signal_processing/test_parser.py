@@ -7,6 +7,23 @@ import sys
 import types
 import unittest
 
+#python3 -m compileall software/layer2_signal_processing
+#python3 -m unittest software.layer2_signal_processing.test_parser -v
+'''python3 - <<'PY'
+from software.layer2_signal_processing import SignalProcessor, FeatureExtractor, build_mock_radar_frame
+
+processor = SignalProcessor(doppler_bins=16)
+frame = build_mock_radar_frame()          # entrada simulada (RadarFrame)
+processed = processor.process(frame)      # salida principal de Layer 2
+features = FeatureExtractor().extract(processed)  # salida heatmaps/features
+
+print("range_doppler shape:", processed.range_doppler.shape)
+print("point_cloud shape:", processed.point_cloud.shape)
+print("range_heatmap shape:", features.range_heatmap.shape)
+print("doppler_heatmap shape:", features.doppler_heatmap.shape)
+print("vector:", features.vector.tolist())
+PY'''
+
 # Stub pyserial so Layer 1 modules can be imported in environments
 # where the serial dependency is not installed.
 if "serial" not in sys.modules:
