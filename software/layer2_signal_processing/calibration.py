@@ -16,7 +16,9 @@ class BackgroundModel:
 
     def update(self, sample: np.ndarray) -> np.ndarray:
         sample_arr = np.asarray(sample, dtype=np.float32)
-        if self.baseline is None:
+
+        # Reset baseline when shape changes to keep calibration safe and deterministic.
+        if self.baseline is None or self.baseline.shape != sample_arr.shape:
             self.baseline = sample_arr.copy()
         else:
             self.baseline = (1.0 - self.alpha) * self.baseline + self.alpha * sample_arr
@@ -24,6 +26,6 @@ class BackgroundModel:
 
     def subtract(self, sample: np.ndarray) -> np.ndarray:
         sample_arr = np.asarray(sample, dtype=np.float32)
-        if self.baseline is None:
+        if self.baseline is None or self.baseline.shape != sample_arr.shape:
             return sample_arr
         return sample_arr - self.baseline
