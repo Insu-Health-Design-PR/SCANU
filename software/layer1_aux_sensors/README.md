@@ -1,5 +1,5 @@
 # Layer 1 - Auxiliary Sensors
 
-This module is reserved for non-radar auxiliary sensor acquisition (e.g., PIR, RF triggers, thermal probe via ESP32/USB serial).
+This module handles auxiliary sensor ingestion through USB serial (typically ESP32 as aggregator).
 
-Status: scaffold created.
+Main API: `AuxSensorSource`, `AuxProtocol`, `SerialBridge`, and typed models in `sensor_models.py`.
