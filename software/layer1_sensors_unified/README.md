@@ -7,3 +7,15 @@ This package groups all non-primary Layer 1 sensor modules in one place:
 - `radar_presence_60g` (Infineon 60 GHz presence path)
 
 The primary radar path remains isolated in `software/layer1_radar`.
+
+## Shared Port Scanner
+
+To avoid duplicated serial-port discovery logic, this package provides a common scanner:
+
+- `common.port_scanner.PortScanner`
+- `common.port_scanner.PortInfo`
+
+Sensor-specific matching is implemented by dedicated resolvers:
+
+- `aux_sensors.port_resolver.AuxSensorPortResolver`
+- `radar_presence_60g.port_resolver.Presence60GPortResolver`
