@@ -1,5 +1,5 @@
 # Layer 1 - Thermal Camera
 
-This module is reserved for thermal camera acquisition and preprocessing (e.g., Lepton/PureThermal stream ingestion).
+This module provides thermal camera ingestion and lightweight feature extraction.
 
-Status: scaffold created.
+Main API: `ThermalCameraSource`, `MockLeptonProvider`, and `ThermalProcessor`.
