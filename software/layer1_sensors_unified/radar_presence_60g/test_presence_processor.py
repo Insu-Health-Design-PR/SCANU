@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from software.layer1_radar_presence_60g import PresenceFrame, PresenceProcessor
+from software.layer1_sensors_unified.radar_presence_60g import PresenceFrame, PresenceProcessor
 
 
 class TestPresenceProcessor(unittest.TestCase):

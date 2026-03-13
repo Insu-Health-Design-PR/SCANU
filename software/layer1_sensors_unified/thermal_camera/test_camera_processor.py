@@ -6,7 +6,7 @@ import unittest
 
 import numpy as np
 
-from software.layer1_thermal_camera import ThermalFrame, ThermalProcessor
+from software.layer1_sensors_unified.thermal_camera import ThermalFrame, ThermalProcessor
 
 
 class TestThermalProcessor(unittest.TestCase):

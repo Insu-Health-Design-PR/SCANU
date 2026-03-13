@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from software.layer1_aux_sensors import AuxProtocol
+from software.layer1_sensors_unified.aux_sensors import AuxProtocol
 
 
 class TestAuxProtocol(unittest.TestCase):

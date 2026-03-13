@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import unittest
 
-from software.layer1_aux_sensors import AuxHealthConfig, AuxSensorSource
+from software.layer1_sensors_unified.aux_sensors import AuxHealthConfig, AuxSensorSource
 
 
 class FakeClock:
