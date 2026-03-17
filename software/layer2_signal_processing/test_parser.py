@@ -10,10 +10,19 @@ import unittest
 #python3 -m compileall software/layer2_signal_processing
 #python3 -m unittest software.layer2_signal_processing.test_parser -v
 '''python3 - <<'PY'
-from software.layer2_signal_processing import SignalProcessor, FeatureExtractor, build_mock_radar_frame
+from software.layer2_signal_processing import SignalProcessor, FeatureExtractor
+from software.layer1_radar.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
+import struct
+
+def build_layer1_raw_frame():
+    range_profile = struct.pack("<4H", 10, 20, 30, 40)
+    body = struct.pack("<II", TLVType.RANGE_PROFILE, len(range_profile)) + range_profile
+    total_len = FRAME_HEADER_SIZE + len(body)
+    header_fields = struct.pack("<8I", 1, total_len, 0x6843, 1, 123456, 0, 1, 0)
+    return MAGIC_WORD + header_fields + body
 
 processor = SignalProcessor(doppler_bins=16)
-frame = build_mock_radar_frame()          # entrada simulada (RadarFrame)
+frame = build_layer1_raw_frame()          # entrada real estilo Layer 1
 processed = processor.process(frame)      # salida principal de Layer 2
 features = FeatureExtractor().extract(processed)  # salida heatmaps/features
 
