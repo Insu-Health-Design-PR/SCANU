@@ -121,7 +121,7 @@ def main():
                 return
 
         print(f"      Sent {result.commands_sent} commands")
-        print("      Radar configured and running!")
+        print("      Radar configured and is running!")
         
         # 4. Capture frames
         print(f"\n[4/5] Capturing {args.frames} frames...")
