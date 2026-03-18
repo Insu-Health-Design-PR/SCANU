@@ -176,7 +176,7 @@ class RadarConfigurator:
         self,
         command: str,
         delay: float = SerialConfig.COMMAND_DELAY,
-        response_timeout: float = 1.5,
+        response_timeout: float = 3.0,
     ) -> str:
         """
         Send a single CLI command and read response.
@@ -205,8 +205,8 @@ class RadarConfigurator:
             # Not fatal; proceed.
             pass
 
-        # Send command with newline
-        cmd_bytes = (cmd + '\n').encode('utf-8')
+        # Send command with CRLF (some firmwares/bridges are picky about line endings)
+        cmd_bytes = (cmd + '\r\n').encode('utf-8')
         self.serial.config_port.write(cmd_bytes)
         
         # Wait for processing (minimum inter-command gap)
