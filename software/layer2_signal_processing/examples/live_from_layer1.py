@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import argparse
 import logging
-import sys
 import time
 from pathlib import Path
 
-# Add software directory to import path.
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+import sys
 
-from layer2_signal_processing.live_pipeline import Layer1RealtimePipeline
+# Add project root to import path so ``software.*`` imports work from zip extracts.
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+
+from software.layer2_signal_processing.live_pipeline import Layer1RealtimePipeline
 
 
 def setup_logging(verbose: bool = False) -> None:
