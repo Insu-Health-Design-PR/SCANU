@@ -172,13 +172,19 @@ class RadarConfigurator:
         self.serial = serial_manager
         self._is_running = False
     
-    def send_command(self, command: str, delay: float = SerialConfig.COMMAND_DELAY) -> str:
+    def send_command(
+        self,
+        command: str,
+        delay: float = SerialConfig.COMMAND_DELAY,
+        response_timeout: float = 1.5,
+    ) -> str:
         """
         Send a single CLI command and read response.
         
         Args:
             command: CLI command string (without newline)
             delay: Time to wait for response (seconds)
+            response_timeout: Maximum time to read response (seconds)
             
         Returns:
             Response string from radar
@@ -191,19 +197,44 @@ class RadarConfigurator:
         if not cmd or cmd.startswith('%'):
             return ""  # Skip empty lines and comments
         
+        # Flush any stale CLI output before sending a new command so responses align.
+        try:
+            if self.serial.config_port.in_waiting:
+                self.serial.config_port.read(self.serial.config_port.in_waiting)
+        except Exception:
+            # Not fatal; proceed.
+            pass
+
         # Send command with newline
         cmd_bytes = (cmd + '\n').encode('utf-8')
         self.serial.config_port.write(cmd_bytes)
         
-        # Wait for processing
-        time.sleep(delay)
-        
-        # Read response
-        response = ""
-        if self.serial.config_port.in_waiting > 0:
-            response = self.serial.config_port.read(
-                self.serial.config_port.in_waiting
-            ).decode('utf-8', errors='ignore')
+        # Wait for processing (minimum inter-command gap)
+        if delay > 0:
+            time.sleep(delay)
+
+        # Read response. Many mmWave demo firmwares only become ready for the next
+        # command once the CLI prompt re-appears (e.g., "mmwDemo:/>").
+        response_chunks: List[str] = []
+        start = time.time()
+        while (time.time() - start) < response_timeout:
+            waiting = 0
+            try:
+                waiting = self.serial.config_port.in_waiting
+            except Exception:
+                waiting = 0
+
+            if waiting > 0:
+                chunk = self.serial.config_port.read(waiting).decode('utf-8', errors='ignore')
+                if chunk:
+                    response_chunks.append(chunk)
+                    combined = "".join(response_chunks)
+                    if "mmwDemo:/>" in combined or combined.strip().endswith(">"):
+                        break
+            else:
+                time.sleep(0.01)
+
+        response = "".join(response_chunks)
         
         logger.debug(f"CMD: {cmd}")
         if response.strip():

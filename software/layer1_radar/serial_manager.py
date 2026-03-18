@@ -268,7 +268,19 @@ class SerialManager:
             
         except serial.SerialException as e:
             self.disconnect()
-            raise RuntimeError(f"Failed to open serial ports: {e}")
+            # Common on Linux when a different process already holds the TTY:
+            # "Device or resource busy" (errno 16).
+            hint = ""
+            errno = getattr(e, "errno", None)
+            if errno == 16:
+                hint = (
+                    "\n\nThe data/CLI port is busy (already opened by another process). "
+                    "Close any serial monitor (screen/minicom), stop other scripts, or identify the holder with:\n"
+                    "  sudo lsof /dev/ttyUSB1\n"
+                    "  sudo fuser -v /dev/ttyUSB1\n"
+                    "Then stop/kill that process and retry."
+                )
+            raise RuntimeError(f"Failed to open serial ports: {e}{hint}")
     
     def disconnect(self) -> None:
         """Close all serial connections."""
