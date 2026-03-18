@@ -9,7 +9,7 @@ This script demonstrates the complete Layer 1 pipeline:
 5. Display results
 
 Usage:
-    python capture_frames.py [--frames N] [--output FILE]
+    python capture_frames.py [--frames N] [--output FILE] [--config FILE]
 """
 
 import argparse
@@ -65,7 +65,6 @@ def main():
             print(f"  {port['device']}: {port['description']}")
         return
     
-    # Main capture flow
     serial_mgr = SerialManager()
     
     try:
@@ -103,33 +102,26 @@ def main():
         # 3. Configure radar
         configurator = RadarConfigurator(serial_mgr)
 
-        # 3a. First-start minimal configuration
-        print("\n[3/5] Configuring radar (first start)...")
-        result = configurator.configure_first_start()
-        if not result.success:
-            print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
-            for error in result.errors:
-                print(f"  - {error}")
-            return
-
-        # 3b. Post-start optional configuration
-        print("\n      Applying post-start configuration...")
-        result = configurator.configure_post_start()
-        if not result.success:
-            print(f"\nPost-start configuration had {len(result.errors)} errors:")
-            for error in result.errors:
-                print(f"  - {error}")
-
-        # 3c. Load user config file if provided
         if args.config:
-            print(f"\n      Loading custom config from: {args.config}")
+            print(f"\n[3/5] Configuring radar using file: {args.config}")
             result = configurator.configure_from_file(Path(args.config))
             if not result.success:
-                print(f"\nCustom config had {len(result.errors)} errors:")
+                print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
                 for error in result.errors:
                     print(f"  - {error}")
-        
-        print(f"      Radar configured and running!")
+                return
+        else:
+            # Use default config if no file provided
+            print("\n[3/5] Configuring radar using default configuration")
+            result = configurator.configure()
+            if not result.success:
+                print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
+                for error in result.errors:
+                    print(f"  - {error}")
+                return
+
+        print(f"      Sent {result.commands_sent} commands")
+        print("      Radar configured and running!")
         
         # 4. Capture frames
         print(f"\n[4/5] Capturing {args.frames} frames...")
