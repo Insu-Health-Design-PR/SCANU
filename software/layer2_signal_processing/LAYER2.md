@@ -34,27 +34,18 @@ Transform Layer 1 radar outputs into calibrated spectral outputs and heatmap-rea
 - Deterministic behavior with lightweight numerical operations.
 
 
-## ~/Desktop/SCANU-dev_adrian/SCANU
-## ~/Desktop/SCANU-dev_adrian/SCANU/software/layer2_signal_processing
-## cd ~/Desktop/SCANU-dev_adrian/SCANU
-python3 -m unittest software.layer2_signal_processing.test_signal_processor -v
-python3 -m unittest software.layer2_signal_processing.test_parser -v
-##cd ~/Desktop/SCANU-dev_adrian/SCANU
-python3
-
-
-
-
-
 from software.layer1_radar import SerialManager, RadarConfigurator, UARTSource, TLVParser
 from software.layer2_signal_processing import SignalProcessor, FeatureExtractor
 
 serial_mgr = SerialManager()
 ports = serial_mgr.find_radar_ports()
+print("Ports:", ports)
+
 serial_mgr.connect(ports.config_port, ports.data_port)
 
 configurator = RadarConfigurator(serial_mgr)
-configurator.configure()
+result = configurator.configure()
+print("Config success:", result.success)
 
 uart = UARTSource(serial_mgr)
 parser = TLVParser()
@@ -62,17 +53,21 @@ processor = SignalProcessor()
 feature_extractor = FeatureExtractor()
 
 raw_frame = uart.read_frame()
+print("Got raw frame:", raw_frame is not None, "bytes:", len(raw_frame) if raw_frame else 0)
+
 parsed = parser.parse(raw_frame)
+print("Frame number:", parsed.frame_number)
+print("Detected points:", len(parsed.points))
+print("Has range profile:", parsed.range_profile is not None)
+print("Stats:", parsed.stats)
+
 processed = processor.process(parsed)
 features = feature_extractor.extract(processed)
 
-print("frame:", processed.frame_number)
 print("range_doppler shape:", processed.range_doppler.shape)
 print("point_cloud shape:", processed.point_cloud.shape)
-print("vector:", features.vector)
+print("feature vector:", features.vector)
 
 configurator.stop()
 serial_mgr.disconnect()
 
-- Parser unit tests runnable from Layer 2 task context.
-- End-to-end compatibility with downstream feature consumers.
