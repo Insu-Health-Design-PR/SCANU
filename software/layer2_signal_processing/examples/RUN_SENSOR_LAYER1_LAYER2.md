@@ -1,30 +1,33 @@
 # Run Sensor Through Layer 1 And Layer 2
 
-This guide is for Jetson/Linux. The commands below are ready to copy and paste.
+This guide is for Jetson/Linux using a downloaded project folder or zip extract.
 
-## 1. Go to the repo
-
-```bash
-cd /ruta/a/SCANU
-```
-
-## 2. Update your branch
-
-For `dev_adrian`:
+Project root example:
 
 ```bash
-git checkout dev_adrian
-git pull origin dev_adrian
+cd ~/Desktop/SCANU-dev_adrian
 ```
 
-For `main`:
+If your extracted folder contains another nested `SCANU` folder, enter that one instead:
 
 ```bash
-git checkout main
-git pull origin main
+cd ~/Desktop/SCANU-dev_adrian/SCANU
 ```
 
-## 3. Find the serial ports
+## 1. Confirm you are in the project root
+
+```bash
+pwd
+ls
+```
+
+You should see at least:
+
+- `software`
+- `README.md`
+- `run_sensor_layer1_layer2.sh`
+
+## 2. Find the serial ports
 
 Quick check:
 
@@ -38,49 +41,42 @@ More detailed check:
 python3 software/layer1_radar/examples/list_ports.py
 ```
 
-## 4. Run the live sensor through Layer 1 and Layer 2
+## 3. Easiest way to run it
+
+The shell launcher is the simplest option:
+
+```bash
+./run_sensor_layer1_layer2.sh --full
+```
+
+That tries to autodetect the radar ports.
+
+## 4. Run with manual ports if needed
 
 Replace `/dev/ttyUSB0` and `/dev/ttyUSB1` with your real ports.
 
 Summary output:
 
 ```bash
-python3 software/layer2_signal_processing/examples/run_sensor_layer1_layer2.py \
-  --config-port /dev/ttyUSB0 \
-  --data-port /dev/ttyUSB1 \
-  --frames 20
+./run_sensor_layer1_layer2.sh --config-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --frames 20
 ```
 
 Full Layer 2 output for each frame:
 
 ```bash
-python3 software/layer2_signal_processing/examples/run_sensor_layer1_layer2.py \
-  --config-port /dev/ttyUSB0 \
-  --data-port /dev/ttyUSB1 \
-  --frames 5 \
-  --full
+./run_sensor_layer1_layer2.sh --config-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --frames 5 --full
 ```
 
 Verbose logging:
 
 ```bash
-python3 software/layer2_signal_processing/examples/run_sensor_layer1_layer2.py \
-  --config-port /dev/ttyUSB0 \
-  --data-port /dev/ttyUSB1 \
-  --frames 5 \
-  --full \
-  -v
+./run_sensor_layer1_layer2.sh --config-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --frames 5 --full -v
 ```
 
 Use a specific radar config file:
 
 ```bash
-python3 software/layer2_signal_processing/examples/run_sensor_layer1_layer2.py \
-  --config-port /dev/ttyUSB0 \
-  --data-port /dev/ttyUSB1 \
-  --config /ruta/a/tu_config.cfg \
-  --frames 5 \
-  --full
+./run_sensor_layer1_layer2.sh --config-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --config /ruta/a/tu_config.cfg --frames 5 --full
 ```
 
 ## 5. What you should see
@@ -104,6 +100,7 @@ Try these checks:
 
 - Swap `--config-port` and `--data-port`
 - Confirm the radar is powered and detected by Linux
+- Make sure you are in the project root before running the launcher
 - Run Layer 1 only first:
 
 ```bash
