@@ -9,7 +9,7 @@ Handles discovery and connection to the radar's two UART ports:
 import serial
 import serial.tools.list_ports
 import logging
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Iterable
 from dataclasses import dataclass
 
 from .radar_constants import SerialConfig
@@ -41,6 +41,61 @@ class SerialManager:
         self.config_port: Optional[serial.Serial] = None
         self.data_port: Optional[serial.Serial] = None
         self._connected = False
+
+    @staticmethod
+    def _sort_port_devices(devices: Iterable[str]) -> List[str]:
+        """
+        Sort port device names in a human-friendly way.
+
+        Examples:
+        - Linux: /dev/ttyUSB0, /dev/ttyUSB1, /dev/ttyACM0 ...
+        - Windows: COM3, COM12 ...
+        """
+        def key(d: str):
+            s = str(d)
+            # Windows COM ports
+            if s.upper().startswith("COM"):
+                try:
+                    return (0, int(s[3:]))
+                except Exception:
+                    return (0, s)
+            # Linux ttyUSB / ttyACM
+            for prefix in ("/dev/ttyUSB", "/dev/ttyACM"):
+                if s.startswith(prefix):
+                    try:
+                        return (1, prefix, int(s[len(prefix):]))
+                    except Exception:
+                        return (1, prefix, s)
+            return (2, s)
+
+        return sorted([str(d) for d in devices], key=key)
+
+    @staticmethod
+    def _pick_standard_enhanced_pair(all_ports: List[serial.tools.list_ports.ListPortInfo]) -> Optional[RadarPorts]:
+        """
+        Heuristic for USB-UART bridges exposing "Standard" and "Enhanced" ports.
+
+        Common pattern (varies by driver):
+        - One port description contains 'standard'
+        - The other contains 'enhanced'
+        Typically: standard = CLI/config, enhanced = DATA (higher throughput).
+        """
+        standard = None
+        enhanced = None
+        for p in all_ports:
+            desc = (p.description or "").lower()
+            if standard is None and "standard" in desc:
+                standard = p
+            if enhanced is None and "enhanced" in desc:
+                enhanced = p
+
+        if standard and enhanced:
+            return RadarPorts(
+                config_port=standard.device,
+                data_port=enhanced.device,
+                description=f"{standard.description} / {enhanced.description}",
+            )
+        return None
     
     @staticmethod
     def list_all_ports() -> List[dict]:
@@ -57,7 +112,12 @@ class SerialManager:
             })
         return ports
     
-    def find_radar_ports(self, verbose: bool = True) -> RadarPorts:
+    def find_radar_ports(
+        self,
+        verbose: bool = True,
+        config_port: Optional[str] = None,
+        data_port: Optional[str] = None,
+    ) -> RadarPorts:
         """
         Auto-discover IWR6843 radar ports.
         
@@ -67,6 +127,8 @@ class SerialManager:
         
         Args:
             verbose: Print discovered ports
+            config_port: Optional explicit config/CLI port override
+            data_port: Optional explicit data port override
             
         Returns:
             RadarPorts with config and data port names
@@ -74,6 +136,10 @@ class SerialManager:
         Raises:
             RuntimeError: If radar ports cannot be found
         """
+        # Explicit override path: user already knows the two ports.
+        if config_port and data_port:
+            return RadarPorts(config_port=str(config_port), data_port=str(data_port), description="(manual override)")
+
         all_ports = list(serial.tools.list_ports.comports())
         
         if verbose:
@@ -81,8 +147,7 @@ class SerialManager:
             for p in all_ports:
                 logger.info(f"  {p.device}: {p.description}")
         
-        # Look for XDS110 debug probe (used by TI EVMs)
-        # Or direct IWR6843 identification
+        # 1) Look for XDS110 debug probe (used by TI EVMs) / mmWave identifiers.
         radar_ports = []
         for port in all_ports:
             desc_lower = port.description.lower()
@@ -96,16 +161,55 @@ class SerialManager:
                 if port.vid == 0x0451 and port not in radar_ports:
                     radar_ports.append(port)
         
+        # 2) USB-UART bridge "Standard" + "Enhanced" ports.
+        if len(radar_ports) < 2:
+            pair = self._pick_standard_enhanced_pair(all_ports)
+            if pair is not None:
+                logger.info(f"Radar bridge found - Config: {pair.config_port}, Data: {pair.data_port}")
+                return pair
+
+        # 3) Generic fallback (common on Linux bridges): if we can reasonably choose two ports.
+        # - Prefer ttyUSB/ttyACM devices
+        # - If user provided only one side, infer the other as "next" device when possible
+        devices = [p.device for p in all_ports]
+        sorted_devices = self._sort_port_devices(devices)
+
+        if config_port and not data_port:
+            cfg = str(config_port)
+            if cfg in sorted_devices:
+                idx = sorted_devices.index(cfg)
+                if idx + 1 < len(sorted_devices):
+                    inferred = sorted_devices[idx + 1]
+                    logger.info(f"Inferred data port {inferred} from config port {cfg}")
+                    return RadarPorts(config_port=cfg, data_port=inferred, description="(inferred data port)")
+
+        if data_port and not config_port:
+            dat = str(data_port)
+            if dat in sorted_devices:
+                idx = sorted_devices.index(dat)
+                if idx - 1 >= 0:
+                    inferred = sorted_devices[idx - 1]
+                    logger.info(f"Inferred config port {inferred} from data port {dat}")
+                    return RadarPorts(config_port=inferred, data_port=dat, description="(inferred config port)")
+
+        # If we still have <2 identified ports, use best-effort selection of ttyUSB/ttyACM pairs.
+        if len(radar_ports) < 2:
+            preferred = [d for d in sorted_devices if str(d).startswith("/dev/ttyUSB") or str(d).startswith("/dev/ttyACM")]
+            # If exactly two preferred ports exist, treat them as config/data in order.
+            if len(preferred) == 2:
+                logger.info(f"Using generic USB-serial pair: {preferred[0]}, {preferred[1]}")
+                return RadarPorts(config_port=preferred[0], data_port=preferred[1], description="(generic usb-serial pair)")
+
         if len(radar_ports) < 2:
             available = [f"{p.device} ({p.description})" for p in all_ports]
             raise RuntimeError(
-                f"Could not find radar ports. Need 2 XDS110/IWR6843 ports.\n"
+                "Could not find radar ports. Need 2 ports (CLI/config + data).\n"
                 f"Available ports: {available}\n"
-                f"Make sure the radar is connected via USB."
+                "If you're using a UART bridge, pass the ports explicitly (CLI + DATA)."
             )
         
         # Sort by port name/number to get consistent ordering
-        radar_ports.sort(key=lambda p: p.device)
+        radar_ports.sort(key=lambda p: self._sort_port_devices([p.device])[0])
         
         # First port is config, second is data
         config_port = radar_ports[0].device

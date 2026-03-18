@@ -48,6 +48,10 @@ def main():
                         help='Output file for captured data (JSON)')
     parser.add_argument('--config', '-c', type=str, default=None,
                         help='Path to radar config file')
+    parser.add_argument('--cli-port', type=str, default=None,
+                        help='Explicit CLI/config port (e.g. /dev/ttyUSB0 or COM3)')
+    parser.add_argument('--data-port', type=str, default=None,
+                        help='Explicit data port (e.g. /dev/ttyUSB1 or COM4)')
     parser.add_argument('--verbose', '-v', action='store_true',
                         help='Enable verbose logging')
     parser.add_argument('--list-ports', action='store_true',
@@ -75,7 +79,10 @@ def main():
         
         print("\n[1/5] Searching for radar...")
         try:
-            ports = serial_mgr.find_radar_ports()
+            ports = serial_mgr.find_radar_ports(
+                config_port=args.cli_port,
+                data_port=args.data_port,
+            )
             print(f"      Found: {ports.description}")
             print(f"      Config port: {ports.config_port}")
             print(f"      Data port: {ports.data_port}")
@@ -85,6 +92,7 @@ def main():
             print("  1. Make sure the radar is connected via USB")
             print("  2. Install TI XDS110 drivers if on Windows")
             print("  3. Check USB cable is data-capable")
+            print("  4. If using a UART bridge, pass --cli-port and --data-port")
             print("\nAvailable ports:")
             for port in SerialManager.list_all_ports():
                 print(f"    {port['device']}: {port['description']}")
