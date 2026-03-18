@@ -27,9 +27,7 @@ from layer1_radar import (
     RadarConfigurator,
     UARTSource,
     TLVParser,
-    DEFAULT_CONFIG,
 )
-
 
 def setup_logging(verbose: bool = False):
     """Configure logging."""
@@ -38,7 +36,6 @@ def setup_logging(verbose: bool = False):
         level=level,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
-
 
 def main():
     parser = argparse.ArgumentParser(description='Capture radar frames')
@@ -104,41 +101,35 @@ def main():
         print("      Connected!")
         
         # 3. Configure radar
-        
-        # 3a. Configure minimal first-start commands
-
         configurator = RadarConfigurator(serial_mgr)
+
+        # 3a. First-start minimal configuration
         print("\n[3/5] Configuring radar (first start)...")
-        result = configurator.configure(first_start_config)
+        result = configurator.configure_first_start()
         if not result.success:
             print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
             for error in result.errors:
                 print(f"  - {error}")
             return
 
-        # 3b. Apply optional post-start commands
+        # 3b. Post-start optional configuration
         print("\n      Applying post-start configuration...")
-        result = configurator.configure(post_start_config)
+        result = configurator.configure_post_start()
         if not result.success:
             print(f"\nPost-start configuration had {len(result.errors)} errors:")
             for error in result.errors:
                 print(f"  - {error}")
-        
+
+        # 3c. Load user config file if provided
         if args.config:
-            print(f"      Loading config from: {args.config}")
+            print(f"\n      Loading custom config from: {args.config}")
             result = configurator.configure_from_file(Path(args.config))
-        else:
-            print("      Using default configuration")
-            result = configurator.configure()
+            if not result.success:
+                print(f"\nCustom config had {len(result.errors)} errors:")
+                for error in result.errors:
+                    print(f"  - {error}")
         
-        if not result.success:
-            print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
-            for error in result.errors:
-                print(f"  - {error}")
-            return
-        
-        print(f"      Sent {result.commands_sent} commands")
-        print("      Radar configured and running!")
+        print(f"      Radar configured and running!")
         
         # 4. Capture frames
         print(f"\n[4/5] Capturing {args.frames} frames...")
@@ -147,7 +138,6 @@ def main():
         uart_source = UARTSource(serial_mgr)
         tlv_parser = TLVParser()
         
-        # Clear any stale data
         serial_mgr.flush_data_port()
         uart_source.clear_buffer()
         
@@ -156,10 +146,7 @@ def main():
         
         try:
             for i, raw_frame in enumerate(uart_source.stream_frames(max_frames=args.frames)):
-                # Parse frame
                 parsed = tlv_parser.parse(raw_frame)
-                
-                # Display progress
                 elapsed = time.time() - start_time
                 fps = (i + 1) / elapsed if elapsed > 0 else 0
                 
@@ -167,8 +154,7 @@ def main():
                       f"{len(parsed.points):2d} objects, "
                       f"{len(raw_frame):5d} bytes, "
                       f"{fps:.1f} FPS", end='')
-                
-                # Store frame data if output requested
+
                 if args.output:
                     frame_dict = {
                         'frame_number': parsed.frame_number,
@@ -187,8 +173,6 @@ def main():
         # Stats
         elapsed = time.time() - start_time
         source_stats = uart_source.get_stats()
-        parser_stats = tlv_parser.get_stats()
-        
         print(f"\n\n      Capture complete!")
         print(f"      Total frames: {source_stats['frames_read']}")
         print(f"      Total bytes: {source_stats['bytes_read']:,}")
@@ -200,7 +184,6 @@ def main():
             print(f"\n[5/5] Saving data to {args.output}...")
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            
             with open(output_path, 'w') as f:
                 json.dump({
                     'capture_info': {
@@ -210,7 +193,6 @@ def main():
                     },
                     'frames': frames_data
                 }, f, indent=2)
-            
             print(f"      Saved {len(frames_data)} frames")
         
         # Stop radar
@@ -224,7 +206,6 @@ def main():
     finally:
         serial_mgr.disconnect()
         print("\nSerial ports closed.")
-
 
 if __name__ == '__main__':
     main()
