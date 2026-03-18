@@ -5,8 +5,10 @@ Use this to verify your radar is detected before running capture.
 
 Usage:
     python list_ports.py
+    python list_ports.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1
 """
 
+import argparse
 import sys
 from pathlib import Path
 
@@ -17,6 +19,13 @@ from layer1_radar import SerialManager
 
 
 def main():
+    parser = argparse.ArgumentParser(description="List serial ports and detect radar ports")
+    parser.add_argument('--cli-port', type=str, default=None,
+                        help='Explicit CLI/config port (e.g. /dev/ttyUSB0 or COM3)')
+    parser.add_argument('--data-port', type=str, default=None,
+                        help='Explicit data port (e.g. /dev/ttyUSB1 or COM4)')
+    args = parser.parse_args()
+
     print("\n" + "="*60)
     print("Serial Port Scanner")
     print("="*60)
@@ -47,7 +56,11 @@ def main():
     
     mgr = SerialManager()
     try:
-        radar_ports = mgr.find_radar_ports(verbose=False)
+        radar_ports = mgr.find_radar_ports(
+            verbose=False,
+            config_port=args.cli_port,
+            data_port=args.data_port,
+        )
         print(f"\n✓ Radar found!")
         print(f"  Config port: {radar_ports.config_port}")
         print(f"  Data port: {radar_ports.data_port}")

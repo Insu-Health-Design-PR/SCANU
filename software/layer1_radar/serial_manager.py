@@ -9,7 +9,7 @@ Handles discovery and connection to the radar's two UART ports:
 import serial
 import serial.tools.list_ports
 import logging
-from typing import Optional, Tuple, List, Iterable
+from typing import Optional, Tuple, List, Iterable, Any
 from dataclasses import dataclass
 
 from .radar_constants import SerialConfig
@@ -71,7 +71,7 @@ class SerialManager:
         return sorted([str(d) for d in devices], key=key)
 
     @staticmethod
-    def _pick_standard_enhanced_pair(all_ports: List[serial.tools.list_ports.ListPortInfo]) -> Optional[RadarPorts]:
+    def _pick_standard_enhanced_pair(all_ports: List[Any]) -> Optional[RadarPorts]:
         """
         Heuristic for USB-UART bridges exposing "Standard" and "Enhanced" ports.
 
