@@ -104,8 +104,23 @@ def main():
         print("      Connected!")
         
         # 3. Configure radar
-        print("\n[3/5] Configuring radar...")
-        configurator = RadarConfigurator(serial_mgr)
+        
+        # 3a. Configure minimal first-start commands
+        print("\n[3/5] Configuring radar (first start)...")
+        result = configurator.configure(first_start_config)
+        if not result.success:
+            print(f"\nConfiguration FAILED with {len(result.errors)} errors:")
+            for error in result.errors:
+                print(f"  - {error}")
+            return
+
+        # 3b. Apply optional post-start commands
+        print("\n      Applying post-start configuration...")
+        result = configurator.configure(post_start_config)
+        if not result.success:
+            print(f"\nPost-start configuration had {len(result.errors)} errors:")
+            for error in result.errors:
+                print(f"  - {error}")
         
         if args.config:
             print(f"      Loading config from: {args.config}")
