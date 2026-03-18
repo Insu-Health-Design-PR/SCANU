@@ -135,6 +135,62 @@ class TestSignalProcessor(unittest.TestCase):
         self.assertEqual(processed.timestamp_ms, 1500.0)
         self.assertEqual(processed.source_timestamp_cycles, 50)
 
+    def test_process_json_frame_dict_uses_range_profile_and_timestamp(self) -> None:
+        processor = SignalProcessor(doppler_bins=4, time_fn=lambda: 999.0)
+        frame_dict = {
+            "frame_number": 12,
+            "timestamp": 424242,
+            "num_points": 2,
+            "has_range_profile": True,
+            "range_profile": [10.0, 20.0, 30.0, 40.0],
+            "points": [
+                {
+                    "x": 0.5,
+                    "y": 1.0,
+                    "z": 1.5,
+                    "doppler": 0.0,
+                    "snr": 12.0,
+                    "noise": 3.5,
+                },
+                {
+                    "x": -0.5,
+                    "y": 0.25,
+                    "z": 0.0,
+                    "doppler": -0.25,
+                    "snr": 8.0,
+                    "noise": 2.0,
+                },
+            ],
+        }
+
+        processed = processor.process(frame_dict)
+
+        self.assertEqual(processed.frame_number, 12)
+        self.assertEqual(processed.source_timestamp_cycles, 424242)
+        self.assertEqual(processed.timestamp_ms, 999000.0)
+        self.assertEqual(processed.range_doppler.shape[1], 4)
+        self.assertEqual(processed.point_cloud.shape, (2, 6))
+        self.assertAlmostEqual(processed.point_cloud[0, 0], 0.5)
+        self.assertAlmostEqual(processed.point_cloud[1, 3], -0.25)
+
+    def test_process_json_frame_dict_with_only_points(self) -> None:
+        processor = SignalProcessor(doppler_bins=4, time_fn=lambda: 2.0)
+        frame_dict = {
+            "frame_number": 8,
+            "timestamp": 8080,
+            "points": [
+                {"x": 0.1, "y": 0.2, "z": 0.3, "doppler": 0.4},
+            ],
+        }
+
+        processed = processor.process(frame_dict)
+
+        self.assertEqual(processed.frame_number, 8)
+        self.assertEqual(processed.source_timestamp_cycles, 8080)
+        self.assertEqual(processed.timestamp_ms, 2000.0)
+        self.assertEqual(processed.point_cloud.shape, (1, 4))
+        self.assertEqual(processed.range_doppler.ndim, 2)
+
     def test_process_layer1_raw_bytes(self) -> None:
         _ensure_serial_stub()
         processor = SignalProcessor(doppler_bins=4, time_fn=lambda: 9.0)
