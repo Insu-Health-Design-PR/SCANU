@@ -106,6 +106,8 @@ def main():
         # 3. Configure radar
         
         # 3a. Configure minimal first-start commands
+
+        configurator = RadarConfigurator(serial_mgr)
         print("\n[3/5] Configuring radar (first start)...")
         result = configurator.configure(first_start_config)
         if not result.success:
