@@ -46,7 +46,7 @@ from layer1_radar import (
 
 # 1. Connect to radar
 serial_mgr = SerialManager()
-ports = serial_mgr.find_radar_ports()
+ports = serial_mgr.find_radar_ports()  # or pass explicit CLI/DATA ports (see below)
 serial_mgr.connect(ports.config_port, ports.data_port)
 
 # 2. Configure radar
@@ -168,6 +168,9 @@ point_cloud = parsed.get_point_cloud()  # Nx4 array
 
 ```bash
 python examples/list_ports.py
+
+# If you're using a UART bridge that exposes two ports, pass them explicitly
+python examples/list_ports.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1
 ```
 
 ### Capture Frames
@@ -184,6 +187,11 @@ python examples/capture_frames.py -c my_config.cfg
 
 # Verbose logging
 python examples/capture_frames.py -v
+
+# UART bridge mode (two ports):
+# - CLI/config port (often "Standard")
+# - DATA port (often "Enhanced")
+python examples/capture_frames.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1
 ```
 
 ## Configuration
@@ -209,6 +217,7 @@ To customize, edit `DEFAULT_CONFIG` in `radar_config.py` or provide your own `.c
 2. Install TI XDS110 drivers (Windows)
 3. Run `python examples/list_ports.py` to see available ports
 4. Verify USB cable supports data (not charge-only)
+5. If using a UART bridge, run capture with `--cli-port` and `--data-port`
 
 ### No frames received
 
