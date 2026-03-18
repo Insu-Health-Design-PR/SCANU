@@ -78,6 +78,16 @@ class SignalProcessor:
         point_cloud: np.ndarray
         source_timestamp_cycles: int | None = None
 
+    @staticmethod
+    def _get_field(obj: Any, name: str, default: Any = None) -> Any:
+        if isinstance(obj, dict):
+            return obj.get(name, default)
+        return getattr(obj, name, default)
+
+    @classmethod
+    def _has_field(cls, obj: Any, name: str) -> bool:
+        return cls._get_field(obj, name, None) is not None
+
     def _normalize_input(self, frame: bytes | bytearray | memoryview | Any) -> _NormalizedInput:
         if isinstance(frame, (bytes, bytearray, memoryview)):
             return self._normalize_parsed_frame(self._parse_layer1_raw_frame(bytes(frame)))
@@ -91,7 +101,7 @@ class SignalProcessor:
     ) -> _NormalizedInput:
         signal = self._extract_signal(frame)
         point_cloud = self._extract_point_cloud(frame)
-        frame_number = int(getattr(frame, "frame_number", 0))
+        frame_number = int(self._get_field(frame, "frame_number", 0))
         source_timestamp_cycles = self._extract_timestamp_cycles(frame)
         timestamp_ms = self._resolve_timestamp_ms(frame)
 
@@ -109,22 +119,32 @@ class SignalProcessor:
         )
 
     def _resolve_timestamp_ms(self, frame: Any) -> float | None:
-        if hasattr(frame, "timestamp_ms"):
-            return float(frame.timestamp_ms)
+        timestamp_ms = self._get_field(frame, "timestamp_ms")
+        if timestamp_ms is not None:
+            return float(timestamp_ms)
         return None
 
     def _extract_timestamp_cycles(self, frame: Any) -> int | None:
-        if hasattr(frame, "timestamp_cycles"):
-            return int(frame.timestamp_cycles)
+        timestamp_cycles = self._get_field(frame, "timestamp_cycles")
+        if timestamp_cycles is not None:
+            return int(timestamp_cycles)
+        # JSON captures use "timestamp" for the Layer 1 cycle counter.
+        timestamp_cycles = self._get_field(frame, "timestamp")
+        if timestamp_cycles is not None:
+            return int(timestamp_cycles)
         return None
 
     def _extract_signal(self, frame: Any) -> np.ndarray:
-        if hasattr(frame, "range_profile") and frame.range_profile is not None:
-            signal = np.asarray(frame.range_profile, dtype=np.float32).reshape(-1)
-        elif hasattr(frame, "noise_profile") and frame.noise_profile is not None:
-            signal = np.asarray(frame.noise_profile, dtype=np.float32).reshape(-1)
-        elif hasattr(frame, "points"):
-            signal = self._points_to_signal(getattr(frame, "points"))
+        range_profile = self._get_field(frame, "range_profile")
+        noise_profile = self._get_field(frame, "noise_profile")
+        points = self._get_field(frame, "points")
+
+        if range_profile is not None:
+            signal = np.asarray(range_profile, dtype=np.float32).reshape(-1)
+        elif noise_profile is not None:
+            signal = np.asarray(noise_profile, dtype=np.float32).reshape(-1)
+        elif points is not None:
+            signal = self._points_to_signal(points)
         else:
             raise TypeError("SignalProcessor.process expects Layer 1 raw bytes or a parsed Layer 1 frame")
 
@@ -133,37 +153,39 @@ class SignalProcessor:
         return signal
 
     def _extract_point_cloud(self, frame: Any) -> np.ndarray:
-        if hasattr(frame, "get_point_cloud_with_snr"):
-            point_cloud = np.asarray(frame.get_point_cloud_with_snr(), dtype=np.float32)
+        get_point_cloud_with_snr = self._get_field(frame, "get_point_cloud_with_snr")
+        if callable(get_point_cloud_with_snr):
+            point_cloud = np.asarray(get_point_cloud_with_snr(), dtype=np.float32)
             if point_cloud.size > 0:
                 return point_cloud
 
-        if hasattr(frame, "get_point_cloud"):
-            point_cloud = np.asarray(frame.get_point_cloud(), dtype=np.float32)
+        get_point_cloud = self._get_field(frame, "get_point_cloud")
+        if callable(get_point_cloud):
+            point_cloud = np.asarray(get_point_cloud(), dtype=np.float32)
             if point_cloud.size > 0:
                 return point_cloud
 
-        if not hasattr(frame, "points"):
+        points = self._get_field(frame, "points")
+        if points is None:
             return np.empty((0, 3), dtype=np.float32)
 
-        points = getattr(frame, "points")
         if not points:
             return np.empty((0, 3), dtype=np.float32)
 
         rows: list[list[float]] = []
         for point in points:
             values = [
-                float(getattr(point, "x", 0.0)),
-                float(getattr(point, "y", 0.0)),
-                float(getattr(point, "z", 0.0)),
+                float(self._get_field(point, "x", 0.0)),
+                float(self._get_field(point, "y", 0.0)),
+                float(self._get_field(point, "z", 0.0)),
             ]
 
-            if hasattr(point, "doppler"):
-                values.append(float(point.doppler))
-            if hasattr(point, "snr"):
-                values.append(float(point.snr))
-            if hasattr(point, "noise"):
-                values.append(float(point.noise))
+            if self._has_field(point, "doppler"):
+                values.append(float(self._get_field(point, "doppler", 0.0)))
+            if self._has_field(point, "snr"):
+                values.append(float(self._get_field(point, "snr", 0.0)))
+            if self._has_field(point, "noise"):
+                values.append(float(self._get_field(point, "noise", 0.0)))
 
             rows.append(values)
 
@@ -182,10 +204,10 @@ class SignalProcessor:
         for point in points:
             samples.extend(
                 [
-                    float(getattr(point, "x", 0.0)),
-                    float(getattr(point, "y", 0.0)),
-                    float(getattr(point, "z", 0.0)),
-                    float(getattr(point, "doppler", 0.0)),
+                    float(self._get_field(point, "x", 0.0)),
+                    float(self._get_field(point, "y", 0.0)),
+                    float(self._get_field(point, "z", 0.0)),
+                    float(self._get_field(point, "doppler", 0.0)),
                 ]
             )
 
