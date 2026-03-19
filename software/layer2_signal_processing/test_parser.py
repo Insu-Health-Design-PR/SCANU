@@ -3,55 +3,15 @@
 from __future__ import annotations
 
 import struct
-import sys
-import types
 import unittest
 
-#python3 -m compileall software/layer2_signal_processing
-#python3 -m unittest software.layer2_signal_processing.test_parser -v
-'''python3 - <<'PY'
-from software.layer2_signal_processing import SignalProcessor, FeatureExtractor
-from software.layer1_radar.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
-import struct
+try:
+    from software.layer2_signal_processing.test_support import ensure_serial_stub
+except ModuleNotFoundError:
+    from test_support import ensure_serial_stub
 
-def build_layer1_raw_frame():
-    range_profile = struct.pack("<4H", 10, 20, 30, 40)
-    body = struct.pack("<II", TLVType.RANGE_PROFILE, len(range_profile)) + range_profile
-    total_len = FRAME_HEADER_SIZE + len(body)
-    header_fields = struct.pack("<8I", 1, total_len, 0x6843, 1, 123456, 0, 1, 0)
-    return MAGIC_WORD + header_fields + body
 
-processor = SignalProcessor(doppler_bins=16)
-frame = build_layer1_raw_frame()          # entrada real estilo Layer 1
-processed = processor.process(frame)      # salida principal de Layer 2
-features = FeatureExtractor().extract(processed)  # salida heatmaps/features
-
-print("range_doppler shape:", processed.range_doppler.shape)
-print("point_cloud shape:", processed.point_cloud.shape)
-print("range_heatmap shape:", features.range_heatmap.shape)
-print("doppler_heatmap shape:", features.doppler_heatmap.shape)
-print("vector:", features.vector.tolist())
-PY'''
-
-# Stub pyserial so Layer 1 modules can be imported in environments
-# where the serial dependency is not installed.
-if "serial" not in sys.modules:
-    serial_module = types.ModuleType("serial")
-    serial_module.SerialException = Exception
-    serial_module.Serial = object
-    serial_module.EIGHTBITS = 8
-    serial_module.PARITY_NONE = "N"
-    serial_module.STOPBITS_ONE = 1
-
-    serial_tools = types.ModuleType("serial.tools")
-    serial_list_ports = types.ModuleType("serial.tools.list_ports")
-    serial_list_ports.comports = lambda: []
-    serial_tools.list_ports = serial_list_ports
-    serial_module.tools = serial_tools
-
-    sys.modules["serial"] = serial_module
-    sys.modules["serial.tools"] = serial_tools
-    sys.modules["serial.tools.list_ports"] = serial_list_ports
+ensure_serial_stub()
 
 from software.layer1_radar.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
 from software.layer1_radar.tlv_parser import TLVParser
