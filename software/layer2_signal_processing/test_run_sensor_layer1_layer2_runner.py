@@ -5,37 +5,18 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
-import sys
 import tempfile
-import types
 import unittest
 from pathlib import Path
 
-
-def _ensure_serial_stub() -> None:
-    if "serial" in sys.modules:
-        return
-
-    serial_module = types.ModuleType("serial")
-    serial_module.SerialException = Exception
-    serial_module.Serial = object
-    serial_module.EIGHTBITS = 8
-    serial_module.PARITY_NONE = "N"
-    serial_module.STOPBITS_ONE = 1
-
-    serial_tools = types.ModuleType("serial.tools")
-    serial_list_ports = types.ModuleType("serial.tools.list_ports")
-    serial_list_ports.comports = lambda: []
-    serial_tools.list_ports = serial_list_ports
-    serial_module.tools = serial_tools
-
-    sys.modules["serial"] = serial_module
-    sys.modules["serial.tools"] = serial_tools
-    sys.modules["serial.tools.list_ports"] = serial_list_ports
+try:
+    from software.layer2_signal_processing.test_support import ensure_serial_stub
+except ModuleNotFoundError:
+    from test_support import ensure_serial_stub
 
 
 def _load_runner_module():
-    _ensure_serial_stub()
+    ensure_serial_stub()
 
     module_path = (
         Path(__file__).resolve().parent
