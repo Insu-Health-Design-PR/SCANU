@@ -23,6 +23,7 @@ class TestPresenceProcessor(unittest.TestCase):
         self.assertEqual(features.frame_number, 10)
         self.assertTrue(features.is_present)
         self.assertAlmostEqual(features.presence_score, 0.8)
+        self.assertAlmostEqual(features.motion_score, 0.6)
         self.assertAlmostEqual(features.confidence, 0.7)
 
     def test_extract_clamps_bounds(self) -> None:
@@ -33,12 +34,14 @@ class TestPresenceProcessor(unittest.TestCase):
             presence_raw=1.5,
             motion_raw=-0.5,
             distance_m=2.0,
+            signal_quality=0.8,
         )
 
         features = processor.extract(frame)
 
         self.assertAlmostEqual(features.presence_score, 1.0)
-        self.assertAlmostEqual(features.confidence, 0.5)
+        self.assertAlmostEqual(features.motion_score, 0.0)
+        self.assertAlmostEqual(features.confidence, 0.4)
         self.assertTrue(features.is_present)
 
 
