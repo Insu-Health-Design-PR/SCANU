@@ -4,16 +4,16 @@ This guide is for Jetson/Linux when you received the project as a zip, extracted
 
 `Sensor -> Layer 1 -> Layer 2`
 
-The launcher for this flow is:
+The development runner for this flow is:
 
 ```bash
-./run_sensor_layer1_layer2.sh
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py
 ```
 
 It calls:
 
 ```bash
-software/layer2_signal_processing/examples/run_sensor_layer1_layer2.py
+software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py
 ```
 
 ## 1. Enter the correct project root
@@ -34,12 +34,11 @@ ls
 You should see at least:
 
 ```bash
-run_sensor_layer1_layer2.sh
 software
 README.md
 ```
 
-If `run_sensor_layer1_layer2.sh` is missing, you are probably one folder above or below the real root.
+If `software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py` is missing, you are probably one folder above or below the real root.
 
 ## 2. Quick port check in Linux
 
@@ -64,7 +63,7 @@ That is useful to confirm which port looks like the config/CLI port and which on
 Start with:
 
 ```bash
-./run_sensor_layer1_layer2.sh --check
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --check
 ```
 
 What `--check` does:
@@ -92,19 +91,19 @@ If you provide ports manually, you must provide both the config/CLI port and the
 Autodetect ports, summary output:
 
 ```bash
-./run_sensor_layer1_layer2.sh --frames 20
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --frames 20
 ```
 
 Autodetect ports, full JSON output:
 
 ```bash
-./run_sensor_layer1_layer2.sh --frames 5 --full
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --frames 5 --full
 ```
 
 Manual ports, summary output:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --config-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --frames 20
@@ -113,7 +112,7 @@ Manual ports, summary output:
 Manual ports using the `--cli-port` alias:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --frames 20
@@ -122,7 +121,7 @@ Manual ports using the `--cli-port` alias:
 Manual ports, verbose logging:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --frames 10 \
@@ -132,7 +131,7 @@ Manual ports, verbose logging:
 Manual ports, full JSON output:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --frames 5 \
@@ -142,7 +141,7 @@ Manual ports, full JSON output:
 Custom radar config file:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --config software/layer1_radar/examples/configs/full_config.cfg \
@@ -174,7 +173,7 @@ This lets you confirm that real sensor data is reaching Layer 2.
 To save the output while still seeing it live:
 
 ```bash
-./run_sensor_layer1_layer2.sh \
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --frames 10 \
@@ -189,7 +188,7 @@ To save the output while still seeing it live:
 Incorrect:
 
 ```bash
-./run_sensor_layer1_layer2.sh --cli-port /dev/ttyUSB0 --frames 10
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --cli-port /dev/ttyUSB0 --frames 10
 ```
 
 Why it fails:
@@ -199,7 +198,7 @@ Why it fails:
 Correct:
 
 ```bash
-./run_sensor_layer1_layer2.sh --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --frames 10
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --frames 10
 ```
 
 ### Config file does not exist
@@ -207,7 +206,7 @@ Correct:
 Incorrect:
 
 ```bash
-./run_sensor_layer1_layer2.sh --config /tmp/missing.cfg --frames 5
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --config /tmp/missing.cfg --frames 5
 ```
 
 Why it fails:
@@ -221,7 +220,7 @@ Be careful not to mix flags copied from other commands or documents that use dif
 For this runner, keep the command shape consistent with:
 
 ```bash
-./run_sensor_layer1_layer2.sh [--config-port|--cli-port <port>] [--data-port <port>] [--config <file>] [--frames N] [--full] [-v]
+python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py [--config-port|--cli-port <port>] [--data-port <port>] [--config <file>] [--frames N] [--full] [-v]
 ```
 
 ## 9. Troubleshooting checklist
@@ -229,7 +228,7 @@ For this runner, keep the command shape consistent with:
 Use this checklist if the sensor does not start or Layer 2 output does not appear:
 
 - Confirm you are in the correct project root.
-- Run `./run_sensor_layer1_layer2.sh --check` first.
+- Run `python3 software/layer2_signal_processing/testing/run_sensor_layer1_layer2.py --check` first.
 - Run `ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null` and verify the radar appears.
 - Run `python3 software/layer1_radar/examples/list_ports.py` for more detail.
 - Verify that config/CLI and data ports are not swapped.

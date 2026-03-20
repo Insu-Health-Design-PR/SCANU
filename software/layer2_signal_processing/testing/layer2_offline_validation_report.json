@@ -11,7 +11,7 @@
   },
   "captures": [
     {
-      "file": "software/layer2_signal_processing/empty_frames.json",
+      "file": "software/layer2_signal_processing/testing/empty_frames.json",
       "capture_info": {
         "frames": 300,
         "duration_seconds": 29.91608691215515,
@@ -137,7 +137,7 @@
       ]
     },
     {
-      "file": "software/layer2_signal_processing/moving_person_frames.json",
+      "file": "software/layer2_signal_processing/testing/moving_person_frames.json",
       "capture_info": {
         "frames": 300,
         "duration_seconds": 29.916496515274048,
