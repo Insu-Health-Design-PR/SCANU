@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 import numpy as np
 
 try:
-    from software.layer2_signal_processing.test_support import (
+    from software.layer2_signal_processing.testing.test_support import (
         build_layer1_raw_frame,
         ensure_serial_stub,
     )

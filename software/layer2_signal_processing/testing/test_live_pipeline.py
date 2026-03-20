@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 
 try:
-    from software.layer2_signal_processing.test_support import ensure_serial_stub
+    from software.layer2_signal_processing.testing.test_support import ensure_serial_stub
 except ModuleNotFoundError:
     from test_support import ensure_serial_stub
 

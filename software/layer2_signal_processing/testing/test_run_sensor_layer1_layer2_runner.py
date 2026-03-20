@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 
 try:
-    from software.layer2_signal_processing.test_support import ensure_serial_stub
+    from software.layer2_signal_processing.testing.test_support import ensure_serial_stub
 except ModuleNotFoundError:
     from test_support import ensure_serial_stub
 
@@ -18,11 +18,7 @@ except ModuleNotFoundError:
 def _load_runner_module():
     ensure_serial_stub()
 
-    module_path = (
-        Path(__file__).resolve().parent
-        / "examples"
-        / "run_sensor_layer1_layer2.py"
-    )
+    module_path = Path(__file__).resolve().parent / "run_sensor_layer1_layer2.py"
     spec = importlib.util.spec_from_file_location("run_sensor_layer1_layer2_runner", module_path)
     assert spec is not None
     assert spec.loader is not None
