@@ -20,6 +20,23 @@ class TestPresence60GPortResolver(unittest.TestCase):
         self.assertEqual(len(matches), 1)
         self.assertEqual(matches[0].device, "/dev/ttyACM1")
 
+    def test_exact_xensiv_match_ranks_first(self) -> None:
+        ports = (
+            PortInfo("/dev/ttyACM1", "Infineon Radar Presence", "Infineon", None, None, ""),
+            PortInfo(
+                "/dev/ttyACM0",
+                "XENSIV BGT60LTR11AIP DEMOBGT60LTR11AIPTOBO1",
+                "Infineon",
+                None,
+                None,
+                "",
+            ),
+        )
+
+        matches = Presence60GPortResolver.find_candidates(ports)
+
+        self.assertEqual(matches[0].device, "/dev/ttyACM0")
+
 
 if __name__ == "__main__":
     unittest.main()
