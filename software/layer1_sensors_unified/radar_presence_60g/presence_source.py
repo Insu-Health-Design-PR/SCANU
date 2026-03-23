@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from .presence_models import PresenceFrame, PresenceSample
-from .port_resolver import Presence60GPortResolver
 
 
 class PresenceProvider(Protocol):
@@ -91,7 +90,14 @@ class BGT60LTR11AIPSerialProvider:
                 "pyserial is required for BGT60LTR11AIPSerialProvider.connect()"
             ) from exc
 
-        port_name = self.config.port or self._autodetect_port()
+        if not self.config.port:
+            raise RuntimeError(
+                "BGT60LTR11AIPSerialProvider requires an explicit serial port. "
+                "Pass BGT60LTR11AIPSerialConfig(port='/dev/ttyUSB0') or use "
+                "--port in test_bgt60_live.py."
+            )
+
+        port_name = self.config.port
         self._port = serial.Serial(
             port=port_name,
             baudrate=self.config.baudrate,
@@ -112,16 +118,19 @@ class BGT60LTR11AIPSerialProvider:
             self.connect()
 
         while True:
-            raw = self._port.readline(self.config.max_line_bytes)
-            if not raw:
-                raise TimeoutError(
-                    "Timed out waiting for BGT60LTR11AIP serial output"
-                )
-
-            line = raw.decode("utf-8", errors="ignore").strip()
+            line = self.read_line()
             sample = self.parse_line(line)
             if sample is not None:
                 return sample
+
+    def read_line(self) -> str:
+        if not self.is_connected:
+            self.connect()
+
+        raw = self._port.readline(self.config.max_line_bytes)
+        if not raw:
+            raise TimeoutError("Timed out waiting for BGT60LTR11AIP serial output")
+        return raw.decode("utf-8", errors="ignore").strip()
 
     def parse_line(self, line: str) -> PresenceSample | None:
         text = line.strip()
@@ -141,14 +150,6 @@ class BGT60LTR11AIPSerialProvider:
             return parsed
 
         return None
-
-    def _autodetect_port(self) -> str:
-        candidates = Presence60GPortResolver.find_candidates()
-        if not candidates:
-            raise RuntimeError(
-                "Could not find a BGT60LTR11AIP serial port automatically"
-            )
-        return candidates[0].device
 
     def _parse_json_line(self, text: str) -> PresenceSample | None:
         if not text.startswith("{"):
