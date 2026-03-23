@@ -49,6 +49,12 @@ class TestPresenceSource(unittest.TestCase):
 
 
 class TestBGT60LTR11AIPSerialProvider(unittest.TestCase):
+    def test_connect_requires_explicit_port(self) -> None:
+        provider = BGT60LTR11AIPSerialProvider()
+
+        with self.assertRaises(RuntimeError):
+            provider.connect()
+
     def test_parse_json_line(self) -> None:
         provider = BGT60LTR11AIPSerialProvider()
 
@@ -109,6 +115,18 @@ class TestBGT60LTR11AIPSerialProvider(unittest.TestCase):
         self.assertAlmostEqual(sample.motion_raw, 0.6)
         self.assertAlmostEqual(sample.distance_m, 1.1)
         self.assertAlmostEqual(sample.signal_quality, 0.95)
+
+    def test_read_line_returns_decoded_text(self) -> None:
+        class FakeSerial:
+            def __init__(self) -> None:
+                self.is_open = True
+
+            def readline(self, _max_line_bytes: int) -> bytes:
+                return b"presence=1 motion=0.3\n"
+
+        provider = BGT60LTR11AIPSerialProvider(serial_port=FakeSerial())
+
+        self.assertEqual(provider.read_line(), "presence=1 motion=0.3")
 
 
 if __name__ == "__main__":

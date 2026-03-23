@@ -21,7 +21,7 @@ Acquire and normalize presence radar signals from the Infineon XENSIV `BGT60LTR1
 
 ## Recommended Flow
 1. Create `PresenceSource` with a provider.
-2. For hardware, use `BGT60LTR11AIPSerialProvider` and let it autodetect the Infineon/XENSIV serial port or pass one explicitly.
+2. For hardware, use `BGT60LTR11AIPSerialProvider` with an explicit serial port.
 3. Read `PresenceFrame` objects.
 4. Convert to `PresenceFeatures` with `PresenceProcessor.extract()`.
 5. Feed `presence_score`, `motion_score`, `confidence`, and `is_present` into Layer 5 fusion.

@@ -19,8 +19,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--port",
         type=str,
-        default=None,
-        help="Serial port path, for example /dev/ttyACM0. If omitted, auto-detect is used.",
+        required=True,
+        help="Serial port path, for example /dev/ttyUSB0.",
     )
     parser.add_argument(
         "--baudrate",
@@ -33,6 +33,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=20,
         help="Number of valid samples to print before exiting.",
+    )
+    parser.add_argument(
+        "--raw",
+        action="store_true",
+        help="Print raw serial lines instead of parsed frames/features.",
     )
     return parser
 
@@ -50,13 +55,19 @@ def main() -> None:
 
     print("Starting BGT60LTR11AIP live read...")
     try:
-        for index in range(args.samples):
-            frame = source.read_frame()
-            features = processor.extract(frame)
+        if args.raw:
+            for index in range(args.samples):
+                line = provider.read_line()
+                print(f"\nLine {index + 1}/{args.samples}")
+                print(line)
+        else:
+            for index in range(args.samples):
+                frame = source.read_frame()
+                features = processor.extract(frame)
 
-            print(f"\nSample {index + 1}/{args.samples}")
-            print(f"FRAME: {frame}")
-            print(f"FEATURES: {features}")
+                print(f"\nSample {index + 1}/{args.samples}")
+                print(f"FRAME: {frame}")
+                print(f"FEATURES: {features}")
     finally:
         provider.disconnect()
 
