@@ -42,6 +42,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mmwave", choices=("on", "off"), default="on")
     parser.add_argument("--cli-port", type=str, default=None)
     parser.add_argument("--data-port", type=str, default=None)
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="software/layer1_sensor_hub/testing/configs/mmwave_main.cfg",
+        help="Path to mmWave .cfg file used for configuration",
+    )
     parser.add_argument("--skip-mmwave-config", action="store_true")
 
     parser.add_argument("--presence", choices=("mock", "ifx", "off"), default="mock")
@@ -93,7 +99,13 @@ def _build_mmwave(args: argparse.Namespace) -> tuple[Optional[SerialManager], Op
     serial_mgr.connect(ports.config_port, ports.data_port)
 
     if not args.skip_mmwave_config:
-        config_result = RadarConfigurator(serial_mgr).configure()
+        cfg_path = Path(args.config).expanduser().resolve()
+        if not cfg_path.exists():
+            raise RuntimeError(
+                f"mmWave config file not found: {cfg_path}. "
+                "Add a .cfg under testing/configs or pass --config explicitly."
+            )
+        config_result = RadarConfigurator(serial_mgr).configure_from_file(cfg_path)
         if not config_result.success:
             raise RuntimeError(f"mmWave configure failed: {config_result.errors[:3]}")
 
