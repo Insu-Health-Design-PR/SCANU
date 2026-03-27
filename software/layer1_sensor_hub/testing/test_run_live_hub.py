@@ -29,12 +29,12 @@ class _FakeHub:
 
 
 def test_build_parser_defaults():
-    args = build_parser().parse_args([])
+    args = build_parser().parse_args(["--config", "software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg"])
     assert args.mmwave == "on"
     assert args.presence == "mock"
     assert args.thermal == "on"
     assert args.max_frames == 0
-    assert args.config.endswith("software/layer1_sensor_hub/testing/configs/mmwave_main.cfg")
+    assert args.config.endswith("software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg")
 
 
 def test_summarize_frame_contains_sensor_sections():
