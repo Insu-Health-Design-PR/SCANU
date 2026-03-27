@@ -33,6 +33,19 @@ class RuntimeHandles:
     hub: Optional[MultiSensorHub] = None
 
 
+def resolve_config_path(raw_path: str) -> Path:
+    candidate = Path(raw_path).expanduser()
+    if candidate.is_absolute():
+        return candidate
+
+    cwd_candidate = (Path.cwd() / candidate).resolve()
+    if cwd_candidate.exists():
+        return cwd_candidate
+
+    repo_candidate = (REPO_ROOT / candidate).resolve()
+    return repo_candidate
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Live runner for layer1_sensor_hub (3 sensors)")
     parser.add_argument("--max-frames", type=int, default=0, help="0 = run forever")
@@ -99,7 +112,7 @@ def _build_mmwave(args: argparse.Namespace) -> tuple[Optional[SerialManager], Op
     serial_mgr.connect(ports.config_port, ports.data_port)
 
     if not args.skip_mmwave_config:
-        cfg_path = Path(args.config).expanduser().resolve()
+        cfg_path = resolve_config_path(args.config)
         if not cfg_path.exists():
             raise RuntimeError(
                 f"mmWave config file not found: {cfg_path}. "

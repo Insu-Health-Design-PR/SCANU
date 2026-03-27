@@ -25,6 +25,24 @@ from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, 
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 
 
+def resolve_config_path(raw_path: str) -> Path:
+    """
+    Resolve config path robustly:
+    1) absolute/relative from current working directory
+    2) relative to repo root (where this script lives)
+    """
+    candidate = Path(raw_path).expanduser()
+    if candidate.is_absolute():
+        return candidate
+
+    cwd_candidate = (Path.cwd() / candidate).resolve()
+    if cwd_candidate.exists():
+        return cwd_candidate
+
+    repo_candidate = (REPO_ROOT / candidate).resolve()
+    return repo_candidate
+
+
 def setup_logging(verbose: bool) -> None:
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -141,7 +159,7 @@ def main() -> int:
     setup_logging(args.verbose)
     logger = logging.getLogger("capture_all_sensors")
 
-    cfg_path = Path(args.config).expanduser().resolve()
+    cfg_path = resolve_config_path(args.config)
     if not args.skip_mmwave_config and not cfg_path.exists():
         raise RuntimeError(f"Config file not found: {cfg_path}")
 
@@ -300,4 +318,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
