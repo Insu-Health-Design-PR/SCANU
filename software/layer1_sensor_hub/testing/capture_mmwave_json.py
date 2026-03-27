@@ -17,6 +17,19 @@ if str(REPO_ROOT) not in sys.path:
 from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 
 
+def resolve_config_path(raw_path: str) -> Path:
+    candidate = Path(raw_path).expanduser()
+    if candidate.is_absolute():
+        return candidate
+
+    cwd_candidate = (Path.cwd() / candidate).resolve()
+    if cwd_candidate.exists():
+        return cwd_candidate
+
+    repo_candidate = (REPO_ROOT / candidate).resolve()
+    return repo_candidate
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description="Capture mmWave parsed frames into JSON")
     p.add_argument("--frames", "-n", type=int, default=120, help="Number of frames to capture")
@@ -40,7 +53,7 @@ def main() -> int:
         mgr.connect(ports.config_port, ports.data_port)
 
         if not args.skip_config:
-            cfg_path = Path(args.config).expanduser().resolve()
+            cfg_path = resolve_config_path(args.config)
             if not cfg_path.exists():
                 raise RuntimeError(
                     f"mmWave config file not found: {cfg_path}. "

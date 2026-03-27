@@ -2,8 +2,22 @@
 
 ## 1) Move to repository root
 
+If your project has `.../SCANU` as subfolder:
+
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/SCANU
+```
+
+If your project root is directly `.../SCANU-dev_adrian`:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+```
+
+Quick path check:
+
+```bash
+ls software/layer1_sensor_hub/testing/capture_all_sensors.py
 ```
 
 ## 2) Install runtime dependencies
