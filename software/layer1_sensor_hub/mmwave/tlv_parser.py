@@ -139,12 +139,22 @@ class TLVParser:
             tlv_type, tlv_length = struct.unpack("<II", frame[offset : offset + 8])
             offset += 8
 
-            if offset + tlv_length > len(frame):
-                logger.warning(f"TLV {tlv_type} truncated (need {tlv_length}, have {len(frame)-offset})")
+            payload_length = self._resolve_tlv_payload_length(
+                tlv_type=tlv_type,
+                tlv_length=tlv_length,
+                remaining=len(frame) - offset,
+            )
+            if payload_length is None:
+                logger.warning(
+                    "TLV %s invalid/truncated (raw_len=%s, remaining=%s)",
+                    tlv_type,
+                    tlv_length,
+                    len(frame) - offset,
+                )
                 break
 
-            tlv_data = frame[offset : offset + tlv_length]
-            offset += tlv_length
+            tlv_data = frame[offset : offset + payload_length]
+            offset += payload_length
 
             result.raw_tlvs[tlv_type] = tlv_data
 
@@ -156,6 +166,39 @@ class TLVParser:
 
         self._frames_parsed += 1
         return result
+
+    @staticmethod
+    def _resolve_tlv_payload_length(tlv_type: int, tlv_length: int, remaining: int) -> int | None:
+        """
+        Return TLV payload length from raw TLV length field.
+
+        Different TI parser examples in the wild treat `tlv_length` as either:
+        1) payload-only length
+        2) TLV total length including 8-byte TL header
+        This resolver accepts both to avoid frame misalignment.
+        """
+        if tlv_length <= 0:
+            return None
+
+        # Prefer payload-only interpretation when sane.
+        if tlv_length <= remaining:
+            payload_len = tlv_length
+            if payload_len > 0:
+                return payload_len
+
+        # Fallback: `tlv_length` includes the 8-byte TL header.
+        if tlv_length >= 8:
+            payload_len = tlv_length - 8
+            if 0 < payload_len <= remaining:
+                logger.debug(
+                    "TLV %s using inclusive-length mode (raw=%s -> payload=%s)",
+                    tlv_type,
+                    tlv_length,
+                    payload_len,
+                )
+                return payload_len
+
+        return None
 
     def _parse_tlv(self, tlv_type: int, data: bytes, result: ParsedFrame) -> None:
         if tlv_type == TLVType.DETECTED_POINTS:
@@ -218,4 +261,3 @@ def parse_frame(frame: bytes) -> ParsedFrame:
     """Parse a single frame (convenience function)."""
 
     return TLVParser().parse(frame)
-
