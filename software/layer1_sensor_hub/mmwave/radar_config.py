@@ -8,7 +8,7 @@ import logging
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from .radar_constants import SerialConfig
 from .serial_manager import SerialManager
@@ -168,8 +168,15 @@ class RadarConfigurator:
                 commands.append(line)
         return commands
 
-    def configure(self, config: str) -> ConfigResult:
-        commands = self._parse_config_string(config)
+    def configure(self, config: Optional[str] = None) -> ConfigResult:
+        """
+        Configure radar from a config string.
+
+        When `config` is None, uses `DEFAULT_CONFIG`.
+        """
+
+        config_text = DEFAULT_CONFIG if config is None else config
+        commands = self._parse_config_string(config_text)
         logger.info(f"Sending {len(commands)} commands...")
 
         errors: List[str] = []
@@ -179,7 +186,13 @@ class RadarConfigurator:
             response = self.send_command(cmd)
             responses.append(response)
 
-            if "Error" in response or "error" in response:
+            if not response.strip():
+                # Empty response is treated as a transport/config failure because
+                # CLI commands should normally emit prompt/ack/error text.
+                error_msg = f"Command {i+1} '{cmd}': no response from sensor"
+                errors.append(error_msg)
+                logger.error(error_msg)
+            elif "Error" in response or "error" in response:
                 error_msg = f"Command {i+1} '{cmd}': {response.strip()}"
                 errors.append(error_msg)
                 logger.error(error_msg)
@@ -229,4 +242,3 @@ class RadarConfigurator:
 
     def get_version(self) -> str:
         return self.send_command("version")
-
