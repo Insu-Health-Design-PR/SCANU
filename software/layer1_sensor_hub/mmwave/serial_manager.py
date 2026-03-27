@@ -74,6 +74,23 @@ class SerialManager:
 
         return sorted([str(d) for d in devices], key=key)
 
+    @classmethod
+    def _device_sort_key(cls, device: str) -> tuple:
+        """Return natural-sort key for a single serial device path."""
+        s = str(device)
+        if s.upper().startswith("COM"):
+            try:
+                return (0, int(s[3:]))
+            except Exception:
+                return (0, s)
+        for prefix in ("/dev/ttyUSB", "/dev/ttyACM"):
+            if s.startswith(prefix):
+                try:
+                    return (1, prefix, int(s[len(prefix) :]))
+                except Exception:
+                    return (1, prefix, s)
+        return (2, s)
+
     @staticmethod
     def _pick_standard_enhanced_pair(all_ports: List[Any]) -> Optional[RadarPorts]:
         """
@@ -218,7 +235,7 @@ class SerialManager:
             )
 
         # Sort by port name/number to get consistent ordering
-        radar_ports.sort(key=lambda p: self._sort_port_devices([p.device])[0])
+        radar_ports.sort(key=lambda p: self._device_sort_key(p.device))
 
         # First port is config, second is data
         config_port = radar_ports[0].device
@@ -395,4 +412,3 @@ class SerialManager:
 
         self.disconnect()
         return False
-

@@ -139,6 +139,9 @@ class UARTSource:
                     self._buffer = self._buffer[-7:]
                     if discarded > 100:
                         logger.debug(f"Discarded {discarded} bytes (no magic word)")
+                else:
+                    # Avoid hot-looping when UART is idle/noisy and buffer is short.
+                    time.sleep(0.001)
                 continue
 
             # Discard data before magic word
@@ -149,6 +152,7 @@ class UARTSource:
 
             # Check if we have enough for header
             if len(self._buffer) < FRAME_HEADER_SIZE:
+                time.sleep(0.001)
                 continue
 
             # Parse header to get total length
@@ -172,6 +176,7 @@ class UARTSource:
 
             # Check if we have complete frame
             if len(self._buffer) < header.total_packet_length:
+                time.sleep(0.001)
                 continue
 
             frame = bytes(self._buffer[: header.total_packet_length])
@@ -210,4 +215,3 @@ class UARTSource:
         cleared = len(self._buffer)
         self._buffer.clear()
         return cleared
-
