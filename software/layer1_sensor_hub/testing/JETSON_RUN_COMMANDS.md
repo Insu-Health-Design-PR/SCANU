@@ -58,7 +58,7 @@ python3 software/layer1_sensor_hub/testing/capture_mmwave_json.py \
   --data-port /dev/ttyUSB1 \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
-  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test1.json
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/testq.json
 ```
 
 ## 8) Capture thermal MP4 + snapshot
@@ -68,7 +68,7 @@ python3 software/layer1_sensor_hub/testing/capture_thermal_video.py \
   --device 0 \
   --seconds 20 \
   --video /tmp/thermal_capture.mp4 \
-  --snapshot /tmp/thermal_snapshot.png
+  --snapshot /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/view/thermal_snapshot.png
 ```
 
 ## 9) Run unit tests
@@ -87,11 +87,11 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --data-port /dev/ttyUSB1 \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
-  --video /tmp/all_sensors.mp4 \
-  --output /tmp/all_sensors.json \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/all_sensors.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/all_sensors.json \
   --thermal-device 0 \
   --presence ifx``bash
-software/layer1_sensor_hub/testing/configs/mmwave_main.cfg
+software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg
 ```
 
 ## 5) Sensor approval test (PASS/FAIL)
@@ -108,7 +108,7 @@ python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
 ```bash
 python3 software/layer1_sensor_hub/testing/run_live_hub.py \
   --mmwave on \
-  --config software/layer1_sensor_hub/testing/configs/mmwave_main.cfg \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
   --presence mock \
   --thermal on \
   --max-frames 0 \
@@ -132,8 +132,8 @@ python3 software/layer1_sensor_hub/testing/capture_mmwave_json.py \
 python3 software/layer1_sensor_hub/testing/capture_thermal_video.py \
   --device 0 \
   --seconds 20 \
-  --video /tmp/thermal_capture.mp4 \
-  --snapshot /tmp/thermal_snapshot.png
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/thermal_capture.mp4 \
+  --snapshot /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view//thermal_snapshot.png
 ```
 
 ## 9) Run unit tests
@@ -150,10 +150,10 @@ python3 -m pytest -q \
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/testing/configs/low2.cfg \
   --frames 300 \
-  --video /tmp/all_sensors.mp4 \
-  --output /tmp/all_sensors.json \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json
   --thermal-device 0 \
   --presence ifx
 ```
