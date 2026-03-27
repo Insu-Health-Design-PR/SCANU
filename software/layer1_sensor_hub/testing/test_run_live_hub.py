@@ -34,6 +34,7 @@ def test_build_parser_defaults():
     assert args.presence == "mock"
     assert args.thermal == "on"
     assert args.max_frames == 0
+    assert args.config.endswith("software/layer1_sensor_hub/testing/configs/mmwave_main.cfg")
 
 
 def test_summarize_frame_contains_sensor_sections():
@@ -65,4 +66,3 @@ def test_run_loop_stops_at_max_frames():
     assert frames == 3
     assert len(lines) == 3
     assert "frame=1" in lines[0]
-
