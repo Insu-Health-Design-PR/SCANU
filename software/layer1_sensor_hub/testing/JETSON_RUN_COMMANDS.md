@@ -81,3 +81,17 @@ python3 -m pytest -q \
   software/layer1_sensor_hub/testing/test_sensor_hub.py \
   software/layer1_sensor_hub/testing/test_run_live_hub.py
 ```
+
+## 10) Capture all sensors in one command (video + json)
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --config software/layer1_sensor_hub/testing/configs/mmwave_main.cfg \
+  --frames 300 \
+  --video /tmp/all_sensors.mp4 \
+  --output /tmp/all_sensors.json \
+  --thermal-device 0 \
+  --presence ifx
+```
