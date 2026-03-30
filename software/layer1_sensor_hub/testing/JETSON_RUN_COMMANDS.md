@@ -150,10 +150,10 @@ python3 -m pytest -q \
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/low2.cfg \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
-  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
   --thermal-device 0 \
   --presence ifx
 ```
@@ -169,4 +169,23 @@ sudo fuser -k /dev/ttyUSB0 /dev/ttyUSB1
 
 ```bash
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg --frames 300 --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json --thermal-device 0 --presence ifx
+```
+
+## 12) Clean stale processes/ports + run capture (stable config)
+
+```bash
+cd /home/insu/Desktop/SCANU-dev_adrian && \
+pkill -f capture_all_sensors.py || true && \
+pkill -f run_live_hub.py || true && \
+sudo fuser -k /dev/ttyUSB0 /dev/ttyUSB1 2>/dev/null || true && \
+sleep 1 && \
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --frames 300 \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
+  --thermal-device 0 \
+  --presence ifx
 ```
