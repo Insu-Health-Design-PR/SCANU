@@ -125,8 +125,8 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--interval-s", type=float, default=0.1, help="Loop delay between frames")
     p.add_argument("--mmwave-timeout-ms", type=int, default=200, help="mmWave frame read timeout")
 
-    p.add_argument("--cli-port", required=True, help="mmWave CLI port")
-    p.add_argument("--data-port", required=True, help="mmWave DATA port")
+    p.add_argument("--cli-port", default=None, help="mmWave CLI port (optional; auto-detect when omitted)")
+    p.add_argument("--data-port", default=None, help="mmWave DATA port (optional; auto-detect when omitted)")
     p.add_argument("--config", "-c", required=True, help="Path to mmWave .cfg file")
     p.add_argument("--skip-mmwave-config", action="store_true", help="Skip sending .cfg")
 
@@ -154,6 +154,64 @@ def build_presence_source(mode: str, ifx_uuid: Optional[str]) -> Optional[Presen
     return PresenceSource(IfxLtr11PresenceProvider(uuid=ifx_uuid))
 
 
+def connect_mmwave_with_recovery(serial_mgr: SerialManager, cli_port: Optional[str], data_port: Optional[str]) -> tuple[str, str]:
+    """
+    Connect mmWave UART ports and verify CLI responsiveness.
+
+    Recovery behavior:
+    - If both ports are provided, try that pair and then swapped pair.
+    - If ports are omitted or partial, auto-detect using SerialManager heuristics.
+    """
+
+    candidates: list[tuple[str, str]] = []
+    if cli_port and data_port:
+        candidates.append((str(cli_port), str(data_port)))
+        if str(cli_port) != str(data_port):
+            candidates.append((str(data_port), str(cli_port)))
+    else:
+        ports = serial_mgr.find_radar_ports(verbose=False, config_port=cli_port, data_port=data_port)
+        candidates.append((ports.config_port, ports.data_port))
+        if ports.config_port != ports.data_port:
+            candidates.append((ports.data_port, ports.config_port))
+
+    errors: list[str] = []
+    chosen: Optional[tuple[str, str]] = None
+    for cfg, dat in candidates:
+        alive = False
+        try:
+            serial_mgr.connect(cfg, dat)
+            alive, probe_rsp = serial_mgr.probe_cli(timeout_s=1.0)
+            if alive:
+                chosen = (cfg, dat)
+                break
+            errors.append(f"{cfg}/{dat}: CLI did not respond")
+            logging.getLogger("capture_all_sensors").warning(
+                "CLI probe failed for config/data %s/%s. response='%s'",
+                cfg,
+                dat,
+                (probe_rsp or "").strip()[:160],
+            )
+        except Exception as exc:
+            errors.append(f"{cfg}/{dat}: {exc}")
+        finally:
+            if alive:
+                continue
+            if not serial_mgr.is_connected:
+                continue
+            try:
+                serial_mgr.disconnect()
+            except Exception:
+                pass
+
+    if chosen is not None:
+        return chosen
+
+    raise RuntimeError(
+        "Failed to establish responsive mmWave CLI/DATA ports. "
+        f"Tried pairs: {errors}. If issue persists, reconnect/reset sensor."
+    )
+
+
 def main() -> int:
     args = build_parser().parse_args()
     setup_logging(args.verbose)
@@ -174,7 +232,8 @@ def main() -> int:
 
     try:
         # mmWave setup
-        serial_mgr.connect(args.cli_port, args.data_port)
+        used_cli_port, used_data_port = connect_mmwave_with_recovery(serial_mgr, args.cli_port, args.data_port)
+        logger.info("Using mmWave ports CLI=%s DATA=%s", used_cli_port, used_data_port)
         if not args.skip_mmwave_config:
             cfg_result = RadarConfigurator(serial_mgr).configure_from_file(cfg_path)
             if not cfg_result.success:
@@ -310,10 +369,16 @@ def main() -> int:
                     close_fn()
                 except Exception:
                     pass
-        try:
-            serial_mgr.disconnect()
-        except Exception:
-            pass
+        if serial_mgr.is_connected:
+            try:
+                # Best-effort stop to leave firmware in a clean state for next run.
+                RadarConfigurator(serial_mgr).stop()
+            except Exception:
+                pass
+            try:
+                serial_mgr.disconnect()
+            except Exception:
+                pass
 
 
 if __name__ == "__main__":
