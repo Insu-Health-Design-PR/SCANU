@@ -5,7 +5,6 @@ from .radar_config import DEFAULT_CONFIG, RadarConfigurator
 from .serial_manager import SerialManager
 from .tlv_parser import DetectedPoint, ParsedFrame, TLVParser
 from .uart_source import FrameHeader, UARTSource
-from .point_filter import RadarPointFilterConfig, filter_detected_points
 
 __all__ = [
     "TLVType",
@@ -18,6 +17,5 @@ __all__ = [
     "TLVParser",
     "DetectedPoint",
     "ParsedFrame",
-    "RadarPointFilterConfig",
-    "filter_detected_points",
 ]
+
