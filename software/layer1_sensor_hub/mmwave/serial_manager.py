@@ -402,6 +402,23 @@ class SerialManager:
             logger.debug(f"CLI RSP: {response.strip()}")
         return response
 
+    def probe_cli(self, timeout_s: float = 1.0) -> tuple[bool, str]:
+        """
+        Check whether the CLI UART is responsive.
+
+        Sends lightweight commands and treats any non-empty response as alive.
+        """
+        responses: list[str] = []
+        for cmd in ("version", "sensorStop"):
+            try:
+                rsp = self.send_cli_command(cmd, timeout_s=timeout_s)
+            except Exception:
+                rsp = ""
+            if rsp:
+                responses.append(rsp)
+        merged = "".join(responses)
+        return bool(merged.strip()), merged
+
     def __enter__(self):
         """Context manager entry."""
 
