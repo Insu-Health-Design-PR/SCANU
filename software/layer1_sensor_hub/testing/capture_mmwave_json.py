@@ -38,7 +38,7 @@ def main() -> int:
     p.add_argument("--data-port", default=None, help="Optional explicit DATA port")
     p.add_argument(
         "--config",
-        required=True,
+        default="software/layer1_sensor_hub/testing/configs/mmwave_main.cfg",
         help="Path to mmWave .cfg file",
     )
     p.add_argument("--skip-config", action="store_true", help="Skip RadarConfigurator.configure()")
