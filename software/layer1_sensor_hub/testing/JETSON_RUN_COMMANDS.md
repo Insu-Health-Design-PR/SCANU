@@ -189,3 +189,31 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --thermal-device 0 \
   --presence ifx
 ```
+
+## 13) Run capture after reconnect hardening (stable config)
+
+With explicit ports:
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --frames 300 \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
+  --thermal-device 0 \
+  --presence ifx
+```
+
+Recommended (auto-detect ports + recovery):
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --frames 300 \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
+  --thermal-device 0 \
+  --presence ifx
+```
