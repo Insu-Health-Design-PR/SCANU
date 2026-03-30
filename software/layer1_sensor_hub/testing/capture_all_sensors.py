@@ -21,14 +21,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
-from software.layer1_sensor_hub.mmwave import (
-    RadarConfigurator,
-    RadarPointFilterConfig,
-    SerialManager,
-    TLVParser,
-    UARTSource,
-    filter_detected_points,
-)
+from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 
 
@@ -55,7 +48,7 @@ def setup_logging(verbose: bool) -> None:
     logging.basicConfig(level=level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
 
-def render_radar_panel(width: int, height: int, points: list[object], raw_count: int) -> np.ndarray:
+def render_radar_panel(width: int, height: int, parsed_frame: Optional[object]) -> np.ndarray:
     panel = np.zeros((height, width, 3), dtype=np.uint8)
     cv2.putText(panel, "mmWave Radar", (10, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
 
@@ -69,6 +62,10 @@ def render_radar_panel(width: int, height: int, points: list[object], raw_count:
     cv2.putText(panel, "X", (width - 24, bottom_y - 8), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (130, 130, 130), 1)
     cv2.putText(panel, "Y", (center_x + 6, 52), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (130, 130, 130), 1)
 
+    points = []
+    if parsed_frame is not None:
+        points = getattr(parsed_frame, "points", []) or []
+
     for p in points:
         x_m = float(getattr(p, "x", 0.0))
         y_m = float(getattr(p, "y", 0.0))
@@ -79,7 +76,7 @@ def render_radar_panel(width: int, height: int, points: list[object], raw_count:
 
     cv2.putText(
         panel,
-        f"points raw/filtered: {raw_count}/{len(points)}",
+        f"points: {len(points)}",
         (10, height - 12),
         cv2.FONT_HERSHEY_SIMPLEX,
         0.6,
@@ -145,13 +142,6 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--output", "-o", default="all_sensors.json", help="Output JSON path")
     p.add_argument("--panel-width", type=int, default=640, help="Per-sensor panel width")
     p.add_argument("--panel-height", type=int, default=480, help="Per-sensor panel height")
-    p.add_argument("--mmw-min-range-m", type=float, default=0.35)
-    p.add_argument("--mmw-max-range-m", type=float, default=6.0)
-    p.add_argument("--mmw-max-azimuth-deg", type=float, default=65.0)
-    p.add_argument("--mmw-min-z-m", type=float, default=-1.0)
-    p.add_argument("--mmw-max-z-m", type=float, default=2.5)
-    p.add_argument("--mmw-min-snr-db", type=float, default=6.0)
-    p.add_argument("--mmw-max-abs-doppler-mps", type=float, default=6.0)
     p.add_argument("--verbose", "-v", action="store_true")
     return p
 
@@ -178,15 +168,6 @@ def main() -> int:
     presence_source: Optional[PresenceSource] = None
     writer = None
     records: list[dict] = []
-    point_filter_cfg = RadarPointFilterConfig(
-        min_range_m=args.mmw_min_range_m,
-        max_range_m=args.mmw_max_range_m,
-        max_abs_azimuth_deg=args.mmw_max_azimuth_deg,
-        min_z_m=args.mmw_min_z_m,
-        max_z_m=args.mmw_max_z_m,
-        min_snr_db=args.mmw_min_snr_db,
-        max_abs_doppler_mps=args.mmw_max_abs_doppler_mps,
-    )
 
     p_hist: deque[float] = deque(maxlen=300)
     m_hist: deque[float] = deque(maxlen=300)
@@ -235,13 +216,9 @@ def main() -> int:
 
             # mmWave frame
             mmw_parsed = None
-            raw_points: list[object] = []
-            filtered_points: list[object] = []
             raw = src.read_frame(timeout_ms=args.mmwave_timeout_ms)
             if raw is not None:
                 mmw_parsed = parser.parse(raw)
-                raw_points = getattr(mmw_parsed, "points", []) or []
-                filtered_points = filter_detected_points(raw_points, point_filter_cfg)
 
             # Presence frame
             prs = None
@@ -261,7 +238,7 @@ def main() -> int:
                 thermal_bgr = cv2.resize(thermal_bgr, (panel_w, panel_h), interpolation=cv2.INTER_LINEAR)
             cv2.putText(thermal_bgr, "Thermal", (10, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
 
-            radar_panel = render_radar_panel(panel_w, panel_h, filtered_points, len(raw_points))
+            radar_panel = render_radar_panel(panel_w, panel_h, mmw_parsed)
             inf_panel = render_infineon_panel(panel_w, panel_h, p_hist, m_hist)
             combined = np.hstack((thermal_bgr, radar_panel, inf_panel))
             writer.write(combined)
@@ -271,8 +248,7 @@ def main() -> int:
                 "timestamp_ms": t_ms,
                 "mmwave": {
                     "frame_number": getattr(mmw_parsed, "frame_number", None),
-                    "num_points_raw": len(raw_points),
-                    "num_points_filtered": len(filtered_points),
+                    "num_points": len(getattr(mmw_parsed, "points", []) or []),
                 },
                 "presence": None
                 if prs is None

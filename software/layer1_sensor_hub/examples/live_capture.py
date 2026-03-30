@@ -30,14 +30,13 @@ _software_root = _repo_root / "software"
 sys.path.insert(0, str(_repo_root))
 sys.path.insert(0, str(_software_root))
 
-from software.layer1_sensor_hub.mmwave import (
+from layer1_radar import (
     SerialManager,
     RadarConfigurator,
     UARTSource,
     TLVParser,
 )
-from software.layer1_sensor_hub.thermal import ThermalCameraSource
-from software.layer1_sensor_hub.mmwave import RadarPointFilterConfig, filter_detected_points
+from layer1_radar import ThermalCameraSource
 
 
 def setup_logging(verbose=False):
@@ -214,13 +213,6 @@ def main():
             "Set 0 to disable (default)."
         ),
     )
-    parser.add_argument("--mmw-min-range-m", type=float, default=0.35)
-    parser.add_argument("--mmw-max-range-m", type=float, default=6.0)
-    parser.add_argument("--mmw-max-azimuth-deg", type=float, default=65.0)
-    parser.add_argument("--mmw-min-z-m", type=float, default=-1.0)
-    parser.add_argument("--mmw-max-z-m", type=float, default=2.5)
-    parser.add_argument("--mmw-min-snr-db", type=float, default=6.0)
-    parser.add_argument("--mmw-max-abs-doppler-mps", type=float, default=6.0)
 
     args = parser.parse_args()
 
@@ -232,15 +224,6 @@ def main():
     inf_provider = None
     video_writer = None
     fig = None
-    point_filter_cfg = RadarPointFilterConfig(
-        min_range_m=args.mmw_min_range_m,
-        max_range_m=args.mmw_max_range_m,
-        max_abs_azimuth_deg=args.mmw_max_azimuth_deg,
-        min_z_m=args.mmw_min_z_m,
-        max_z_m=args.mmw_max_z_m,
-        min_snr_db=args.mmw_min_snr_db,
-        max_abs_doppler_mps=args.mmw_max_abs_doppler_mps,
-    )
 
     try:
         print("\n" + "="*60)
@@ -298,7 +281,7 @@ def main():
         if args.infineon:
             # Lazy import so users without ifxradarsdk can still run mmWave+thermal.
             try:
-                from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider
+                from software.layer1_radar.infineon import IfxLtr11PresenceProvider
 
                 inf_provider = IfxLtr11PresenceProvider(uuid=args.infineon_uuid)
                 print("Infineon LTR11 enabled")
@@ -358,13 +341,11 @@ def main():
 
                 last_frame_time = time.time()
                 parsed = tlv_parser.parse(raw_frame)
-                raw_points = parsed.points
-                points = filter_detected_points(raw_points, point_filter_cfg)
 
-                x = [p.x for p in points]
-                y = [p.y for p in points]
-                doppler = [p.doppler for p in points]
-                snr = [p.snr for p in points]
+                x = [p.x for p in parsed.points]
+                y = [p.y for p in parsed.points]
+                doppler = [p.doppler for p in parsed.points]
+                snr = [p.snr for p in parsed.points]
 
                 # Update plot
                 if len(x) > 0:
@@ -452,7 +433,7 @@ def main():
 
                 print(f"\rFrame {i+1}/{args.frames} | "
                       f"Objects: {num_objects} | "
-                      f"Points raw/filtered: {len(raw_points)}/{len(points)} | "
+                      f"Points: {len(parsed.points)} | "
                       f"FPS: {fps_live:.1f}", end="")
 
                 # Optional JSON
@@ -469,9 +450,7 @@ def main():
                         }
                     frames_data.append({
                         "frame": parsed.frame_number,
-                        "points_raw_count": len(raw_points),
-                        "points_filtered_count": len(points),
-                        "points": [p.to_dict() for p in points],
+                        "points": [p.to_dict() for p in parsed.points],
                         "thermal": thermal_payload,
                         "infineon": inf_sample,
                     })

@@ -157,18 +157,3 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --thermal-device 0 \
   --presence ifx
 ```
-
-## 11) Run mmWave only (principal sensor tuned)
-
-```bash
-python3 software/layer1_sensor_hub/testing/run_live_hub.py \
-  --mmwave on \
-  --presence off \
-  --thermal off \
-  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
-  --max-frames 0 \
-  --interval-s 0.1 \
-  --mmw-min-snr-db 5 \
-  --mmw-max-azimuth-deg 60 \
-  --mmw-max-range-m 6
-```
