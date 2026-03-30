@@ -7,6 +7,7 @@ Handles discovery and connection to the radar's two UART ports:
 """
 
 import logging
+import string
 import time
 from dataclasses import dataclass
 from typing import Any, Iterable, List, Optional
@@ -417,7 +418,7 @@ class SerialManager:
             if rsp:
                 responses.append(rsp)
         merged = "".join(responses)
-        return bool(merged.strip()), merged
+        return self._looks_like_cli_text(merged), merged
 
     def __enter__(self):
         """Context manager entry."""
@@ -429,3 +430,27 @@ class SerialManager:
 
         self.disconnect()
         return False
+    @staticmethod
+    def _looks_like_cli_text(response: str) -> bool:
+        text = (response or "").strip()
+        if not text:
+            return False
+
+        # mmWave CLI typically returns prompt/ack/error keywords.
+        markers = (
+            "mmwdemo",
+            "done",
+            "error",
+            "sensorstop",
+            "sensorstart",
+            "version",
+            ":/>",
+        )
+        lowered = text.lower()
+        if any(m in lowered for m in markers):
+            return True
+
+        # Reject likely binary/noisy payloads (wrongly-opened DATA UART).
+        printable = set(string.printable)
+        ratio = sum(ch in printable for ch in text) / max(1, len(text))
+        return ratio > 0.95 and ">" in text
