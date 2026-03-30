@@ -180,37 +180,23 @@ class TLVParser:
         if tlv_length <= 0:
             return None
 
-        def _is_plausible_payload(payload_len: int) -> bool:
-            if payload_len <= 0 or payload_len > remaining:
-                return False
-            if tlv_type == TLVType.DETECTED_POINTS:
-                return payload_len % POINT_SIZE == 0
-            if tlv_type == TLVType.DETECTED_POINTS_SIDE_INFO:
-                return payload_len % POINT_SIDE_INFO_SIZE == 0
-            if tlv_type in (TLVType.RANGE_PROFILE, TLVType.NOISE_PROFILE):
-                return payload_len % 2 == 0
-            if tlv_type == TLVType.STATS:
-                return payload_len >= 24 and payload_len % 4 == 0
-            return True
+        # Prefer payload-only interpretation when sane.
+        if tlv_length <= remaining:
+            payload_len = tlv_length
+            if payload_len > 0:
+                return payload_len
 
-        payload_only = tlv_length
-        inclusive = tlv_length - 8 if tlv_length >= 8 else -1
-        payload_ok = _is_plausible_payload(payload_only)
-        inclusive_ok = _is_plausible_payload(inclusive)
-
-        if payload_ok and not inclusive_ok:
-            return payload_only
-        if inclusive_ok and not payload_ok:
-            logger.debug(
-                "TLV %s using inclusive-length mode (raw=%s -> payload=%s)",
-                tlv_type,
-                tlv_length,
-                inclusive,
-            )
-            return inclusive
-        if payload_ok and inclusive_ok:
-            # Ambiguous case: prefer payload-only to preserve TI mmw demo convention.
-            return payload_only
+        # Fallback: `tlv_length` includes the 8-byte TL header.
+        if tlv_length >= 8:
+            payload_len = tlv_length - 8
+            if 0 < payload_len <= remaining:
+                logger.debug(
+                    "TLV %s using inclusive-length mode (raw=%s -> payload=%s)",
+                    tlv_type,
+                    tlv_length,
+                    payload_len,
+                )
+                return payload_len
 
         return None
 

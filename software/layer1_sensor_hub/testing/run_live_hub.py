@@ -50,9 +50,6 @@ class MMWaveSummary:
     compact_object_score: float
 
 
-DEFAULT_MMW_FILTER_CFG = RadarPointFilterConfig()
-
-
 def resolve_config_path(raw_path: str) -> Path:
     candidate = Path(raw_path).expanduser()
     if candidate.is_absolute():
@@ -78,7 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--config",
         type=str,
-        required=True,
+        default="software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg",
         help="Path to mmWave .cfg file used for configuration",
     )
     parser.add_argument("--skip-mmwave-config", action="store_true")
@@ -177,7 +174,7 @@ def summarize_mmwave(parsed: object, cfg: RadarPointFilterConfig) -> MMWaveSumma
     )
 
 
-def summarize_frame(frame: object, mmw_filter_cfg: RadarPointFilterConfig = DEFAULT_MMW_FILTER_CFG) -> str:
+def summarize_frame(frame: object, mmw_filter_cfg: RadarPointFilterConfig) -> str:
     mmw = getattr(frame, "mmwave_frame", None)
     prs = getattr(frame, "presence_frame", None)
     thm = getattr(frame, "thermal_frame_bgr", None)
@@ -261,7 +258,7 @@ def run_loop(
     max_frames: int,
     interval_s: float,
     mmwave_timeout_ms: int,
-    mmw_filter_cfg: RadarPointFilterConfig = DEFAULT_MMW_FILTER_CFG,
+    mmw_filter_cfg: RadarPointFilterConfig,
     printer: Callable[[str], None] = print,
     sleeper: Callable[[float], None] = time.sleep,
 ) -> int:
