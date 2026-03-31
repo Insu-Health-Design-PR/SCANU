@@ -217,3 +217,25 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --thermal-device 0 \
   --presence ifx
 ```
+
+## 14) Run capture with stable Linux serial IDs (`/dev/serial/by-id`)
+
+List stable serial IDs first:
+
+```bash
+ls -l /dev/serial/by-id
+```
+
+Use those IDs instead of `/dev/ttyUSB*`:
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
+  --cli-port "/dev/serial/by-id/TU_ID_CLI" \
+  --data-port "/dev/serial/by-id/TU_ID_DATA" \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --frames 300 \
+  --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
+  --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
+  --thermal-device 0 \
+  --presence ifx
+```
