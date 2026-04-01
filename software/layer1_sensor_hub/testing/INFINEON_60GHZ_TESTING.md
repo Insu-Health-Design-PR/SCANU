@@ -51,6 +51,35 @@ Expected output shape:
 frame=N | mmw=off | ifx=on presence=0.xxx motion=0.xxx dist=N/A | thermal=off
 ```
 
+## 3.1) Basic person-pass detector (value + zone + detection time)
+
+Run:
+
+```bash
+python3 software/layer1_sensor_hub/testing/ifx_presence_basic.py \
+  --duration-s 30 \
+  --interval-s 0.2 \
+  --presence-th 0.45 \
+  --motion-th 0.35
+```
+
+Optional UUID:
+
+```bash
+python3 software/layer1_sensor_hub/testing/ifx_presence_basic.py \
+  --ifx-uuid <REAL_UUID> \
+  --duration-s 30 \
+  --interval-s 0.2
+```
+
+What it prints:
+- Live signal value (`presence`, `motion`)
+- Basic location proxy (`zone=near|mid|far`)
+- Detection timeline (`start`, `end`, `duration`)
+
+What it saves:
+- JSON event list in `software/layer1_sensor_hub/testing/view/ifx_events_<timestamp>.json`
+
 ## 4) Raw Metadata Diagnostic
 
 Use this when output seems weak/intermittent:
@@ -105,7 +134,6 @@ Gaps for the 60GHz sensor:
 - Empty scene: presence low and stable, no persistent motion.
 - Person crossing FOV: clear rise in presence/motion within 1-2 seconds.
 - Person standing: presence remains elevated even if motion decreases.
-
 
 
 
