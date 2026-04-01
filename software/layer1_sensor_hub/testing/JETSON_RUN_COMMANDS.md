@@ -239,3 +239,39 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --thermal-device 0 \
   --presence ifx
 ```
+
+## 15) Test only Infineon 60GHz sensor (no mmWave, no thermal)
+
+Check SDK import:
+
+```bash
+python3 -c "import ifxradarsdk; print('ifxradarsdk OK')"
+```
+
+Run connectivity approval only for Infineon:
+
+```bash
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
+  --skip-mmwave \
+  --skip-thermal
+```
+
+If you have a specific Infineon UUID:
+
+```bash
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
+  --skip-mmwave \
+  --skip-thermal \
+  --ifx-uuid <TU_UUID>
+```
+
+Run live loop only with Infineon (code-path validation):
+
+```bash
+python3 software/layer1_sensor_hub/testing/run_live_hub.py \
+  --mmwave off \
+  --thermal off \
+  --presence ifx \
+  --max-frames 50 \
+  --interval-s 0.2
+```
