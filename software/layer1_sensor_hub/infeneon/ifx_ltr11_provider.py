@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 from typing import Optional
 
@@ -38,6 +39,10 @@ class IfxLtr11PresenceProvider:
         self._baseline_warmup_left = 20
         self._presence_ema = 0.0
         self._ema_alpha = 0.25
+        self._active_hist: deque[bool] = deque(maxlen=40)
+        self._motion_flag_hist: deque[bool] = deque(maxlen=40)
+        self._motion_score_hist: deque[float] = deque(maxlen=40)
+        self._avg_power_hist: deque[float] = deque(maxlen=40)
         self.last_meta: dict | None = None
 
         cfg = self._dev.get_config_defaults()
@@ -123,15 +128,59 @@ class IfxLtr11PresenceProvider:
         power_score = float(np.clip(power_delta / (0.25 * baseline + 1e-6), 0.0, 1.0))
 
         active = bool(getattr(metadata, "active", False))
-        active_score = 1.0 if active else 0.0
+        motion_flag = bool(getattr(metadata, "motion", False))
         motion_score = float(np.clip(motion_energy / (signal_rms + 1e-6), 0.0, 1.0))
 
+        self._active_hist.append(active)
+        self._motion_flag_hist.append(motion_flag)
+        self._motion_score_hist.append(motion_score)
+        self._avg_power_hist.append(avg_power)
+
+        active_ratio = 1.0 if active else 0.0
+        motion_flag_ratio = 1.0 if motion_flag else 0.0
+        mean_motion_score = motion_score
+        power_cv = 0.0
+        active_stuck_high = False
+        if self._active_hist:
+            active_ratio = float(np.mean(np.asarray(self._active_hist, dtype=np.float32)))
+            motion_flag_ratio = float(np.mean(np.asarray(self._motion_flag_hist, dtype=np.float32)))
+            mean_motion_score = float(np.mean(np.asarray(self._motion_score_hist, dtype=np.float32)))
+            p_arr = np.asarray(self._avg_power_hist, dtype=np.float32)
+            p_mean = float(np.mean(p_arr)) if p_arr.size else 0.0
+            p_std = float(np.std(p_arr)) if p_arr.size else 0.0
+            power_cv = p_std / max(1e-6, p_mean)
+            active_stuck_high = (
+                len(self._active_hist) >= 20
+                and active_ratio > 0.95
+                and motion_flag_ratio < 0.10
+                and mean_motion_score < 0.20
+                and power_cv < 0.02
+            )
+
+        active_weight = 0.55
+        if active_stuck_high:
+            # Some boards/firmware report `active=True` almost always.
+            # Down-weight active to avoid a permanently high presence floor.
+            active_weight = 0.10
+        elif active_ratio < 0.05:
+            # If active is almost always false, still keep a small influence.
+            active_weight = 0.20
+
+        power_weight = 0.30
+        motion_weight = 1.0 - active_weight - power_weight
+        active_score = 1.0 if active else 0.0
+
         # Presence should remain meaningful for quiet subjects, not only motion.
-        presence_raw_instant = float(np.clip(0.6 * active_score + 0.3 * power_score + 0.1 * motion_score, 0.0, 1.0))
+        presence_raw_instant = float(
+            np.clip(
+                active_weight * active_score + power_weight * power_score + motion_weight * motion_score,
+                0.0,
+                1.0,
+            )
+        )
         self._presence_ema = (1.0 - self._ema_alpha) * self._presence_ema + self._ema_alpha * presence_raw_instant
         presence_raw = float(np.clip(self._presence_ema, 0.0, 1.0))
 
-        motion_flag = bool(getattr(metadata, "motion", False))
         motion_raw = max(1.0 if motion_flag else 0.0, motion_score)
         # LTR11 metadata does not expose direct distance.
         distance_m = -1.0
@@ -147,6 +196,12 @@ class IfxLtr11PresenceProvider:
             "motion_energy": motion_energy,
             "power_score": power_score,
             "motion_score": motion_score,
+            "active_ratio": active_ratio,
+            "motion_flag_ratio": motion_flag_ratio,
+            "mean_motion_score": mean_motion_score,
+            "power_cv": power_cv,
+            "active_stuck_high": active_stuck_high,
+            "active_weight": active_weight,
             "presence_raw_instant": presence_raw_instant,
         }
         return presence_raw, motion_raw, distance_m
