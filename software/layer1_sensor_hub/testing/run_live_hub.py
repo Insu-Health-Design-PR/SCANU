@@ -86,7 +86,9 @@ def summarize_frame(frame: object) -> str:
 
     prs_summary = "ifx=off"
     if prs is not None:
-        prs_summary = f"ifx=on presence={prs.presence_raw:.3f} motion={prs.motion_raw:.3f} dist={prs.distance_m:.2f}m"
+        dist = getattr(prs, "distance_m", -1.0)
+        dist_text = f"{dist:.2f}m" if isinstance(dist, (int, float)) and dist >= 0 else "N/A"
+        prs_summary = f"ifx=on presence={prs.presence_raw:.3f} motion={prs.motion_raw:.3f} dist={dist_text}"
 
     thm_summary = "thermal=off"
     if thm is not None:

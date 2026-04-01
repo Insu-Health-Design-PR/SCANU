@@ -315,7 +315,7 @@ def main() -> int:
                     "frame_number": prs.frame_number,
                     "presence_raw": float(prs.presence_raw),
                     "motion_raw": float(prs.motion_raw),
-                    "distance_m": float(prs.distance_m),
+                    "distance_m": None if float(prs.distance_m) < 0 else float(prs.distance_m),
                 },
                 "thermal": {
                     "mean_u8": float(np.mean(cv2.cvtColor(thermal_bgr, cv2.COLOR_BGR2GRAY))),

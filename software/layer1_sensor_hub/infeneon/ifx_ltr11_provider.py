@@ -34,6 +34,10 @@ class IfxLtr11PresenceProvider:
         self._dev = DeviceLtr11(uuid=uuid)
         self._started = False
         self._prev_frame: np.ndarray | None = None
+        self._power_baseline: float | None = None
+        self._baseline_warmup_left = 20
+        self._presence_ema = 0.0
+        self._ema_alpha = 0.25
         self.last_meta: dict | None = None
 
         cfg = self._dev.get_config_defaults()
@@ -103,19 +107,46 @@ class IfxLtr11PresenceProvider:
             motion_energy = float(np.sqrt(np.mean(dmag * dmag))) if dmag.size else 0.0
         self._prev_frame = arr.copy()
 
-        presence_raw = motion_energy
+        avg_power = float(getattr(metadata, "avg_power", 0.0))
+        if self._power_baseline is None:
+            self._power_baseline = max(avg_power, 1e-6)
+
+        if self._baseline_warmup_left > 0:
+            self._power_baseline = 0.7 * self._power_baseline + 0.3 * max(avg_power, 1e-6)
+            self._baseline_warmup_left -= 1
+        else:
+            # Slow baseline tracking for long sessions and mild ambient drift.
+            self._power_baseline = 0.995 * self._power_baseline + 0.005 * max(avg_power, 1e-6)
+
+        baseline = max(self._power_baseline, 1e-6)
+        power_delta = max(0.0, avg_power - baseline)
+        power_score = float(np.clip(power_delta / (0.25 * baseline + 1e-6), 0.0, 1.0))
+
+        active = bool(getattr(metadata, "active", False))
+        active_score = 1.0 if active else 0.0
+        motion_score = float(np.clip(motion_energy / (signal_rms + 1e-6), 0.0, 1.0))
+
+        # Presence should remain meaningful for quiet subjects, not only motion.
+        presence_raw_instant = float(np.clip(0.6 * active_score + 0.3 * power_score + 0.1 * motion_score, 0.0, 1.0))
+        self._presence_ema = (1.0 - self._ema_alpha) * self._presence_ema + self._ema_alpha * presence_raw_instant
+        presence_raw = float(np.clip(self._presence_ema, 0.0, 1.0))
+
         motion_flag = bool(getattr(metadata, "motion", False))
-        motion_raw = 1.0 if motion_flag else 0.0
+        motion_raw = max(1.0 if motion_flag else 0.0, motion_score)
         # LTR11 metadata does not expose direct distance.
         distance_m = -1.0
 
         self.last_meta = {
-            "avg_power": float(getattr(metadata, "avg_power", 0.0)),
-            "active": bool(getattr(metadata, "active", False)),
+            "avg_power": avg_power,
+            "power_baseline": baseline,
+            "active": active,
             "motion": motion_flag,
             "direction": bool(getattr(metadata, "direction", False)),
             "num_samples": int(arr.size),
             "signal_rms": signal_rms,
             "motion_energy": motion_energy,
+            "power_score": power_score,
+            "motion_score": motion_score,
+            "presence_raw_instant": presence_raw_instant,
         }
         return presence_raw, motion_raw, distance_m
