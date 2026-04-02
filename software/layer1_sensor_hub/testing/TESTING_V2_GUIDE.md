@@ -101,3 +101,32 @@ python3 -m pytest -q \
   software/layer1_sensor_hub/testing/test_sensor_hub.py \
   software/layer1_sensor_hub/testing/test_run_live_hub.py
 ```
+
+### 6) `concealed_weapon_screening_test.py`
+Purpose:
+- Run a live camera + mmWave + Infineon capture using `capture_all_sensors_rich.py`.
+- Generate a screening report (`ALERT` / `NO_ALERT`) from fused heuristics.
+
+Example:
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 300 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/concealed_screening.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/concealed_screening_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/concealed_screening_report.json
+```
+
+Notes:
+- This is an experimental screening test, not a certified weapon detector.
+- Tune thresholds (`--mmwave-risk-th`, `--presence-th`, `--thermal-delta-th`) using your own field captures.
+
+### 7) `WEAPON_DETECTION_TESTING.md`
+Purpose:
+- Dedicated command set for experimental concealed-weapon screening workflow.
+- Uses `stable_tracking_weapon_detection.cfg` as the recommended mmWave base profile.
+
+Open:
+- `software/layer1_sensor_hub/testing/WEAPON_DETECTION_TESTING.md`
