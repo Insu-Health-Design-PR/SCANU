@@ -116,3 +116,18 @@ git checkout dev_adrian
 git pull --ff-only origin dev_adrian
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py --help | grep mode
 ```
+
+## 9) Commands Used In Jetson (No IFX)
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py --help | grep mode
+
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py --skip-infineon
+
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json
+
+cat software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_report.json
+```
