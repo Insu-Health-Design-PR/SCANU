@@ -1,0 +1,22 @@
+{
+  "status": "NO_ALERT",
+  "summary": {
+    "frames": 300,
+    "alerts": 0,
+    "avg_frame_score": 0.02580717206065154,
+    "thermal_baseline": 69.47902701822916
+  },
+  "thresholds": {
+    "mmwave_risk_th": 0.45,
+    "presence_th": 0.55,
+    "thermal_delta_th": 6.0,
+    "min_consecutive": 6,
+    "thermal_baseline_frames": 20
+  },
+  "capture_paths": {
+    "capture_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/weapon_screening_capture.json",
+    "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/weapon_screening.mp4",
+    "risk_config": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
+  },
+  "segments": []
+}
