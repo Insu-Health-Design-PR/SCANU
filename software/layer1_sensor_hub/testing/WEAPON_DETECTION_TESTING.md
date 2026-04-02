@@ -1,0 +1,84 @@
+# Weapon Detection Screening (Experimental)
+
+This guide uses camera + mmWave + Infineon to run an **experimental screening** workflow for concealed object patterns.
+
+Important:
+- This is a heuristic screening flow.
+- It is **not** a certified weapon detector.
+- Always treat `ALERT` as a prompt for manual review, not final proof.
+
+## 1) Recommended Config Files
+
+- mmWave profile:
+  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg`
+- Risk profile:
+  - `software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json`
+
+## 2) Preflight (Connectivity)
+
+```bash
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py
+```
+
+If you need explicit ports:
+
+```bash
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --thermal-device 0
+```
+
+## 3) Rich Capture With New Weapon Config
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_all_sensors_rich.py \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 300 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_rich.mp4 \
+  --output software/layer1_sensor_hub/testing/view/weapon_screening_rich.json
+```
+
+## 4) Full Screening Test (Capture + Report)
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 300 \
+  --interval-s 0.1 \
+  --mmwave-risk-th 0.45 \
+  --presence-th 0.55 \
+  --thermal-delta-th 6.0 \
+  --min-consecutive 6 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_report.json
+```
+
+## 5) Interpreting Output
+
+`NO_ALERT`:
+- No suspicious segment matched your thresholds and persistence criteria.
+
+`ALERT`:
+- One or more suspicious segments were found.
+- Check:
+  - `max_mmwave_risk`
+  - `max_presence`
+  - `max_thermal_delta`
+- Review the MP4 and capture JSON before any operational decision.
+
+## 6) Tuning Tips
+
+If detections are too weak (misses):
+- Lower `--mmwave-risk-th` (example: `0.40`)
+- Lower `--presence-th` (example: `0.50`)
+- Lower `--min-consecutive` (example: `4`)
+
+If false positives are high:
+- Raise `--mmwave-risk-th` (example: `0.55`)
+- Raise `--presence-th` (example: `0.65`)
+- Raise `--min-consecutive` (example: `8`)

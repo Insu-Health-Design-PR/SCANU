@@ -39,3 +39,5 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors_rich.py \
 ```
 
 Important: this is a heuristic profile for experiments. It is not a certified safety/security detector.
+
+- `stable_tracking_weapon_detection.cfg`: experimental indoor profile for concealed-object screening tests.
