@@ -105,3 +105,14 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
 - `--presence-th 1.0` (effectively disabled)
 - `--thermal-delta-th 4.0`
 - `--min-consecutive 4`
+
+## 8) Verify Local Branch/Script Before Running `--mode`
+
+Run this first to ensure your local copy includes the latest `--mode no_ifx` support:
+
+```bash
+cd /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU
+git checkout dev_adrian
+git pull --ff-only origin dev_adrian
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py --help | grep mode
+```
