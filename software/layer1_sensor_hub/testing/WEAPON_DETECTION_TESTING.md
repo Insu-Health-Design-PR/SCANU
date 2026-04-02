@@ -82,3 +82,26 @@ If false positives are high:
 - Raise `--mmwave-risk-th` (example: `0.55`)
 - Raise `--presence-th` (example: `0.65`)
 - Raise `--min-consecutive` (example: `8`)
+
+## 7) No-IFX Preset (mmWave + Thermal)
+
+Use this when the presence sensor is unavailable or unstable.
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_report.json
+```
+
+`--mode no_ifx` applies these tuned values automatically:
+- `--presence off`
+- `--mmwave-risk-th 0.07`
+- `--presence-th 1.0` (effectively disabled)
+- `--thermal-delta-th 4.0`
+- `--min-consecutive 4`
