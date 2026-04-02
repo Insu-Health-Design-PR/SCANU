@@ -25,6 +25,17 @@ RICH_CAPTURE_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/capture_al
 DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
 DEFAULT_OUT_DIR = REPO_ROOT / "software/layer1_sensor_hub/testing/view"
 
+MODE_PRESETS = {
+    "default": {},
+    "no_ifx": {
+        "presence": "off",
+        "mmwave_risk_th": 0.07,
+        "presence_th": 1.0,
+        "thermal_delta_th": 4.0,
+        "min_consecutive": 4,
+    },
+}
+
 
 @dataclass
 class Segment:
@@ -38,6 +49,12 @@ class Segment:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Live concealed-object screening test")
+    p.add_argument(
+        "--mode",
+        choices=("default", "no_ifx"),
+        default="default",
+        help="Preset mode. `no_ifx` disables Infineon presence and applies tuned thresholds.",
+    )
 
     p.add_argument("--config", required=True, help="Path to mmWave cfg")
     p.add_argument("--frames", type=int, default=300, help="Capture frames")
@@ -125,6 +142,12 @@ def _run_capture(args: argparse.Namespace) -> None:
     print("Running live capture:")
     print(" ".join(cmd))
     subprocess.run(cmd, check=True)
+
+
+def _apply_mode_presets(args: argparse.Namespace) -> None:
+    preset = MODE_PRESETS.get(str(args.mode), {})
+    for key, value in preset.items():
+        setattr(args, key, value)
 
 
 def _safe_float(v: object, default: float = 0.0) -> float:
@@ -236,6 +259,7 @@ def _analyze_capture(args: argparse.Namespace) -> dict:
 
 def main() -> int:
     args = build_parser().parse_args()
+    _apply_mode_presets(args)
 
     capture_json_path = Path(args.capture_json).expanduser().resolve()
     capture_json_path.parent.mkdir(parents=True, exist_ok=True)
