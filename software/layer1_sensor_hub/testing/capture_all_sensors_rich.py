@@ -6,7 +6,6 @@ from __future__ import annotations
 import argparse
 import json
 import logging
-import math
 import sys
 import time
 from collections import deque
@@ -24,6 +23,33 @@ if str(REPO_ROOT) not in sys.path:
 from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
 from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
+
+RISK_PARAM_KEYS = {
+    "roi_half_width_m",
+    "roi_y_back_m",
+    "roi_y_front_m",
+    "snr_iqr_k",
+    "min_roi_points",
+    "persistent_threshold",
+    "persist_window",
+    "persist_required",
+    "ema_alpha",
+}
+
+RISK_PROFILES = {
+    "concealed_game_prop": {
+        # More sensitive profile intended for compact, partially occluded reflective objects.
+        "roi_half_width_m": 0.18,
+        "roi_y_back_m": 0.12,
+        "roi_y_front_m": 0.16,
+        "snr_iqr_k": 1.1,
+        "min_roi_points": 2,
+        "persistent_threshold": 0.20,
+        "persist_window": 24,
+        "persist_required": 8,
+        "ema_alpha": 0.30,
+    }
+}
 
 
 def resolve_config_path(raw_path: str) -> Path:
@@ -133,6 +159,17 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--persist-window", type=int, default=20, help="Persistence window size (M)")
     p.add_argument("--persist-required", type=int, default=12, help="Required active frames in window (N)")
     p.add_argument("--ema-alpha", type=float, default=0.2, help="EMA alpha for reflective fraction")
+    p.add_argument(
+        "--risk-profile",
+        choices=("none", "concealed_game_prop"),
+        default="none",
+        help="Named risk profile override",
+    )
+    p.add_argument(
+        "--risk-config",
+        default=None,
+        help="Optional JSON risk config path. Overrides risk defaults/profile when present.",
+    )
     return p
 
 
@@ -204,6 +241,63 @@ def _point_to_dict(p: object) -> dict:
         "snr": float(getattr(p, "snr", 0.0)),
         "noise": float(getattr(p, "noise", 0.0)),
     }
+
+
+def _coerce_risk_types(raw: dict) -> dict:
+    out: dict = {}
+    float_keys = (
+        "roi_half_width_m",
+        "roi_y_back_m",
+        "roi_y_front_m",
+        "snr_iqr_k",
+        "persistent_threshold",
+        "ema_alpha",
+    )
+    int_keys = ("min_roi_points", "persist_window", "persist_required")
+
+    for k in float_keys:
+        if k in raw:
+            out[k] = float(raw[k])
+    for k in int_keys:
+        if k in raw:
+            out[k] = int(raw[k])
+    return out
+
+
+def resolve_risk_params(args: argparse.Namespace, logger: logging.Logger) -> dict:
+    risk_params = {
+        "roi_half_width_m": float(args.roi_half_width_m),
+        "roi_y_back_m": float(args.roi_y_back_m),
+        "roi_y_front_m": float(args.roi_y_front_m),
+        "snr_iqr_k": float(args.snr_iqr_k),
+        "min_roi_points": int(args.min_roi_points),
+        "persistent_threshold": float(args.persistent_threshold),
+        "persist_window": int(args.persist_window),
+        "persist_required": int(args.persist_required),
+        "ema_alpha": float(args.ema_alpha),
+        "profile": "none",
+    }
+
+    if args.risk_profile != "none":
+        risk_params.update(_coerce_risk_types(RISK_PROFILES[args.risk_profile]))
+        risk_params["profile"] = str(args.risk_profile)
+
+    if args.risk_config:
+        cfg_path = resolve_config_path(str(args.risk_config))
+        if not cfg_path.exists():
+            raise RuntimeError(f"Risk config file not found: {cfg_path}")
+        loaded = json.loads(cfg_path.read_text(encoding="utf-8"))
+        if not isinstance(loaded, dict):
+            raise RuntimeError(f"Risk config must be a JSON object: {cfg_path}")
+        unknown = sorted(set(loaded.keys()) - RISK_PARAM_KEYS)
+        if unknown:
+            raise RuntimeError(f"Unknown risk config keys in {cfg_path}: {unknown}")
+        risk_params.update(_coerce_risk_types(loaded))
+        risk_params["profile"] = f"file:{cfg_path.name}"
+        risk_params["config_path"] = str(cfg_path)
+        logger.info("Loaded risk config from %s", cfg_path)
+
+    return risk_params
 
 
 def compute_risk_features(
@@ -310,6 +404,8 @@ def main() -> int:
     if not args.skip_mmwave_config and not cfg_path.exists():
         raise RuntimeError(f"Config file not found: {cfg_path}")
 
+    risk_params = resolve_risk_params(args, logger)
+
     serial_mgr = SerialManager()
     thermal = None
     presence_source: Optional[PresenceSource] = None
@@ -318,7 +414,7 @@ def main() -> int:
 
     p_hist: deque[float] = deque(maxlen=300)
     m_hist: deque[float] = deque(maxlen=300)
-    persistent_buffer: deque[int] = deque(maxlen=max(1, int(args.persist_window)))
+    persistent_buffer: deque[int] = deque(maxlen=max(1, int(risk_params["persist_window"])))
     risk_ema = 0.0
 
     try:
@@ -392,14 +488,14 @@ def main() -> int:
                 mmw_points,
                 persistent_buffer,
                 risk_ema,
-                roi_half_width_m=float(args.roi_half_width_m),
-                roi_y_back_m=float(args.roi_y_back_m),
-                roi_y_front_m=float(args.roi_y_front_m),
-                snr_iqr_k=float(args.snr_iqr_k),
-                min_roi_points=int(args.min_roi_points),
-                persistent_threshold=float(args.persistent_threshold),
-                persist_required=int(args.persist_required),
-                ema_alpha=float(args.ema_alpha),
+                roi_half_width_m=float(risk_params["roi_half_width_m"]),
+                roi_y_back_m=float(risk_params["roi_y_back_m"]),
+                roi_y_front_m=float(risk_params["roi_y_front_m"]),
+                snr_iqr_k=float(risk_params["snr_iqr_k"]),
+                min_roi_points=int(risk_params["min_roi_points"]),
+                persistent_threshold=float(risk_params["persistent_threshold"]),
+                persist_required=int(risk_params["persist_required"]),
+                ema_alpha=float(risk_params["ema_alpha"]),
             )
 
             rec = {
@@ -442,17 +538,7 @@ def main() -> int:
                         "frames": len(records),
                         "duration_s": time.time() - started,
                         "video": str(Path(args.video).resolve()),
-                        "risk_params": {
-                            "roi_half_width_m": float(args.roi_half_width_m),
-                            "roi_y_back_m": float(args.roi_y_back_m),
-                            "roi_y_front_m": float(args.roi_y_front_m),
-                            "snr_iqr_k": float(args.snr_iqr_k),
-                            "min_roi_points": int(args.min_roi_points),
-                            "persistent_threshold": float(args.persistent_threshold),
-                            "persist_window": int(args.persist_window),
-                            "persist_required": int(args.persist_required),
-                            "ema_alpha": float(args.ema_alpha),
-                        },
+                        "risk_params": risk_params,
                     },
                     "frames": records,
                 },
