@@ -55,7 +55,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--presence-th", type=float, default=1.0)
     p.add_argument("--thermal-delta-th", type=float, default=3.5)
     p.add_argument("--min-consecutive", type=int, default=3)
-    p.add_argument("--fusion-mode", choices=("strict_and", "mm_primary_temporal"), default="mm_primary_temporal")
+    p.add_argument(
+        "--fusion-mode",
+        choices=("strict_and", "mm_primary_temporal", "mm_primary_score_boost"),
+        default="mm_primary_temporal",
+    )
     p.add_argument("--thermal-support-window", type=int, default=12)
     p.add_argument("--thermal-support-delta-th", type=float, default=None)
     return p
@@ -304,4 +308,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

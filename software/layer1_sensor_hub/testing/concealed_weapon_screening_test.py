@@ -38,6 +38,17 @@ MODE_PRESETS = {
     },
 }
 
+# Map each preset key to its corresponding CLI argument flag.
+PRESET_ARG_FLAGS = {
+    "presence": "--presence",
+    "mmwave_risk_th": "--mmwave-risk-th",
+    "presence_th": "--presence-th",
+    "thermal_delta_th": "--thermal-delta-th",
+    "min_consecutive": "--min-consecutive",
+    "fusion_mode": "--fusion-mode",
+    "thermal_support_window": "--thermal-support-window",
+}
+
 
 @dataclass
 class Segment:
@@ -84,9 +95,13 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--min-consecutive", type=int, default=6, help="Min consecutive suspicious frames")
     p.add_argument(
         "--fusion-mode",
-        choices=("strict_and", "mm_primary_temporal"),
+        choices=("strict_and", "mm_primary_temporal", "mm_primary_score_boost"),
         default="strict_and",
-        help="Fusion logic. `strict_and` uses same-frame AND; `mm_primary_temporal` uses mmWave primary + thermal support window.",
+        help=(
+            "Fusion logic. `strict_and` uses same-frame AND; "
+            "`mm_primary_temporal` uses mmWave primary + thermal support window; "
+            "`mm_primary_score_boost` keeps mmWave primary and uses thermal/presence as confidence boost."
+        ),
     )
     p.add_argument(
         "--thermal-support-window",
@@ -164,9 +179,13 @@ def _run_capture(args: argparse.Namespace) -> None:
     subprocess.run(cmd, check=True)
 
 
-def _apply_mode_presets(args: argparse.Namespace) -> None:
+def _apply_mode_presets(args: argparse.Namespace, argv: list[str]) -> None:
     preset = MODE_PRESETS.get(str(args.mode), {})
     for key, value in preset.items():
+        flag = PRESET_ARG_FLAGS.get(key)
+        # Respect explicitly passed CLI args; presets only fill non-overridden values.
+        if flag is not None and flag in argv:
+            continue
         setattr(args, key, value)
 
 
@@ -252,13 +271,23 @@ def _analyze_capture(args: argparse.Namespace) -> dict:
         if args.fusion_mode == "strict_and":
             thermal_supported = td >= args.thermal_delta_th
             suspicious = mr >= args.mmwave_risk_th and (pr >= args.presence_th or thermal_supported)
-        else:
+        elif args.fusion_mode == "mm_primary_temporal":
             # mmWave is primary; thermal support can arrive within a small temporal window.
             w = max(0, int(args.thermal_support_window))
             lo = max(0, i - w)
             hi = min(len(thermal_delta_values), i + w + 1)
             thermal_supported = any(x >= thermal_support_th for x in thermal_delta_values[lo:hi])
             suspicious = mr >= args.mmwave_risk_th and (pr >= args.presence_th or thermal_supported)
+        else:
+            # mmWave is primary; thermal and presence add confidence but do not hard-block.
+            w = max(0, int(args.thermal_support_window))
+            lo = max(0, i - w)
+            hi = min(len(thermal_delta_values), i + w + 1)
+            thermal_supported = any(x >= thermal_support_th for x in thermal_delta_values[lo:hi])
+            thermal_boost = 0.015 if thermal_supported else 0.0
+            presence_boost = 0.015 if pr >= args.presence_th else 0.0
+            effective_mm = mr + thermal_boost + presence_boost
+            suspicious = effective_mm >= args.mmwave_risk_th
 
         thermal_support_flags.append(bool(thermal_supported))
         suspicious_flags.append(bool(suspicious))
@@ -316,7 +345,7 @@ def _analyze_capture(args: argparse.Namespace) -> dict:
 
 def main() -> int:
     args = build_parser().parse_args()
-    _apply_mode_presets(args)
+    _apply_mode_presets(args, sys.argv[1:])
 
     capture_json_path = Path(args.capture_json).expanduser().resolve()
     capture_json_path.parent.mkdir(parents=True, exist_ok=True)
