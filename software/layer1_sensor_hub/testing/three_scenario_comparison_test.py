@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--thermal-device", type=int, default=0)
     p.add_argument(
         "--fusion-mode",
-        choices=("strict_and", "mm_primary_temporal"),
+        choices=("strict_and", "mm_primary_temporal", "mm_primary_score_boost"),
         default=None,
         help="Optional fusion mode override forwarded to concealed_weapon_screening_test.py",
     )

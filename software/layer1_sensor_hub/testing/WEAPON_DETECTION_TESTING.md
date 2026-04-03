@@ -214,7 +214,7 @@ python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py --skip-infineo
 
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
-  --fusion-mode mm_primary_temporal \
+  --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
   --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
@@ -229,7 +229,7 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
 
 python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --mode no_ifx \
-  --fusion-mode mm_primary_temporal \
+  --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
   --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
@@ -251,7 +251,7 @@ python3 software/layer1_sensor_hub/testing/weapon_distance_campaign.py \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
   --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
   --plan software/layer1_sensor_hub/testing/configs/weapon_distance_campaign_plan.json \
-  --fusion-mode mm_primary_temporal \
+  --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
   --mmwave-risk-th 0.06 \
   --thermal-delta-th 3.5 \
@@ -273,3 +273,6 @@ Campaign outputs:
 - `campaign_results.json`
 - `campaign_results.csv`
 - `campaign_summary.md`
+
+Fusion mode note:
+- `mm_primary_score_boost` keeps mmWave as primary signal and uses thermal/presence as confidence boost (recommended for concealed-object runs where thermal can be intermittent).
