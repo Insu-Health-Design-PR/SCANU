@@ -201,3 +201,25 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --interval-s 0.1 \
   --output-prefix school_airport_trial_temporal
 ```
+
+## 13) Jetson Without Git (Download ZIP)
+
+If Git is not available on Jetson, download the latest `dev_adrian` ZIP directly:
+
+- Browser URL:
+  - `https://github.com/Insu-Health-Design-PR/SCANU/archive/refs/heads/dev_adrian.zip`
+
+Terminal option (`wget`):
+
+```bash
+cd /home/insu/Desktop
+wget -O SCANU-dev_adrian.zip https://github.com/Insu-Health-Design-PR/SCANU/archive/refs/heads/dev_adrian.zip
+unzip -o SCANU-dev_adrian.zip
+cd SCANU-dev_adrian/SCANU
+```
+
+Verify that new temporal-fusion flags exist:
+
+```bash
+python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py --help | grep -E "fusion|thermal-support"
+```
