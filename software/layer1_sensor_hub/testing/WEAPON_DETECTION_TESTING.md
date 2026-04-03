@@ -276,3 +276,22 @@ Campaign outputs:
 
 Fusion mode note:
 - `mm_primary_score_boost` keeps mmWave as primary signal and uses thermal/presence as confidence boost (recommended for concealed-object runs where thermal can be intermittent).
+
+## 15) Quick Run V2 (Recommended)
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_score_boost \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --mmwave-risk-th 0.06 \
+  --thermal-delta-th 3.5 \
+  --min-consecutive 3 \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_v2_boost.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_boost_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_boost_report.json
+```
