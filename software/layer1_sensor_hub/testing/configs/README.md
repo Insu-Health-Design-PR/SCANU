@@ -42,3 +42,4 @@ Important: this is a heuristic profile for experiments. It is not a certified sa
 
 - `stable_tracking_weapon_detection.cfg`: experimental indoor profile for concealed-object screening tests.
 - `stable_tracking_weapon_detection_sensitivity.cfg`: higher-sensitivity variant for concealed-object screening experiments.
+- `stable_tracking_weapon_detection_v2.cfg`: tuned sensitivity profile for concealed-object trials with stronger torso/waist reflector capture.
