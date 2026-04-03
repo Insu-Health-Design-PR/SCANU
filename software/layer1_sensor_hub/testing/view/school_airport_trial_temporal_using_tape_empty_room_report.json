@@ -1,0 +1,29 @@
+{
+  "status": "NO_ALERT",
+  "summary": {
+    "frames": 350,
+    "alerts": 0,
+    "avg_frame_score": 0.027956479840960148,
+    "thermal_baseline": 57.21394694010415,
+    "mmwave_candidate_frames": 0,
+    "thermal_supported_frames": 0,
+    "suspicious_frames": 0,
+    "max_consecutive_suspicious": 0
+  },
+  "thresholds": {
+    "mmwave_risk_th": 0.07,
+    "presence_th": 1.0,
+    "thermal_delta_th": 4.0,
+    "fusion_mode": "mm_primary_temporal",
+    "thermal_support_window": 12,
+    "thermal_support_delta_th": 4.0,
+    "min_consecutive": 4,
+    "thermal_baseline_frames": 20
+  },
+  "capture_paths": {
+    "capture_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_empty_room_capture.json",
+    "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_empty_room.mp4",
+    "risk_config": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
+  },
+  "segments": []
+}

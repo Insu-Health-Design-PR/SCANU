@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "mode": "no_ifx",
+    "config": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg",
+    "risk_config": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json",
+    "frames": 350,
+    "interval_s": 0.1
+  },
+  "scenarios": [
+    {
+      "scenario": "empty_room",
+      "status": "NO_ALERT",
+      "alerts": 0,
+      "avg_frame_score": 0.027956479840960148,
+      "capture_metrics": {
+        "frames": 350,
+        "mm_risk_max": 0.0,
+        "mm_risk_p95": 0.0,
+        "mm_risk_mean": 0.0,
+        "mm_points_nonzero_ratio": 0.0,
+        "thermal_mean": 57.64844215959819
+      },
+      "paths": {
+        "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_empty_room.mp4",
+        "capture_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_empty_room_capture.json",
+        "report_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_empty_room_report.json"
+      }
+    },
+    {
+      "scenario": "person_unarmed",
+      "status": "NO_ALERT",
+      "alerts": 0,
+      "avg_frame_score": 0.04595799488542597,
+      "capture_metrics": {
+        "frames": 350,
+        "mm_risk_max": 0.06375,
+        "mm_risk_p95": 0.005145084892499998,
+        "mm_risk_mean": 0.0013459246160554942,
+        "mm_points_nonzero_ratio": 0.38285714285714284,
+        "thermal_mean": 65.67580068824411
+      },
+      "paths": {
+        "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_unarmed.mp4",
+        "capture_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_unarmed_capture.json",
+        "report_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_unarmed_report.json"
+      }
+    },
+    {
+      "scenario": "person_concealed_object",
+      "status": "NO_ALERT",
+      "alerts": 0,
+      "avg_frame_score": 0.005096328273765442,
+      "capture_metrics": {
+        "frames": 350,
+        "mm_risk_max": 0.07250000000001529,
+        "mm_risk_p95": 0.03000000068375929,
+        "mm_risk_mean": 0.004427591306582683,
+        "mm_points_nonzero_ratio": 0.44285714285714284,
+        "thermal_mean": 63.81498930431547
+      },
+      "paths": {
+        "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_concealed_object.mp4",
+        "capture_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_concealed_object_capture.json",
+        "report_json": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/school_airport_trial_temporal_using_tape_person_concealed_object_report.json"
+      }
+    }
+  ],
+  "comparison": {
+    "status": "PARTIAL_SEPARATION",
+    "delta_mm_risk_p95": {
+      "person_vs_empty": 0.005145084892499998,
+      "armed_vs_person": 0.024854915791259292
+    },
+    "recommended_mmwave_risk_threshold": 0.017572542788129645
+  }
+}
