@@ -295,3 +295,28 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_boost_capture.json \
   --report-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_boost_report.json
 ```
+
+## 16) Two People Test (One Threat, One No Threat) - Sensitivity Config
+
+Recommended setup:
+- Two subjects in frame.
+- Subject A: no threat item.
+- Subject B: concealed replica (waist/back or bag).
+- Keep both visible while walking/pausing for at least 30-45 seconds.
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_score_boost \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --mmwave-risk-th 0.06 \
+  --thermal-delta-th 3.5 \
+  --min-consecutive 3 \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/two_people_one_threat_sens.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_report.json
+```
