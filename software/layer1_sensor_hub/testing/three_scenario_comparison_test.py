@@ -39,6 +39,24 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--interval-s", type=float, default=0.1)
     p.add_argument("--mmwave-timeout-ms", type=int, default=200)
     p.add_argument("--thermal-device", type=int, default=0)
+    p.add_argument(
+        "--fusion-mode",
+        choices=("strict_and", "mm_primary_temporal"),
+        default=None,
+        help="Optional fusion mode override forwarded to concealed_weapon_screening_test.py",
+    )
+    p.add_argument(
+        "--thermal-support-window",
+        type=int,
+        default=None,
+        help="Optional thermal support window (frames) for temporal fusion mode.",
+    )
+    p.add_argument(
+        "--thermal-support-delta-th",
+        type=float,
+        default=None,
+        help="Optional thermal support threshold override.",
+    )
 
     p.add_argument("--cli-port", default=None)
     p.add_argument("--data-port", default=None)
@@ -129,6 +147,12 @@ def _run_one_scenario(args: argparse.Namespace, scenario: str, out_dir: Path) ->
         cmd += ["--data-port", str(args.data_port)]
     if args.skip_mmwave_config:
         cmd += ["--skip-mmwave-config"]
+    if args.fusion_mode is not None:
+        cmd += ["--fusion-mode", str(args.fusion_mode)]
+    if args.thermal_support_window is not None:
+        cmd += ["--thermal-support-window", str(args.thermal_support_window)]
+    if args.thermal_support_delta_th is not None:
+        cmd += ["--thermal-support-delta-th", str(args.thermal_support_delta_th)]
 
     print("=" * 90)
     print(f"Running scenario: {scenario}")

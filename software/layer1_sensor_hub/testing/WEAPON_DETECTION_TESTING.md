@@ -167,3 +167,37 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
 
 Output report example:
 - `software/layer1_sensor_hub/testing/view/school_airport_trial_comparison_report.json`
+
+## 12) Temporal Fusion (Recommended)
+
+The screening logic now supports temporal fusion, where mmWave is primary and thermal can support within a nearby frame window.
+
+Single run example:
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_temporal.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_temporal_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_temporal_report.json
+```
+
+Three-scenario comparison with temporal fusion:
+
+```bash
+python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 350 \
+  --interval-s 0.1 \
+  --output-prefix school_airport_trial_temporal
+```

@@ -33,6 +33,8 @@ MODE_PRESETS = {
         "presence_th": 1.0,
         "thermal_delta_th": 4.0,
         "min_consecutive": 4,
+        "fusion_mode": "mm_primary_temporal",
+        "thermal_support_window": 12,
     },
 }
 
@@ -80,6 +82,24 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--thermal-delta-th", type=float, default=6.0, help="Threshold above thermal baseline")
     p.add_argument("--thermal-baseline-frames", type=int, default=20, help="Frames used to estimate thermal baseline")
     p.add_argument("--min-consecutive", type=int, default=6, help="Min consecutive suspicious frames")
+    p.add_argument(
+        "--fusion-mode",
+        choices=("strict_and", "mm_primary_temporal"),
+        default="strict_and",
+        help="Fusion logic. `strict_and` uses same-frame AND; `mm_primary_temporal` uses mmWave primary + thermal support window.",
+    )
+    p.add_argument(
+        "--thermal-support-window",
+        type=int,
+        default=0,
+        help="Half-window (frames) used by `mm_primary_temporal` to find nearby thermal support.",
+    )
+    p.add_argument(
+        "--thermal-support-delta-th",
+        type=float,
+        default=None,
+        help="Optional thermal support threshold. If omitted, uses --thermal-delta-th.",
+    )
 
     p.add_argument(
         "--video",
@@ -157,6 +177,18 @@ def _safe_float(v: object, default: float = 0.0) -> float:
         return float(default)
 
 
+def _longest_run(flags: list[bool]) -> int:
+    best = 0
+    cur = 0
+    for f in flags:
+        if f:
+            cur += 1
+            best = max(best, cur)
+        else:
+            cur = 0
+    return best
+
+
 def _collect_segments(flags: list[bool], mmrisk: list[float], presence: list[float], thermal_delta: list[float], min_len: int) -> list[Segment]:
     segments: list[Segment] = []
     start: int | None = None
@@ -204,13 +236,31 @@ def _analyze_capture(args: argparse.Namespace) -> dict:
     mmrisk_values = [_safe_float((((f.get("mmwave") or {}).get("risk_features") or {}).get("risk_score_mmwave")), 0.0) for f in frames]
     presence_values = [_safe_float(((f.get("presence") or {}).get("presence_raw")), 0.0) for f in frames]
     thermal_delta_values = [v - thermal_baseline for v in thermal_values]
+    thermal_support_th = (
+        float(args.thermal_delta_th)
+        if args.thermal_support_delta_th is None
+        else float(args.thermal_support_delta_th)
+    )
 
     suspicious_flags: list[bool] = []
+    thermal_support_flags: list[bool] = []
     per_frame_score: list[float] = []
-    for mr, pr, td in zip(mmrisk_values, presence_values, thermal_delta_values):
+    for i, (mr, pr, td) in enumerate(zip(mmrisk_values, presence_values, thermal_delta_values)):
         score = 0.60 * mr + 0.25 * min(1.0, max(0.0, pr)) + 0.15 * min(1.0, max(0.0, td / max(1e-6, args.thermal_delta_th)))
         per_frame_score.append(score)
-        suspicious = mr >= args.mmwave_risk_th and (pr >= args.presence_th or td >= args.thermal_delta_th)
+
+        if args.fusion_mode == "strict_and":
+            thermal_supported = td >= args.thermal_delta_th
+            suspicious = mr >= args.mmwave_risk_th and (pr >= args.presence_th or thermal_supported)
+        else:
+            # mmWave is primary; thermal support can arrive within a small temporal window.
+            w = max(0, int(args.thermal_support_window))
+            lo = max(0, i - w)
+            hi = min(len(thermal_delta_values), i + w + 1)
+            thermal_supported = any(x >= thermal_support_th for x in thermal_delta_values[lo:hi])
+            suspicious = mr >= args.mmwave_risk_th and (pr >= args.presence_th or thermal_supported)
+
+        thermal_support_flags.append(bool(thermal_supported))
         suspicious_flags.append(bool(suspicious))
 
     segments = _collect_segments(
@@ -229,11 +279,18 @@ def _analyze_capture(args: argparse.Namespace) -> dict:
             "alerts": len(segments),
             "avg_frame_score": avg_score,
             "thermal_baseline": thermal_baseline,
+            "mmwave_candidate_frames": int(sum(1 for v in mmrisk_values if v >= float(args.mmwave_risk_th))),
+            "thermal_supported_frames": int(sum(1 for v in thermal_support_flags if v)),
+            "suspicious_frames": int(sum(1 for v in suspicious_flags if v)),
+            "max_consecutive_suspicious": int(_longest_run(suspicious_flags)),
         },
         "thresholds": {
             "mmwave_risk_th": float(args.mmwave_risk_th),
             "presence_th": float(args.presence_th),
             "thermal_delta_th": float(args.thermal_delta_th),
+            "fusion_mode": str(args.fusion_mode),
+            "thermal_support_window": int(args.thermal_support_window),
+            "thermal_support_delta_th": float(thermal_support_th),
             "min_consecutive": int(args.min_consecutive),
             "thermal_baseline_frames": int(args.thermal_baseline_frames),
         },
