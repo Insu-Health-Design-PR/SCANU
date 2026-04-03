@@ -10,7 +10,8 @@ Important:
 ## 1) Recommended Config Files
 
 - mmWave profile:
-  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg`
+  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg`
+  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg` (fallback)
 - Risk profile:
   - `software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json`
 
@@ -202,3 +203,39 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --output-prefix school_airport_trial_temporal
 ```
 
+## 13) V2 Tuning For Concealed Object Detection
+
+Use this sequence in order:
+
+```bash
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py --help | grep -E "mode|fusion-mode|thermal-support-window"
+
+python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py --skip-infineon
+
+python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --mmwave-risk-th 0.06 \
+  --thermal-delta-th 3.5 \
+  --min-consecutive 3 \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_v2.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_v2_report.json
+
+python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 350 \
+  --interval-s 0.1 \
+  --output-prefix school_airport_trial_v2
+
+cat software/layer1_sensor_hub/testing/view/school_airport_trial_v2_comparison_report.json
+```
