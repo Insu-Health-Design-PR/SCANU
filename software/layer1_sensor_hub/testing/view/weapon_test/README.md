@@ -1,18 +1,11 @@
-# Weapon Test Files
+# testing/view
 
-This folder is reserved for scenario artifacts related to concealed-object / weapon screening tests.
+Folder for storing `layer1_sensor_hub` test outputs.
 
-Suggested contents:
-- Scenario videos (`.mp4`)
-- Capture data (`*_capture.json`)
-- Report outputs (`*_report.json`)
-- Comparison reports (`*_comparison_report.json`)
+## Expected contents
 
-Recommended naming:
-- `<prefix>_empty_room.mp4`
-- `<prefix>_person_unarmed.mp4`
-- `<prefix>_person_concealed_object.mp4`
-- `<prefix>_comparison_report.json`
+- Capture videos (`.mp4`)
+- Capture data (`.json`)
+- Validation snapshots (`.png`)
 
-Example prefix:
-- `school_airport_trial`
+This folder is kept to support quick testing and visual review on Jetson.
