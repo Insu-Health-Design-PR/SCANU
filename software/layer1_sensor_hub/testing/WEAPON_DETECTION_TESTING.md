@@ -223,3 +223,47 @@ Verify that new temporal-fusion flags exist:
 ```bash
 python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py --help | grep -E "fusion|thermal-support"
 ```
+------------------DATA-------------
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 350 \
+  --interval-s 0.1 \
+  --output-prefix school_airport_trial_temporal
+usage: three_scenario_comparison_test.py [-h] [--mode {default,no_ifx}] [--config CONFIG] [--risk-config RISK_CONFIG] [--frames FRAMES] [--interval-s INTERVAL_S] [--mmwave-timeout-ms MMWAVE_TIMEOUT_MS]
+                                         [--thermal-device THERMAL_DEVICE] [--cli-port CLI_PORT] [--data-port DATA_PORT] [--skip-mmwave-config] [--output-prefix OUTPUT_PREFIX] [--out-dir OUT_DIR]
+                                         [--no-prompt] [--comparison-report COMPARISON_REPORT]
+three_scenario_comparison_test.py: error: unrecognized arguments: --fusion-mode mm_primary_temporal --thermal-support-window 12
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 350 \
+  --interval-s 0.1 \
+  --output-prefix school_airport_trial_temporal
+usage: three_scenario_comparison_test.py [-h] [--mode {default,no_ifx}] [--config CONFIG] [--risk-config RISK_CONFIG] [--frames FRAMES] [--interval-s INTERVAL_S] [--mmwave-timeout-ms MMWAVE_TIMEOUT_MS]
+                                         [--thermal-device THERMAL_DEVICE] [--cli-port CLI_PORT] [--data-port DATA_PORT] [--skip-mmwave-config] [--output-prefix OUTPUT_PREFIX] [--out-dir OUT_DIR]
+                                         [--no-prompt] [--comparison-report COMPARISON_REPORT]
+three_scenario_comparison_test.py: error: unrecognized arguments: --fusion-mode mm_primary_temporal --thermal-support-window 12
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video software/layer1_sensor_hub/testing/view/weapon_screening_temporal.mp4 \
+  --capture-json software/layer1_sensor_hub/testing/view/weapon_screening_temporal_capture.json \
+  --report-json software/layer1_sensor_hub/testing/view/weapon_screening_temporal_report.json
+usage: concealed_weapon_screening_test.py [-h] [--mode {default,no_ifx}] --config CONFIG [--frames FRAMES] [--interval-s INTERVAL_S] [--mmwave-timeout-ms MMWAVE_TIMEOUT_MS] [--cli-port CLI_PORT]
+                                          [--data-port DATA_PORT] [--skip-mmwave-config] [--ifx-uuid IFX_UUID] [--presence {ifx,mock,off}] [--thermal-device THERMAL_DEVICE]
+                                          [--thermal-width THERMAL_WIDTH] [--thermal-height THERMAL_HEIGHT] [--thermal-fps THERMAL_FPS] [--risk-config RISK_CONFIG] [--mmwave-risk-th MMWAVE_RISK_TH]
+                                          [--presence-th PRESENCE_TH] [--thermal-delta-th THERMAL_DELTA_TH] [--thermal-baseline-frames THERMAL_BASELINE_FRAMES] [--min-consecutive MIN_CONSECUTIVE]
+                                          [--video VIDEO] [--capture-json CAPTURE_JSON] [--report-json REPORT_JSON] [--fail-on-alert]
+concealed_weapon_screening_test.py: error: unrecognized arguments: --fusion-mode mm_primary_temporal --thermal-support-window 12
