@@ -239,3 +239,37 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
 
 cat software/layer1_sensor_hub/testing/view/school_airport_trial_v2_comparison_report.json
 ```
+
+## 14) Distance Campaign (5ft / 10ft / 20ft)
+
+This campaign runs an operator-guided sequence and saves **video + capture JSON + report JSON** for each case.
+You will press Enter before each run.
+
+```bash
+python3 software/layer1_sensor_hub/testing/weapon_distance_campaign.py \
+  --mode no_ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --plan software/layer1_sensor_hub/testing/configs/weapon_distance_campaign_plan.json \
+  --fusion-mode mm_primary_temporal \
+  --thermal-support-window 12 \
+  --mmwave-risk-th 0.06 \
+  --thermal-delta-th 3.5 \
+  --min-consecutive 3 \
+  --frames 350 \
+  --interval-s 0.1 \
+  --campaign-name school_airport_distance_v1
+```
+
+Output folder:
+
+- `software/layer1_sensor_hub/testing/view/weapon_distance_campaign/school_airport_distance_v1/`
+
+Campaign outputs:
+
+- One `.mp4` per case
+- One `_capture.json` per case
+- One `_report.json` per case
+- `campaign_results.json`
+- `campaign_results.csv`
+- `campaign_summary.md`
