@@ -131,3 +131,39 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
 
 cat software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_report.json
 ```
+
+## 10) Run With Sensitivity Config (No IFX)
+
+```bash
+python3 /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
+  --mode no_ifx \
+  --config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 450 \
+  --interval-s 0.1 \
+  --video /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/view/weapon_screening_sens.mp4 \
+  --capture-json /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/view/weapon_screening_sens_capture.json \
+  --report-json /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/view/weapon_screening_sens_report.json
+```
+
+## 11) Three-Scenario Comparison Test
+
+Run one full cycle with these scenarios in order:
+1. `empty_room`
+2. `person_unarmed`
+3. `person_concealed_object`
+
+The script pauses before each scenario (press Enter to continue), and generates a combined comparison report.
+
+```bash
+python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
+  --mode no_ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --frames 350 \
+  --interval-s 0.1 \
+  --output-prefix school_airport_trial
+```
+
+Output report example:
+- `software/layer1_sensor_hub/testing/view/school_airport_trial_comparison_report.json`
