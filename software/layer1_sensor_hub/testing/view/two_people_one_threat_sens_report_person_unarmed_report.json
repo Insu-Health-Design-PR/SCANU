@@ -1,0 +1,29 @@
+{
+  "status": "NO_ALERT",
+  "summary": {
+    "frames": 350,
+    "alerts": 0,
+    "avg_frame_score": 0.05927569351438487,
+    "thermal_baseline": 56.492680664062505,
+    "mmwave_candidate_frames": 0,
+    "thermal_supported_frames": 233,
+    "suspicious_frames": 0,
+    "max_consecutive_suspicious": 0
+  },
+  "thresholds": {
+    "mmwave_risk_th": 0.03,
+    "presence_th": 1.0,
+    "thermal_delta_th": 3.0,
+    "fusion_mode": "mm_primary_temporal",
+    "thermal_support_window": 10,
+    "thermal_support_delta_th": 1.0,
+    "min_consecutive": 2,
+    "thermal_baseline_frames": 20
+  },
+  "capture_paths": {
+    "capture_json": "/home/insu/Desktop/weapon_test_data/2_person/two_people_one_threat_sens_report_person_unarmed_capture.json",
+    "video": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_report_person_unarmed.mp4",
+    "risk_config": "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
+  },
+  "segments": []
+}
