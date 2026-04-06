@@ -321,6 +321,43 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --report-json software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_report.json
 ```
 
+## 17) Interactive Dataset Collection Menu (Safe/Unsafe)
+
+This menu-driven runner is designed for collecting training data with minimal manual work.
+It stores data in:
+
+- `/home/insu/Desktop/collecting_data/safe/...`
+- `/home/insu/Desktop/collecting_data/unsafe/...`
+
+For each run it saves:
+
+- `.mp4` video
+- `_capture.json`
+- `_report.json`
+- `manifest.jsonl` (dataset index)
+
+Menu behavior:
+
+- Choose `SAFE` or `UNSAFE`
+- Choose scenario
+- Enter distance
+- Press Enter to run
+- After each run:
+  - `Enter` = next run (same scenario/distance, auto-increment run id)
+  - `r` = repeat last test
+  - `m` = return to main menu
+  - `exit` = stop
+
+```bash
+python3 software/layer1_sensor_hub/testing/interactive_dataset_collector.py \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --out-base /home/insu/Desktop/collecting_data \
+  --frames 350 \
+  --interval-s 0.1 \
+  --presence ifx
+```
+
 
 
 
