@@ -35,7 +35,9 @@ SAFE_SCENARIOS = [
 UNSAFE_SCENARIOS = [
     "armed_on_body",
     "concealed_object",
+    "concealed_weapon",
     "threat_in_bag",
+    "two_people_one_weapon",
 ]
 
 
@@ -367,4 +369,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

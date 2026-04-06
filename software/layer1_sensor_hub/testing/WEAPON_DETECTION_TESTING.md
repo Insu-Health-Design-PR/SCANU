@@ -348,6 +348,14 @@ Menu behavior:
   - `m` = return to main menu
   - `exit` = stop
 
+Current `UNSAFE` scenarios in the menu:
+
+- `armed_on_body`
+- `concealed_object`
+- `concealed_weapon`
+- `threat_in_bag`
+- `two_people_one_weapon`
+
 ```bash
 python3 software/layer1_sensor_hub/testing/interactive_dataset_collector.py \
   --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
