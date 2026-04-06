@@ -320,3 +320,9 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --capture-json software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_capture.json \
   --report-json software/layer1_sensor_hub/testing/view/two_people_one_threat_sens_report.json
 ```
+
+
+
+
+python3 /home/insu/Desktop/SCANU/software/layer1_radar/examples/anomaly_report_from_capture.py \
+  --capture-json "/home/insu/Desktop/weapon_test_data/2_person/two_people_one_threat_sens_report_person_concealed_object_capture.json"
