@@ -420,4 +420,9 @@ python3 software/layer1_sensor_hub/testing/capture_dual_camera_menu.py \
   --default-video-seconds 10
 ```
 
+Notes:
+
+- Console states now show clear progress: `PREPARING`, `RECORDING`, `SAVING`, `DONE`.
+- The script estimates effective camera FPS and writes videos with adjusted FPS to reduce short/fast playback artifacts.
+- Increase duration with `--default-video-seconds 20` (or higher) if needed.
 
