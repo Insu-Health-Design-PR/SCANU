@@ -474,10 +474,29 @@ Useful options:
 - `--rgb-device auto` -> auto-detect Logitech/C920 first.
 - `--presence off` -> run without Infineon if needed.
 - `--no-prompt` -> run all 4 scenarios without pressing Enter.
+- `--capture-mode image|video|both` -> choose output type (default `both`).
+- `--video-fps 10` and `--video-codec mp4v` -> composite video settings.
+
+Video-only example:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
+  --out-dir /home/insu/Desktop/collecting_data/four_scenario_multisensor \
+  --session school_trial_video \
+  --rgb-device /dev/video2 \
+  --thermal-device 0 \
+  --presence ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --capture-mode video \
+  --video-fps 10 \
+  --capture-seconds 10
+```
 
 Outputs per scenario:
 
 - `*_composite.png`
+- `*_composite.mp4` (when `--capture-mode video|both`)
 - `*_rgb.png`
 - `*_thermal.png`
 - `*_radar.png`
