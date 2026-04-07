@@ -88,6 +88,10 @@ def _open_rgb(device: int, width: int, height: int, fps: int):
         raise RuntimeError("OpenCV (cv2) is required. Install python3-opencv or opencv-python.")
     cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
     if not cap.isOpened():
+        # Fallback for systems where index+V4L2 cannot open but CAP_ANY works.
+        cap.release()
+        cap = cv2.VideoCapture(device)
+    if not cap.isOpened():
         raise RuntimeError(f"Cannot open RGB camera /dev/video{device}")
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -154,6 +158,9 @@ def _probe_rgb_index(idx: int) -> bool:
     cap = cv2.VideoCapture(idx, cv2.CAP_V4L2)
     if not cap.isOpened():
         cap.release()
+        cap = cv2.VideoCapture(idx)
+    if not cap.isOpened():
+        cap.release()
         return False
     ok, frame = cap.read()
     cap.release()
@@ -162,10 +169,16 @@ def _probe_rgb_index(idx: int) -> bool:
 
 def _detect_rgb_device(rgb_device_arg: str, thermal_device: int) -> int:
     if rgb_device_arg.lower() != "auto":
+        maybe_idx = _parse_video_index(rgb_device_arg)
+        if maybe_idx is not None:
+            return maybe_idx
         try:
             return int(rgb_device_arg)
         except ValueError as exc:
-            raise RuntimeError(f"Invalid --rgb-device value: {rgb_device_arg}") from exc
+            raise RuntimeError(
+                f"Invalid --rgb-device value: {rgb_device_arg}. "
+                "Use 'auto', integer index, or /dev/videoX"
+            ) from exc
 
     # 1) Prefer Logitech/C920 from v4l2 listing.
     entries = _list_v4l2_devices()
