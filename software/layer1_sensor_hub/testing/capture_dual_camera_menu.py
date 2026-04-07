@@ -56,8 +56,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--thermal-height", type=int, default=480)
     p.add_argument("--thermal-fps", type=int, default=30)
 
-    p.add_argument("--default-video-seconds", type=float, default=10.0, help="Default video duration")
+    p.add_argument("--default-video-seconds", type=float, default=20.0, help="Default video duration")
     p.add_argument("--codec", default="mp4v", help="Video codec fourcc (default: mp4v)")
+    p.add_argument("--fps-probe-seconds", type=float, default=1.2, help="Seconds to estimate effective camera FPS")
     return p
 
 
@@ -207,6 +208,38 @@ def _print_cameras() -> None:
             print(f"  - {n}")
 
 
+def _countdown(seconds: int = 3) -> None:
+    for n in range(seconds, 0, -1):
+        print(f"[PREPARING] Recording starts in {n}...")
+        time.sleep(1.0)
+
+
+def _measure_rgb_fps(cap, seconds: float) -> float:
+    if seconds <= 0:
+        return 0.0
+    start = time.time()
+    c = 0
+    while time.time() - start < seconds:
+        frame = _read_rgb(cap)
+        if frame is not None:
+            c += 1
+    elapsed = max(1e-6, time.time() - start)
+    return c / elapsed
+
+
+def _measure_thermal_fps(thermal: ThermalCameraSource, seconds: float) -> float:
+    if seconds <= 0:
+        return 0.0
+    start = time.time()
+    c = 0
+    while time.time() - start < seconds:
+        frame = thermal.read_colormap_bgr()
+        if frame is not None:
+            c += 1
+    elapsed = max(1e-6, time.time() - start)
+    return c / elapsed
+
+
 def _capture_photo(
     out_dir: Path,
     rgb_cap,
@@ -261,8 +294,9 @@ def _capture_video(
     thermal_device: int,
     seconds: float,
     codec: str,
-    rgb_fps: int,
-    thermal_fps: int,
+    rgb_fps_target: int,
+    thermal_fps_target: int,
+    fps_probe_seconds: float,
 ) -> None:
     base = _base_id(out_dir)
     rgb_video = out_dir / f"{base}_rgb.mp4"
@@ -277,15 +311,30 @@ def _capture_video(
 
     rgb_h, rgb_w = rgb_frame.shape[:2]
     th_h, th_w = th_frame.shape[:2]
+
+    # Estimate effective FPS to avoid short/fast playback when capture FPS is lower than requested.
+    print("[PREPARING] Measuring effective FPS...")
+    rgb_fps_measured = _measure_rgb_fps(rgb_cap, float(fps_probe_seconds))
+    th_fps_measured = _measure_thermal_fps(thermal, float(fps_probe_seconds))
+    rgb_fps_write = max(1.0, min(float(rgb_fps_target), rgb_fps_measured if rgb_fps_measured > 0 else float(rgb_fps_target)))
+    th_fps_write = max(1.0, min(float(thermal_fps_target), th_fps_measured if th_fps_measured > 0 else float(thermal_fps_target)))
+    print(
+        f"[PREPARING] RGB fps target={rgb_fps_target} measured={rgb_fps_measured:.2f} write={rgb_fps_write:.2f} | "
+        f"Thermal target={thermal_fps_target} measured={th_fps_measured:.2f} write={th_fps_write:.2f}"
+    )
+
+    _countdown(3)
     fourcc = cv2.VideoWriter_fourcc(*codec)
-    rgb_writer = cv2.VideoWriter(str(rgb_video), fourcc, float(rgb_fps), (rgb_w, rgb_h))
-    th_writer = cv2.VideoWriter(str(th_video), fourcc, float(thermal_fps), (th_w, th_h))
+    rgb_writer = cv2.VideoWriter(str(rgb_video), fourcc, float(rgb_fps_write), (rgb_w, rgb_h))
+    th_writer = cv2.VideoWriter(str(th_video), fourcc, float(th_fps_write), (th_w, th_h))
     if not rgb_writer.isOpened():
         raise RuntimeError(f"Failed to open RGB video writer: {rgb_video}")
     if not th_writer.isOpened():
         raise RuntimeError(f"Failed to open thermal video writer: {th_video}")
 
+    print(f"[RECORDING] Running for {seconds:.1f}s...")
     start = time.time()
+    last_tick = -1
     frame_count = 0
     try:
         while time.time() - start < max(0.5, float(seconds)):
@@ -296,31 +345,46 @@ def _capture_video(
             rgb_writer.write(rgb)
             th_writer.write(th)
             frame_count += 1
+            elapsed = time.time() - start
+            tick = int(elapsed)
+            if tick != last_tick:
+                last_tick = tick
+                print(f"[RECORDING] {elapsed:.1f}s / {seconds:.1f}s")
             if frame_count == 1:
                 _ = cv2.imwrite(str(rgb_snap), rgb)
                 _ = cv2.imwrite(str(th_snap), th)
     finally:
+        print("[SAVING] Finalizing video files...")
         rgb_writer.release()
         th_writer.release()
 
+    duration_real = max(0.0, time.time() - start)
     row = {
         "timestamp": datetime.now().isoformat(),
         "type": "video",
         "base_id": base,
         "duration_s_requested": float(seconds),
+        "duration_s_recorded": float(duration_real),
         "frames_written": frame_count,
         "rgb_device": rgb_device,
         "thermal_device": thermal_device,
+        "rgb_fps_target": int(rgb_fps_target),
+        "thermal_fps_target": int(thermal_fps_target),
+        "rgb_fps_measured": float(rgb_fps_measured),
+        "thermal_fps_measured": float(th_fps_measured),
+        "rgb_fps_write": float(rgb_fps_write),
+        "thermal_fps_write": float(th_fps_write),
         "rgb_video": str(rgb_video),
         "thermal_video": str(th_video),
         "rgb_snapshot": str(rgb_snap),
         "thermal_snapshot": str(th_snap),
     }
     _save_manifest_row(out_dir, row)
-    print(f"[saved] {rgb_video}")
-    print(f"[saved] {th_video}")
-    print(f"[saved] {rgb_snap}")
-    print(f"[saved] {th_snap}")
+    print(f"[DONE] Saved RGB video: {rgb_video}")
+    print(f"[DONE] Saved thermal video: {th_video}")
+    print(f"[DONE] Saved RGB snapshot: {rgb_snap}")
+    print(f"[DONE] Saved thermal snapshot: {th_snap}")
+    print(f"[DONE] Frames written: {frame_count} | duration: {duration_real:.2f}s")
 
 
 def _menu() -> str:
@@ -386,8 +450,9 @@ def main() -> int:
                     thermal_device=args.thermal_device,
                     seconds=secs,
                     codec=args.codec,
-                    rgb_fps=args.rgb_fps,
-                    thermal_fps=args.thermal_fps,
+                    rgb_fps_target=args.rgb_fps,
+                    thermal_fps_target=args.thermal_fps,
+                    fps_probe_seconds=args.fps_probe_seconds,
                 )
                 continue
             print("Invalid option.")
