@@ -436,3 +436,51 @@ Notes:
 - Console states now show clear progress: `PREPARING`, `RECORDING`, `SAVING`, `DONE`.
 - The script estimates effective camera FPS and writes videos with adjusted FPS to reduce short/fast playback artifacts.
 - Increase duration with `--default-video-seconds 20` (or higher) if needed.
+
+## 20) Four-Scenario Multisensor Composite (RGB + Thermal + mmWave + Presence)
+
+This script runs 4 scenarios with auto-named outputs and saves one **composite image** per scenario showing:
+
+- RGB camera
+- Thermal camera
+- mmWave point cloud panel
+- Presence signal panel
+
+Scenarios in order:
+
+1. `empty_room`
+2. `person_unarmed`
+3. `person_armed_concealed`
+4. `person_armed_visible`
+
+Run from repo root on Jetson:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
+  --out-dir /home/insu/Desktop/collecting_data/four_scenario_multisensor \
+  --session school_trial \
+  --rgb-device /dev/video2 \
+  --thermal-device 0 \
+  --presence ifx \
+  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --capture-seconds 8 \
+  --interval-s 0.1
+```
+
+Useful options:
+
+- `--list-cameras` -> list V4L2 cameras and exit.
+- `--rgb-device auto` -> auto-detect Logitech/C920 first.
+- `--presence off` -> run without Infineon if needed.
+- `--no-prompt` -> run all 4 scenarios without pressing Enter.
+
+Outputs per scenario:
+
+- `*_composite.png`
+- `*_rgb.png`
+- `*_thermal.png`
+- `*_radar.png`
+- `*_presence.png`
+- `*_capture.json`
+- `manifest.jsonl` (session index)
