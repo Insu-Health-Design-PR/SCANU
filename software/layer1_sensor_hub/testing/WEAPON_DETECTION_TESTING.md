@@ -368,6 +368,32 @@ python3 software/layer1_sensor_hub/testing/interactive_dataset_collector.py \
   --presence ifx
 ```
 
+## 18) Thermal Weapon Views (Single Folder + Menu + Auto Name)
+
+This runner captures thermal still images in one folder and labels each image by selected view:
+
+- `front_view`
+- `back_view`
+- `side_view`
+
+Behavior:
+
+- Uses menu to pick view for each capture block.
+- Stores all images in a single output folder.
+- Auto-names files with view + session + incremental index.
+- Writes a manifest JSON for the full session.
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_thermal_weapon_views.py \
+  --out-dir /home/insu/Desktop/collecting_data/thermal_weapon_views \
+  --images-per-view 30 \
+  --thermal-device 0 \
+  --manual
+```
+
+Example output filename:
+
+- `thermal_front_view_20260407T120501_0001.png`
 
 
 
