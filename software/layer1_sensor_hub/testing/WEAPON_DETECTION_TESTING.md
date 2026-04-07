@@ -421,6 +421,16 @@ python3 software/layer1_sensor_hub/testing/capture_dual_camera_menu.py \
   --default-video-seconds 10
 ```
 
+Explicit Jetson example (Logitech on `/dev/video2`):
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_dual_camera_menu.py \
+  --out-dir /home/insu/Desktop/collecting_data/dual_camera \
+  --rgb-device /dev/video2 \
+  --thermal-device 0 \
+  --default-video-seconds 20
+```
+
 Notes:
 
 - Console states now show clear progress: `PREPARING`, `RECORDING`, `SAVING`, `DONE`.
