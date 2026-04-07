@@ -81,6 +81,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     p.add_argument("--panel-width", type=int, default=640)
     p.add_argument("--panel-height", type=int, default=480)
+    p.add_argument(
+        "--capture-mode",
+        choices=("image", "video", "both"),
+        default="both",
+        help="Per-scenario output mode",
+    )
+    p.add_argument("--video-codec", default="mp4v", help="Composite video fourcc codec")
+    p.add_argument("--video-fps", type=float, default=10.0, help="Composite video FPS")
     p.add_argument("--no-prompt", action="store_true", help="Run all scenarios without Enter prompts")
     p.add_argument("--list-cameras", action="store_true", help="List V4L2 camera devices and exit")
     return p
@@ -364,6 +372,9 @@ def _capture_single_scenario(
     mmwave_timeout_ms: int,
     panel_w: int,
     panel_h: int,
+    capture_mode: str,
+    video_codec: str,
+    video_fps: float,
     rgb_cap,
     thermal: ThermalCameraSource,
     uart_src: UARTSource,
@@ -377,6 +388,9 @@ def _capture_single_scenario(
     now = datetime.now().strftime("%Y%m%dT%H%M%S")
     base = f"{session_tag}_{seq:04d}_{scenario_slug}_{now}"
 
+    composite_video_path = out_dir / f"{base}_composite.mp4"
+    video_writer = None
+
     p_hist: deque[float] = deque(maxlen=300)
     m_hist: deque[float] = deque(maxlen=300)
 
@@ -389,6 +403,13 @@ def _capture_single_scenario(
     frame_samples: list[dict] = []
 
     print(f"[CAPTURE] {scenario_slug}: recording {capture_seconds:.1f}s ...")
+    if capture_mode in ("video", "both"):
+        fourcc = cv2.VideoWriter_fourcc(*str(video_codec))
+        fps_write = float(video_fps) if float(video_fps) > 0 else max(1.0, 1.0 / max(interval_s, 0.01))
+        video_writer = cv2.VideoWriter(str(composite_video_path), fourcc, fps_write, (panel_w * 2, panel_h * 2))
+        if not video_writer.isOpened():
+            raise RuntimeError(f"Failed to open composite video writer: {composite_video_path}")
+
     start = time.time()
     i = 0
     while time.time() - start < max(0.5, float(capture_seconds)):
@@ -425,6 +446,30 @@ def _capture_single_scenario(
             best_mm = mm_parsed
             best_mm_points = pts_n
 
+        disp_rgb = rgb if rgb is not None else last_rgb
+        if disp_rgb is None:
+            disp_rgb = np.zeros((panel_h, panel_w, 3), dtype=np.uint8)
+            cv2.putText(disp_rgb, "RGB Camera (no frame)", (20, panel_h // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (180, 180, 180), 2)
+
+        disp_th = th if th is not None else last_th
+        if disp_th is None:
+            disp_th = np.zeros((panel_h, panel_w, 3), dtype=np.uint8)
+            cv2.putText(disp_th, "Thermal Camera (no frame)", (20, panel_h // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (180, 180, 180), 2)
+
+        radar_now = render_radar_panel(panel_w, panel_h, mm_parsed if mm_parsed is not None else best_mm)
+        presence_now = render_presence_panel(panel_w, panel_h, p_hist, m_hist)
+        composite_now = _composite_image(
+            disp_rgb,
+            disp_th,
+            radar_now,
+            presence_now,
+            scenario_slug,
+            scenario_label,
+            max(0.0, time.time() - start),
+        )
+        if video_writer is not None:
+            video_writer.write(composite_now)
+
         frame_samples.append(
             {
                 "frame_idx": i,
@@ -440,6 +485,8 @@ def _capture_single_scenario(
             time.sleep(interval_s)
 
     elapsed = max(0.0, time.time() - start)
+    if video_writer is not None:
+        video_writer.release()
 
     if last_rgb is None:
         last_rgb = np.zeros((panel_h, panel_w, 3), dtype=np.uint8)
@@ -459,8 +506,9 @@ def _capture_single_scenario(
     presence_path = out_dir / f"{base}_presence.png"
     json_path = out_dir / f"{base}_capture.json"
 
-    if not cv2.imwrite(str(composite_path), composite):
-        raise RuntimeError(f"Failed to write: {composite_path}")
+    if capture_mode in ("image", "both"):
+        if not cv2.imwrite(str(composite_path), composite):
+            raise RuntimeError(f"Failed to write: {composite_path}")
     _ = cv2.imwrite(str(rgb_path), last_rgb)
     _ = cv2.imwrite(str(thermal_path), last_th)
     _ = cv2.imwrite(str(radar_path), radar_panel)
@@ -491,7 +539,8 @@ def _capture_single_scenario(
             "points": int(best_mm_points if best_mm_points > 0 else 0),
         },
         "outputs": {
-            "composite_image": str(composite_path),
+            "composite_image": str(composite_path if capture_mode in ("image", "both") else ""),
+            "composite_video": str(composite_video_path if capture_mode in ("video", "both") else ""),
             "rgb_image": str(rgb_path),
             "thermal_image": str(thermal_path),
             "radar_panel": str(radar_path),
@@ -509,12 +558,16 @@ def _capture_single_scenario(
             "timestamp": datetime.now().isoformat(),
             "base_id": base,
             "scenario": scenario_slug,
-            "composite_image": str(composite_path),
+            "composite_image": str(composite_path if capture_mode in ("image", "both") else ""),
+            "composite_video": str(composite_video_path if capture_mode in ("video", "both") else ""),
             "capture_json": str(json_path),
         },
     )
 
-    print(f"[SAVED] {composite_path}")
+    if capture_mode in ("image", "both"):
+        print(f"[SAVED] {composite_path}")
+    if capture_mode in ("video", "both"):
+        print(f"[SAVED] {composite_video_path}")
     print(f"[SAVED] {json_path}")
 
 
@@ -595,6 +648,9 @@ def main() -> int:
                 mmwave_timeout_ms=int(args.mmwave_timeout_ms),
                 panel_w=int(args.panel_width),
                 panel_h=int(args.panel_height),
+                capture_mode=str(args.capture_mode),
+                video_codec=str(args.video_codec),
+                video_fps=float(args.video_fps),
                 rgb_cap=rgb_cap,
                 thermal=thermal,
                 uart_src=uart,
