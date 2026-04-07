@@ -395,5 +395,29 @@ Example output filename:
 
 - `thermal_front_view_20260407T120501_0001.png`
 
+## 19) Dual Camera Menu (Logitech USB + Thermal)
+
+Capture from both cameras at the same time with menu options:
+
+- `1` photo (saves RGB + thermal images)
+- `2` video (saves RGB + thermal videos)
+- `3` exit
+
+Auto-detection:
+
+- `--rgb-device auto` tries to select Logitech/C920 first.
+- You can list V4L2 devices with `--list-cameras`.
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_dual_camera_menu.py --list-cameras
+```
+
+```bash
+python3 software/layer1_sensor_hub/testing/capture_dual_camera_menu.py \
+  --out-dir /home/insu/Desktop/collecting_data/dual_camera \
+  --rgb-device auto \
+  --thermal-device 0 \
+  --default-video-seconds 10
+```
 
 
