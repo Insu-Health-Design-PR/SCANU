@@ -406,6 +406,7 @@ Capture from both cameras at the same time with menu options:
 Auto-detection:
 
 - `--rgb-device auto` tries to select Logitech/C920 first.
+- If auto fails, set RGB explicitly using index (`--rgb-device 2`) or path (`--rgb-device /dev/video2`).
 - You can list V4L2 devices with `--list-cameras`.
 
 ```bash
@@ -425,4 +426,3 @@ Notes:
 - Console states now show clear progress: `PREPARING`, `RECORDING`, `SAVING`, `DONE`.
 - The script estimates effective camera FPS and writes videos with adjusted FPS to reduce short/fast playback artifacts.
 - Increase duration with `--default-video-seconds 20` (or higher) if needed.
-
