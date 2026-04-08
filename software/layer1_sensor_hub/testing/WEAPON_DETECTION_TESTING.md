@@ -478,6 +478,8 @@ Useful options:
 - `--video-fps 10` and `--video-codec mp4v` -> composite video settings.
 - `--combined-video /path/run_all_scenarios.mp4` -> single MP4 across all scenarios.
 - `--combined-video-only` -> only keep the combined MP4 (skip per-scenario MP4 files).
+- `--rgb-fourcc MJPG` -> force webcam format for more stable natural color.
+- `--rgb-color-correct` -> enable gray-world white balance correction.
 - `--mmwave-trail-frames 14` -> accumulates recent radar frames for denser cloud.
 - `--mmwave-view-range-m 4.0` -> forward range shown in radar panel.
 - `--mmwave-view-z-m 1.6` -> vertical range for side projection.
@@ -530,6 +532,29 @@ Single MP4 for all 4 scenarios (parallel RGB + thermal + mmWave):
 cd ~/Desktop/SCANU-dev_adrian
 PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
   --rgb-device /dev/video2 \
+  --thermal-device 0 \
+  --presence off \
+  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
+  --capture-mode video \
+  --combined-video /home/insu/Desktop/collecting_data/four_scenario_multisensor/run_all_scenarios.mp4 \
+  --combined-video-only \
+  --capture-seconds 20 \
+  --mmwave-trail-frames 18 \
+  --mmwave-voxel-size-m 0.08 \
+  --mmwave-min-voxel-hits 2 \
+  --mmwave-min-snr-db 2.0 \
+  --mmwave-view-range-m 4.5 \
+  --mmwave-view-z-m 1.8
+```
+
+Single MP4 with natural RGB color (recommended):
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
+  --rgb-device /dev/video2 \
+  --rgb-fourcc MJPG \
+  --rgb-color-correct \
   --thermal-device 0 \
   --presence off \
   --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \

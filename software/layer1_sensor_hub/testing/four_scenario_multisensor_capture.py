@@ -61,6 +61,12 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--rgb-width", type=int, default=640)
     p.add_argument("--rgb-height", type=int, default=480)
     p.add_argument("--rgb-fps", type=int, default=30)
+    p.add_argument("--rgb-fourcc", default="MJPG", help="Preferred RGB camera pixel format fourcc (e.g. MJPG, YUYV)")
+    p.add_argument(
+        "--rgb-color-correct",
+        action="store_true",
+        help="Apply gray-world white balance correction to RGB frames",
+    )
 
     p.add_argument("--thermal-device", type=int, default=0)
     p.add_argument("--thermal-width", type=int, default=640)
@@ -219,13 +225,23 @@ def _detect_rgb_device(rgb_device_arg: str, thermal_device: int) -> int:
     raise RuntimeError("Failed to auto-detect RGB camera. Use --rgb-device /dev/videoX")
 
 
-def _open_rgb(device: int, width: int, height: int, fps: int):
+def _open_rgb(device: int, width: int, height: int, fps: int, fourcc: str):
     cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
     if not cap.isOpened():
         cap.release()
         cap = cv2.VideoCapture(device)
     if not cap.isOpened():
         raise RuntimeError(f"Cannot open RGB camera /dev/video{device}")
+    if fourcc:
+        try:
+            fourcc_code = cv2.VideoWriter_fourcc(*str(fourcc)[:4])
+            cap.set(cv2.CAP_PROP_FOURCC, fourcc_code)
+        except Exception:
+            pass
+    try:
+        cap.set(cv2.CAP_PROP_CONVERT_RGB, 1)
+    except Exception:
+        pass
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
     cap.set(cv2.CAP_PROP_FPS, fps)
@@ -237,6 +253,17 @@ def _read_rgb(cap) -> Optional[np.ndarray]:
     if not ok:
         return None
     return frame
+
+
+def _gray_world_white_balance(frame_bgr: np.ndarray) -> np.ndarray:
+    # Simple, robust color cast correction for webcams under mixed lighting.
+    f = frame_bgr.astype(np.float32)
+    means = np.mean(f, axis=(0, 1))
+    ref = float(np.mean(means))
+    gains = ref / np.maximum(means, 1e-6)
+    gains = np.clip(gains, 0.55, 1.8)
+    f *= gains.reshape((1, 1, 3))
+    return np.clip(f, 0, 255).astype(np.uint8)
 
 
 def _next_index(out_dir: Path, session_tag: str) -> int:
@@ -588,6 +615,7 @@ def _capture_single_scenario(
     mmwave_max_abs_doppler: float,
     mmwave_min_range_m: float,
     mmwave_max_range_m: float,
+    rgb_color_correct: bool,
     capture_mode: str,
     video_codec: str,
     video_fps: float,
@@ -643,6 +671,8 @@ def _capture_single_scenario(
         rgb = _read_rgb(rgb_cap)
         if rgb is not None:
             rgb = cv2.resize(rgb, (panel_w, panel_h), interpolation=cv2.INTER_LINEAR)
+            if rgb_color_correct:
+                rgb = _gray_world_white_balance(rgb)
             cv2.putText(rgb, "RGB Camera", (10, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
             last_rgb = rgb
 
@@ -862,7 +892,7 @@ def main() -> int:
     print("[INIT] Opening sensors...")
     try:
         rgb_idx = _detect_rgb_device(str(args.rgb_device), int(args.thermal_device))
-        rgb_cap = _open_rgb(rgb_idx, args.rgb_width, args.rgb_height, args.rgb_fps)
+        rgb_cap = _open_rgb(rgb_idx, args.rgb_width, args.rgb_height, args.rgb_fps, str(args.rgb_fourcc))
         thermal = ThermalCameraSource(
             device=args.thermal_device,
             width=args.thermal_width,
@@ -940,6 +970,7 @@ def main() -> int:
                 mmwave_max_abs_doppler=float(args.mmwave_max_abs_doppler),
                 mmwave_min_range_m=float(args.mmwave_min_range_m),
                 mmwave_max_range_m=float(args.mmwave_max_range_m),
+                rgb_color_correct=bool(args.rgb_color_correct),
                 capture_mode=str(args.capture_mode),
                 video_codec=str(args.video_codec),
                 video_fps=float(args.video_fps),
