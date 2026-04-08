@@ -478,7 +478,7 @@ Useful options:
 - `--video-fps 10` and `--video-codec mp4v` -> composite video settings.
 - `--combined-video /path/run_all_scenarios.mp4` -> single MP4 across all scenarios.
 - `--combined-video-only` -> only keep the combined MP4 (skip per-scenario MP4 files).
-- `--rgb-fourcc MJPG` -> force webcam format for more stable natural color.
+- `--rgb-fourcc auto|MJPG|YUYV` -> camera pixel format (`auto` recommended first).
 - `--rgb-color-correct` -> enable gray-world white balance correction.
 - `--mmwave-trail-frames 14` -> accumulates recent radar frames for denser cloud.
 - `--mmwave-view-range-m 4.0` -> forward range shown in radar panel.
@@ -553,8 +553,7 @@ Single MP4 with natural RGB color (recommended):
 cd ~/Desktop/SCANU-dev_adrian
 PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
   --rgb-device /dev/video2 \
-  --rgb-fourcc MJPG \
-  --rgb-color-correct \
+  --rgb-fourcc auto \
   --thermal-device 0 \
   --presence off \
   --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
