@@ -98,6 +98,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--video-codec", default="mp4v", help="Composite video fourcc codec")
     p.add_argument("--video-fps", type=float, default=10.0, help="Composite video FPS")
+    p.add_argument(
+        "--combined-video",
+        default="",
+        help="Optional single output MP4 path for all scenarios combined in sequence",
+    )
+    p.add_argument(
+        "--combined-video-only",
+        action="store_true",
+        help="When used with --combined-video, skip per-scenario MP4 files",
+    )
     p.add_argument("--no-prompt", action="store_true", help="Run all scenarios without Enter prompts")
     p.add_argument("--list-cameras", action="store_true", help="List V4L2 camera devices and exit")
     return p
@@ -581,6 +591,9 @@ def _capture_single_scenario(
     capture_mode: str,
     video_codec: str,
     video_fps: float,
+    shared_video_writer: Optional[cv2.VideoWriter],
+    write_individual_video: bool,
+    combined_video_path: str,
     rgb_cap,
     thermal: ThermalCameraSource,
     uart_src: UARTSource,
@@ -611,7 +624,7 @@ def _capture_single_scenario(
     frame_samples: list[dict] = []
 
     print(f"[CAPTURE] {scenario_slug}: recording {capture_seconds:.1f}s ...")
-    if capture_mode in ("video", "both"):
+    if capture_mode in ("video", "both") and write_individual_video:
         fourcc = cv2.VideoWriter_fourcc(*str(video_codec))
         fps_write = float(video_fps) if float(video_fps) > 0 else max(1.0, 1.0 / max(interval_s, 0.01))
         video_writer = cv2.VideoWriter(str(composite_video_path), fourcc, fps_write, (panel_w * 2, panel_h * 2))
@@ -698,6 +711,8 @@ def _capture_single_scenario(
         )
         if video_writer is not None:
             video_writer.write(composite_now)
+        if shared_video_writer is not None:
+            shared_video_writer.write(composite_now)
 
         frame_samples.append(
             {
@@ -790,7 +805,8 @@ def _capture_single_scenario(
         },
         "outputs": {
             "composite_image": str(composite_path if capture_mode in ("image", "both") else ""),
-            "composite_video": str(composite_video_path if capture_mode in ("video", "both") else ""),
+            "composite_video": str(composite_video_path if (capture_mode in ("video", "both") and write_individual_video) else ""),
+            "combined_video": str(combined_video_path or ""),
             "rgb_image": str(rgb_path),
             "thermal_image": str(thermal_path),
             "radar_panel": str(radar_path),
@@ -809,15 +825,18 @@ def _capture_single_scenario(
             "base_id": base,
             "scenario": scenario_slug,
             "composite_image": str(composite_path if capture_mode in ("image", "both") else ""),
-            "composite_video": str(composite_video_path if capture_mode in ("video", "both") else ""),
+            "composite_video": str(composite_video_path if (capture_mode in ("video", "both") and write_individual_video) else ""),
+            "combined_video": str(combined_video_path or ""),
             "capture_json": str(json_path),
         },
     )
 
     if capture_mode in ("image", "both"):
         print(f"[SAVED] {composite_path}")
-    if capture_mode in ("video", "both"):
+    if capture_mode in ("video", "both") and write_individual_video:
         print(f"[SAVED] {composite_video_path}")
+    if shared_video_writer is not None:
+        print(f"[SAVED] appended to combined video: {combined_video_path}")
     print(f"[SAVED] {json_path}")
 
 
@@ -837,6 +856,8 @@ def main() -> int:
     rgb_cap = None
     thermal = None
     presence_source: Optional[PresenceSource] = None
+    combined_writer: Optional[cv2.VideoWriter] = None
+    combined_video_path = ""
 
     print("[INIT] Opening sensors...")
     try:
@@ -871,6 +892,18 @@ def main() -> int:
         print(f"[INIT] Output dir: {out_dir}")
         print(f"[INIT] RGB camera: /dev/video{rgb_idx}")
         print(f"[INIT] Thermal camera: /dev/video{args.thermal_device}")
+
+        if args.combined_video:
+            if str(args.capture_mode) not in ("video", "both"):
+                raise RuntimeError("--combined-video requires --capture-mode video|both")
+            combined_video_path = str(Path(args.combined_video).expanduser().resolve())
+            Path(combined_video_path).parent.mkdir(parents=True, exist_ok=True)
+            fourcc = cv2.VideoWriter_fourcc(*str(args.video_codec))
+            fps_write = float(args.video_fps) if float(args.video_fps) > 0 else max(1.0, 1.0 / max(float(args.interval_s), 0.01))
+            combined_writer = cv2.VideoWriter(combined_video_path, fourcc, fps_write, (int(args.panel_width) * 2, int(args.panel_height) * 2))
+            if not combined_writer.isOpened():
+                raise RuntimeError(f"Failed to open combined video writer: {combined_video_path}")
+            print(f"[INIT] Combined video output: {combined_video_path}")
 
         seq = _next_index(out_dir, args.session)
         scenarios = _scenario_slug_label_pairs()
@@ -910,6 +943,9 @@ def main() -> int:
                 capture_mode=str(args.capture_mode),
                 video_codec=str(args.video_codec),
                 video_fps=float(args.video_fps),
+                shared_video_writer=combined_writer,
+                write_individual_video=not (bool(args.combined_video) and bool(args.combined_video_only)),
+                combined_video_path=combined_video_path,
                 rgb_cap=rgb_cap,
                 thermal=thermal,
                 uart_src=uart,
@@ -924,6 +960,9 @@ def main() -> int:
 
         print("\n[DONE] Four-scenario multisensor capture finished.")
         print(f"[DONE] Manifest: {out_dir / 'manifest.jsonl'}")
+        if combined_writer is not None:
+            combined_writer.release()
+            print(f"[DONE] Combined video saved: {combined_video_path}")
         return 0
 
     finally:
@@ -952,6 +991,11 @@ def main() -> int:
                 pass
             try:
                 serial_mgr.disconnect()
+            except Exception:
+                pass
+        if combined_writer is not None:
+            try:
+                combined_writer.release()
             except Exception:
                 pass
 
