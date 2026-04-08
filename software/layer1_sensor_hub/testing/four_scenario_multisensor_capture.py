@@ -61,7 +61,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--rgb-width", type=int, default=640)
     p.add_argument("--rgb-height", type=int, default=480)
     p.add_argument("--rgb-fps", type=int, default=30)
-    p.add_argument("--rgb-fourcc", default="MJPG", help="Preferred RGB camera pixel format fourcc (e.g. MJPG, YUYV)")
+    p.add_argument(
+        "--rgb-fourcc",
+        default="auto",
+        help="Preferred RGB camera pixel format fourcc (auto, MJPG, YUYV)",
+    )
     p.add_argument(
         "--rgb-color-correct",
         action="store_true",
@@ -232,7 +236,7 @@ def _open_rgb(device: int, width: int, height: int, fps: int, fourcc: str):
         cap = cv2.VideoCapture(device)
     if not cap.isOpened():
         raise RuntimeError(f"Cannot open RGB camera /dev/video{device}")
-    if fourcc:
+    if fourcc and str(fourcc).lower() not in ("auto", "none", "default", "off"):
         try:
             fourcc_code = cv2.VideoWriter_fourcc(*str(fourcc)[:4])
             cap.set(cv2.CAP_PROP_FOURCC, fourcc_code)
