@@ -569,6 +569,26 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --mmwave-view-z-m 1.8
 ```
 
+If your Jetson camera map matches:
+
+- `HD Pro Webcam C920 -> /dev/video0,/dev/video1`
+- `PureThermal -> /dev/video2,/dev/video3`
+
+use:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
+  --rgb-device /dev/video0 \
+  --thermal-device 2 \
+  --rgb-fourcc auto \
+  --presence off \
+  --capture-mode video \
+  --combined-video /home/insu/Desktop/collecting_data/four_scenario_multisensor/run_all_scenarios.mp4 \
+  --combined-video-only \
+  --capture-seconds 20
+```
+
 Outputs per scenario:
 
 - `*_composite.png`
