@@ -476,6 +476,14 @@ Useful options:
 - `--no-prompt` -> run all 4 scenarios without pressing Enter.
 - `--capture-mode image|video|both` -> choose output type (default `both`).
 - `--video-fps 10` and `--video-codec mp4v` -> composite video settings.
+- `--mmwave-trail-frames 14` -> accumulates recent radar frames for denser cloud.
+- `--mmwave-view-range-m 4.0` -> forward range shown in radar panel.
+- `--mmwave-view-z-m 1.6` -> vertical range for side projection.
+- `--mmwave-voxel-size-m 0.10` -> temporal fusion voxel size.
+- `--mmwave-min-voxel-hits 2` -> keep only persistent voxels.
+- `--mmwave-min-snr-db 2.0` -> reject weak noisy points.
+- `--mmwave-max-abs-doppler 3.5` -> reject unstable outlier velocity points.
+- `--mmwave-min-range-m / --mmwave-max-range-m` -> range gating for cleaner cloud.
 
 Video-only example:
 
@@ -491,6 +499,27 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --capture-mode video \
   --video-fps 10 \
   --capture-seconds 10
+```
+
+Point-cloud quality example (single sensor, denoised temporal fusion):
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian
+PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisensor_capture.py \
+  --out-dir /home/insu/Desktop/collecting_data/four_scenario_multisensor \
+  --session school_trial_cloud \
+  --rgb-device /dev/video2 \
+  --thermal-device 0 \
+  --presence off \
+  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
+  --capture-mode video \
+  --capture-seconds 20 \
+  --mmwave-trail-frames 18 \
+  --mmwave-voxel-size-m 0.08 \
+  --mmwave-min-voxel-hits 2 \
+  --mmwave-min-snr-db 2.0 \
+  --mmwave-view-range-m 4.5 \
+  --mmwave-view-z-m 1.8
 ```
 
 Outputs per scenario:
