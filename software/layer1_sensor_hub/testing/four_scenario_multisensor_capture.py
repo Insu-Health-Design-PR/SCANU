@@ -81,6 +81,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     p.add_argument("--panel-width", type=int, default=640)
     p.add_argument("--panel-height", type=int, default=480)
+    p.add_argument("--mmwave-trail-frames", type=int, default=14, help="Frames to accumulate for denser point cloud")
+    p.add_argument("--mmwave-view-range-m", type=float, default=4.0, help="Forward range shown in radar panel")
+    p.add_argument("--mmwave-view-z-m", type=float, default=1.6, help="Vertical range (+/-) for side view")
+    p.add_argument("--mmwave-voxel-size-m", type=float, default=0.10, help="Voxel size for temporal cloud fusion")
+    p.add_argument("--mmwave-min-voxel-hits", type=int, default=2, help="Minimum temporal hits to keep a fused voxel")
+    p.add_argument("--mmwave-min-snr-db", type=float, default=2.0, help="Minimum SNR (dB) for candidate points")
+    p.add_argument("--mmwave-max-abs-doppler", type=float, default=3.5, help="Reject points beyond this |doppler|")
+    p.add_argument("--mmwave-min-range-m", type=float, default=0.18, help="Minimum valid radar range")
+    p.add_argument("--mmwave-max-range-m", type=float, default=4.8, help="Maximum valid radar range")
     p.add_argument(
         "--capture-mode",
         choices=("image", "video", "both"),
@@ -281,28 +290,216 @@ def _connect_mmwave(serial_mgr: SerialManager, cli_port: Optional[str], data_por
     raise RuntimeError(f"Failed mmWave connect/probe. Tried: {errors}")
 
 
-def render_radar_panel(width: int, height: int, parsed_frame: Optional[object]) -> np.ndarray:
-    panel = np.zeros((height, width, 3), dtype=np.uint8)
-    cv2.putText(panel, "mmWave Point Cloud", (10, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
-
-    center_x = width // 2
-    bottom_y = height - 30
-    meters_to_px = max(40, min(width, height) // 6)
-
-    cv2.line(panel, (center_x, bottom_y), (center_x, 45), (70, 70, 70), 1)
-    cv2.line(panel, (40, bottom_y), (width - 40, bottom_y), (70, 70, 70), 1)
-
+def _extract_point_tuple_list(parsed_frame: Optional[object]) -> list[tuple[float, float, float, float, float]]:
     points = getattr(parsed_frame, "points", []) if parsed_frame is not None else []
-    points = points or []
-    for p in points:
-        x_m = float(getattr(p, "x", 0.0))
-        y_m = float(getattr(p, "y", 0.0))
-        px = int(center_x + x_m * meters_to_px)
-        py = int(bottom_y - y_m * meters_to_px)
-        if 0 <= px < width and 0 <= py < height:
-            cv2.circle(panel, (px, py), 4, (0, 220, 255), -1)
+    out: list[tuple[float, float, float, float, float]] = []
+    for p in points or []:
+        out.append(
+            (
+                float(getattr(p, "x", 0.0)),
+                float(getattr(p, "y", 0.0)),
+                float(getattr(p, "z", 0.0)),
+                float(getattr(p, "doppler", 0.0)),
+                float(getattr(p, "snr", 0.0)),
+            )
+        )
+    return out
 
-    cv2.putText(panel, f"points: {len(points)}", (10, height - 12), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (220, 220, 220), 2)
+
+def _build_temporal_denoised_cloud(
+    history: deque[list[tuple[float, float, float, float, float]]],
+    voxel_size_m: float,
+    min_voxel_hits: int,
+    min_snr_db: float,
+    max_abs_doppler: float,
+    min_range_m: float,
+    max_range_m: float,
+    lateral_limit_m: float,
+    z_limit_m: float,
+) -> tuple[list[tuple[float, float, float, float, float]], dict]:
+    if not history:
+        return [], {"raw_points": 0, "filtered_points": 0, "kept_points": 0, "kept_voxels": 0}
+
+    voxel_size = max(0.03, float(voxel_size_m))
+    min_hits = max(1, int(min_voxel_hits))
+    x_max = max(0.3, float(lateral_limit_m))
+    z_max = max(0.2, float(z_limit_m))
+    r_min = max(0.0, float(min_range_m))
+    r_max = max(r_min + 0.2, float(max_range_m))
+
+    raw_points = 0
+    filtered_points = 0
+    voxels: dict[tuple[int, int, int], dict[str, float]] = {}
+    n_frames = max(1, len(history))
+
+    for age_idx, pts in enumerate(history):
+        raw_points += len(pts)
+        age_norm = (age_idx + 1) / n_frames
+        age_w = 0.35 + 0.65 * age_norm
+        for x_m, y_m, z_m, doppler, snr in pts:
+            if y_m < r_min or y_m > r_max:
+                continue
+            if abs(x_m) > x_max or abs(z_m) > z_max:
+                continue
+            if abs(doppler) > max_abs_doppler:
+                continue
+            if snr < min_snr_db:
+                continue
+            filtered_points += 1
+
+            vx = int(round(x_m / voxel_size))
+            vy = int(round(y_m / voxel_size))
+            vz = int(round(z_m / voxel_size))
+            key = (vx, vy, vz)
+            v = voxels.get(key)
+            weight = age_w * max(0.25, min(2.0, (snr + 2.0) / 12.0))
+            if v is None:
+                voxels[key] = {
+                    "sum_w": weight,
+                    "sum_x": x_m * weight,
+                    "sum_y": y_m * weight,
+                    "sum_z": z_m * weight,
+                    "sum_d": doppler * weight,
+                    "sum_s": snr * weight,
+                    "hits": 1.0,
+                }
+            else:
+                v["sum_w"] += weight
+                v["sum_x"] += x_m * weight
+                v["sum_y"] += y_m * weight
+                v["sum_z"] += z_m * weight
+                v["sum_d"] += doppler * weight
+                v["sum_s"] += snr * weight
+                v["hits"] += 1.0
+
+    fused: list[tuple[float, float, float, float, float]] = []
+    for v in voxels.values():
+        if int(v["hits"]) < min_hits:
+            continue
+        w = max(1e-6, v["sum_w"])
+        fused.append((v["sum_x"] / w, v["sum_y"] / w, v["sum_z"] / w, v["sum_d"] / w, v["sum_s"] / w))
+
+    stats = {
+        "raw_points": int(raw_points),
+        "filtered_points": int(filtered_points),
+        "kept_points": int(len(fused)),
+        "kept_voxels": int(len(fused)),
+    }
+    return fused, stats
+
+
+def _mmwave_color(age_norm: float, snr: float, doppler: float) -> tuple[int, int, int]:
+    # New points are bright, old points are dim.
+    base = 0.35 + 0.65 * max(0.0, min(1.0, age_norm))
+    # Use doppler sign to separate approaching/receding hue.
+    if doppler < -0.12:
+        color = np.array([255, 170, 30], dtype=np.float32)  # orange
+    elif doppler > 0.12:
+        color = np.array([60, 190, 255], dtype=np.float32)  # cyan
+    else:
+        color = np.array([110, 255, 130], dtype=np.float32)  # green
+    snr_gain = max(0.45, min(1.25, (snr + 1.0) / 16.0))
+    c = np.clip(color * base * snr_gain, 0, 255).astype(np.uint8)
+    return int(c[0]), int(c[1]), int(c[2])
+
+
+def render_radar_panel(
+    width: int,
+    height: int,
+    parsed_frame: Optional[object],
+    point_history: Optional[deque[list[tuple[float, float, float, float, float]]]] = None,
+    denoised_points: Optional[list[tuple[float, float, float, float, float]]] = None,
+    view_range_m: float = 4.0,
+    view_z_m: float = 1.6,
+) -> np.ndarray:
+    panel = np.full((height, width, 3), (12, 14, 18), dtype=np.uint8)
+    cv2.putText(panel, "mmWave Point Cloud (Top + Side)", (10, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (240, 240, 240), 2)
+
+    margin = 10
+    top_y0 = 40
+    top_h = max(220, int(height * 0.65))
+    top_h = min(top_h, height - 120)
+    top_x0 = margin
+    top_x1 = width - margin
+    top_y1 = top_y0 + top_h
+
+    side_y0 = top_y1 + 8
+    side_y1 = height - margin
+    side_x0 = margin
+    side_x1 = width - margin
+
+    cv2.rectangle(panel, (top_x0, top_y0), (top_x1, top_y1), (52, 62, 72), 1)
+    cv2.rectangle(panel, (side_x0, side_y0), (side_x1, side_y1), (52, 62, 72), 1)
+
+    center_x = (top_x0 + top_x1) // 2
+    radar_y = top_y1 - 8
+    y_max = max(1.0, float(view_range_m))
+    x_max = max(0.5, y_max / 1.3)
+
+    # Top-view grid (X vs Y).
+    x_ticks = np.arange(-x_max, x_max + 0.001, 0.5)
+    y_ticks = np.arange(0.0, y_max + 0.001, 0.5)
+    for xv in x_ticks:
+        px = int(center_x + (xv / x_max) * ((top_x1 - top_x0) / 2 - 12))
+        cv2.line(panel, (px, top_y0 + 2), (px, top_y1 - 2), (30, 38, 48), 1)
+    for yv in y_ticks:
+        py = int(radar_y - (yv / y_max) * (radar_y - (top_y0 + 12)))
+        cv2.line(panel, (top_x0 + 2, py), (top_x1 - 2, py), (30, 38, 48), 1)
+
+    cv2.line(panel, (center_x, top_y0 + 2), (center_x, top_y1 - 2), (90, 102, 118), 1)
+    cv2.line(panel, (top_x0 + 2, radar_y), (top_x1 - 2, radar_y), (90, 102, 118), 1)
+    cv2.putText(panel, "Top XY", (top_x0 + 8, top_y0 + 18), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (170, 180, 190), 1)
+    cv2.putText(panel, "X", (top_x1 - 16, radar_y - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (170, 180, 190), 1)
+    cv2.putText(panel, "Y", (center_x + 6, top_y0 + 14), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (170, 180, 190), 1)
+
+    # Side-view grid (Y vs Z).
+    z_max = max(0.4, float(view_z_m))
+    for yv in y_ticks:
+        px = int(side_x0 + 12 + (yv / y_max) * (side_x1 - side_x0 - 24))
+        cv2.line(panel, (px, side_y0 + 2), (px, side_y1 - 2), (30, 38, 48), 1)
+    z_ticks = np.arange(-z_max, z_max + 0.001, 0.4)
+    side_mid_y = (side_y0 + side_y1) // 2
+    for zv in z_ticks:
+        py = int(side_mid_y - (zv / z_max) * ((side_y1 - side_y0) / 2 - 8))
+        cv2.line(panel, (side_x0 + 2, py), (side_x1 - 2, py), (30, 38, 48), 1)
+    cv2.line(panel, (side_x0 + 10, side_mid_y), (side_x1 - 10, side_mid_y), (90, 102, 118), 1)
+    cv2.putText(panel, "Side YZ", (side_x0 + 8, side_y0 + 16), cv2.FONT_HERSHEY_SIMPLEX, 0.46, (170, 180, 190), 1)
+    cv2.putText(panel, "Y", (side_x1 - 14, side_mid_y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (170, 180, 190), 1)
+    cv2.putText(panel, "Z", (side_x0 + 6, side_y0 + 28), cv2.FONT_HERSHEY_SIMPLEX, 0.44, (170, 180, 190), 1)
+
+    if point_history is not None and len(point_history) > 0:
+        history = list(point_history)
+    else:
+        history = [_extract_point_tuple_list(parsed_frame)]
+
+    current_points = len(history[-1]) if history else 0
+    trail_total = int(sum(len(x) for x in history))
+    cloud_points = denoised_points if denoised_points is not None else (history[-1] if history else [])
+
+    for x_m, y_m, z_m, doppler, snr in cloud_points:
+        if y_m < 0.0:
+            continue
+        px = int(center_x + (x_m / x_max) * ((top_x1 - top_x0) / 2 - 12))
+        py = int(radar_y - (y_m / y_max) * (radar_y - (top_y0 + 12)))
+        sx = int(side_x0 + 12 + (y_m / y_max) * (side_x1 - side_x0 - 24))
+        sy = int(side_mid_y - (z_m / z_max) * ((side_y1 - side_y0) / 2 - 8))
+
+        color = _mmwave_color(age_norm=1.0, snr=snr, doppler=doppler)
+        radius = 3
+        if top_x0 <= px <= top_x1 and top_y0 <= py <= top_y1:
+            cv2.circle(panel, (px, py), radius, color, -1)
+        if side_x0 <= sx <= side_x1 and side_y0 <= sy <= side_y1:
+            cv2.circle(panel, (sx, sy), radius, color, -1)
+
+    cv2.putText(
+        panel,
+        f"raw_now: {current_points} | trail_raw: {trail_total} | cloud_used: {len(cloud_points)}",
+        (10, height - 12),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.55,
+        (220, 220, 220),
+        2,
+    )
     return panel
 
 
@@ -372,6 +569,15 @@ def _capture_single_scenario(
     mmwave_timeout_ms: int,
     panel_w: int,
     panel_h: int,
+    mmwave_trail_frames: int,
+    mmwave_view_range_m: float,
+    mmwave_view_z_m: float,
+    mmwave_voxel_size_m: float,
+    mmwave_min_voxel_hits: int,
+    mmwave_min_snr_db: float,
+    mmwave_max_abs_doppler: float,
+    mmwave_min_range_m: float,
+    mmwave_max_range_m: float,
     capture_mode: str,
     video_codec: str,
     video_fps: float,
@@ -393,12 +599,14 @@ def _capture_single_scenario(
 
     p_hist: deque[float] = deque(maxlen=300)
     m_hist: deque[float] = deque(maxlen=300)
+    mm_history: deque[list[tuple[float, float, float, float, float]]] = deque(maxlen=max(1, int(mmwave_trail_frames)))
 
     last_rgb: Optional[np.ndarray] = None
     last_th: Optional[np.ndarray] = None
     best_mm = None
     best_mm_points = -1
     last_presence = None
+    denoise_stats_last = {"raw_points": 0, "filtered_points": 0, "kept_points": 0, "kept_voxels": 0}
 
     frame_samples: list[dict] = []
 
@@ -445,6 +653,19 @@ def _capture_single_scenario(
         if mm_parsed is not None and pts_n >= best_mm_points:
             best_mm = mm_parsed
             best_mm_points = pts_n
+        mm_history.append(_extract_point_tuple_list(mm_parsed))
+        denoised_points, denoise_stats = _build_temporal_denoised_cloud(
+            history=mm_history,
+            voxel_size_m=float(mmwave_voxel_size_m),
+            min_voxel_hits=int(mmwave_min_voxel_hits),
+            min_snr_db=float(mmwave_min_snr_db),
+            max_abs_doppler=float(mmwave_max_abs_doppler),
+            min_range_m=float(mmwave_min_range_m),
+            max_range_m=float(mmwave_max_range_m),
+            lateral_limit_m=max(0.3, float(mmwave_view_range_m) / 1.3),
+            z_limit_m=max(0.2, float(mmwave_view_z_m)),
+        )
+        denoise_stats_last = denoise_stats
 
         disp_rgb = rgb if rgb is not None else last_rgb
         if disp_rgb is None:
@@ -456,7 +677,15 @@ def _capture_single_scenario(
             disp_th = np.zeros((panel_h, panel_w, 3), dtype=np.uint8)
             cv2.putText(disp_th, "Thermal Camera (no frame)", (20, panel_h // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (180, 180, 180), 2)
 
-        radar_now = render_radar_panel(panel_w, panel_h, mm_parsed if mm_parsed is not None else best_mm)
+        radar_now = render_radar_panel(
+            panel_w,
+            panel_h,
+            mm_parsed if mm_parsed is not None else best_mm,
+            point_history=mm_history,
+            denoised_points=denoised_points,
+            view_range_m=float(mmwave_view_range_m),
+            view_z_m=float(mmwave_view_z_m),
+        )
         presence_now = render_presence_panel(panel_w, panel_h, p_hist, m_hist)
         composite_now = _composite_image(
             disp_rgb,
@@ -474,7 +703,8 @@ def _capture_single_scenario(
             {
                 "frame_idx": i,
                 "timestamp_ms": t * 1000.0,
-                "mmwave_points": int(pts_n),
+                "mmwave_points_raw": int(pts_n),
+                "mmwave_points_cloud": int(len(denoised_points)),
                 "presence_raw": None if prs is None else float(prs.presence_raw),
                 "motion_raw": None if prs is None else float(prs.motion_raw),
             }
@@ -495,7 +725,15 @@ def _capture_single_scenario(
         last_th = np.zeros((panel_h, panel_w, 3), dtype=np.uint8)
         cv2.putText(last_th, "Thermal Camera (no frame)", (20, panel_h // 2), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (180, 180, 180), 2)
 
-    radar_panel = render_radar_panel(panel_w, panel_h, best_mm)
+    radar_panel = render_radar_panel(
+        panel_w,
+        panel_h,
+        best_mm,
+        point_history=mm_history,
+        denoised_points=denoised_points,
+        view_range_m=float(mmwave_view_range_m),
+        view_z_m=float(mmwave_view_z_m),
+    )
     presence_panel = render_presence_panel(panel_w, panel_h, p_hist, m_hist)
     composite = _composite_image(last_rgb, last_th, radar_panel, presence_panel, scenario_slug, scenario_label, elapsed)
 
@@ -537,6 +775,18 @@ def _capture_single_scenario(
         "best_mmwave": {
             "frame_number": None if best_mm is None else getattr(best_mm, "frame_number", None),
             "points": int(best_mm_points if best_mm_points > 0 else 0),
+        },
+        "pointcloud_processing": {
+            "trail_frames": int(mmwave_trail_frames),
+            "voxel_size_m": float(mmwave_voxel_size_m),
+            "min_voxel_hits": int(mmwave_min_voxel_hits),
+            "min_snr_db": float(mmwave_min_snr_db),
+            "max_abs_doppler": float(mmwave_max_abs_doppler),
+            "min_range_m": float(mmwave_min_range_m),
+            "max_range_m": float(mmwave_max_range_m),
+            "view_range_m": float(mmwave_view_range_m),
+            "view_z_m": float(mmwave_view_z_m),
+            "last_stats": denoise_stats_last,
         },
         "outputs": {
             "composite_image": str(composite_path if capture_mode in ("image", "both") else ""),
@@ -648,6 +898,15 @@ def main() -> int:
                 mmwave_timeout_ms=int(args.mmwave_timeout_ms),
                 panel_w=int(args.panel_width),
                 panel_h=int(args.panel_height),
+                mmwave_trail_frames=int(args.mmwave_trail_frames),
+                mmwave_view_range_m=float(args.mmwave_view_range_m),
+                mmwave_view_z_m=float(args.mmwave_view_z_m),
+                mmwave_voxel_size_m=float(args.mmwave_voxel_size_m),
+                mmwave_min_voxel_hits=int(args.mmwave_min_voxel_hits),
+                mmwave_min_snr_db=float(args.mmwave_min_snr_db),
+                mmwave_max_abs_doppler=float(args.mmwave_max_abs_doppler),
+                mmwave_min_range_m=float(args.mmwave_min_range_m),
+                mmwave_max_range_m=float(args.mmwave_max_range_m),
                 capture_mode=str(args.capture_mode),
                 video_codec=str(args.video_codec),
                 video_fps=float(args.video_fps),
