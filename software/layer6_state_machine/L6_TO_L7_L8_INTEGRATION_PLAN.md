@@ -461,3 +461,53 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --data-port /dev/ttyUSB1 \
   --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
   run --mode live --mmwave on --presence mock --thermal off --max-frames 50
+
+
+
+-----------------------------------------]]]
+
+insu@insu-desktop:~$ cd ~/Desktop/SCANU-dev_adrian
+source .venv/bin/activate
+
+PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
+  --radar-id radar_main \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  run --mode live --mmwave on --presence mock --thermal off --max-frames 50
+Traceback (most recent call last):
+  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialposix.py", line 322, in open
+    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+FileNotFoundError: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/mmwave/serial_manager.py", line 271, in connect
+    self.config_port = serial.Serial(
+  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialutil.py", line 244, in __init__
+    self.open()
+  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialposix.py", line 325, in open
+    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
+serial.serialutil.SerialException: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 257, in <module>
+    raise SystemExit(main())
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 223, in main
+    return _run_command(orchestrator, args)
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 118, in _run_command
+    hub, serial_mgr = _build_live_hub(args)
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 65, in _build_live_hub
+    serial_mgr.connect(ports.config_port, ports.data_port)
+  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/mmwave/serial_manager.py", line 307, in connect
+    raise RuntimeError(f"Failed to open serial ports: {e}{hint}")
+RuntimeError: Failed to open serial ports: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+(.venv) insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ 
+
