@@ -446,3 +446,18 @@ mmwDemo:/>
 }
 (.venv) insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ 
 
+
+
+
+-------------------
+
+
+cd ~/Desktop/SCANU-dev_adrian
+source .venv/bin/activate
+
+PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
+  --radar-id radar_main \
+  --cli-port /dev/ttyUSB0 \
+  --data-port /dev/ttyUSB1 \
+  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  run --mode live --mmwave on --presence mock --thermal off --max-frames 50
