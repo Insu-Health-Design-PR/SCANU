@@ -466,48 +466,1562 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
 
 -----------------------------------------]]]
 
-insu@insu-desktop:~$ cd ~/Desktop/SCANU-dev_adrian
-source .venv/bin/activate
-
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ 
 PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
   --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
   run --mode live --mmwave on --presence mock --thermal off --max-frames 50
-Traceback (most recent call last):
-  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialposix.py", line 322, in open
-    self.fd = os.open(self.portstr, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
-FileNotFoundError: [Errno 2] No such file or directory: '/dev/ttyUSB0'
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "IDLE",
+    "reason": "activity_low",
+    "frame_number": 1,
+    "timestamp_ms": 1775759639252.7954,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.25833333333333336,
+      "confidence": 0.9375,
+      "trigger_score": 0.4166666666666667,
+      "anomaly_score": 0.25833333333333336
+    }
+  },
+  "snapshot": {
+    "state": "IDLE",
+    "dwell_ms": 1133.74072265625,
+    "fused_score": 0.25833333333333336,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "TRIGGERED",
+    "reason": "trigger_detected",
+    "frame_number": 2,
+    "timestamp_ms": 1775759639481.969,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.3666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "TRIGGERED",
+    "dwell_ms": 0.0,
+    "fused_score": 0.3666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "TRIGGERED",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 3,
+    "timestamp_ms": 1775759639684.4146,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.3666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 0.0,
+    "fused_score": 0.3666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 4,
+    "timestamp_ms": 1775759639886.7913,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6433333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.6433333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 202.596923828125,
+    "fused_score": 0.6433333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 5,
+    "timestamp_ms": 1775759640089.4932,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.5183333333333333,
+      "confidence": 0.9375,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.5183333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 405.34375,
+    "fused_score": 0.5183333333333333,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 6,
+    "timestamp_ms": 1775759640292.3665,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3416666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.3416666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 608.641357421875,
+    "fused_score": 0.3416666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "IDLE",
+    "reason": "activity_low",
+    "frame_number": 7,
+    "timestamp_ms": 1775759640495.4805,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.21666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.3333333333333333,
+      "anomaly_score": 0.21666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "IDLE",
+    "dwell_ms": 0.0,
+    "fused_score": 0.21666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "IDLE",
+    "reason": "activity_low",
+    "frame_number": 8,
+    "timestamp_ms": 1775759640697.6562,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.4083333333333334,
+      "confidence": 0.9375,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.4083333333333334
+    }
+  },
+  "snapshot": {
+    "state": "IDLE",
+    "dwell_ms": 201.96142578125,
+    "fused_score": 0.4083333333333334,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "TRIGGERED",
+    "reason": "trigger_detected",
+    "frame_number": 9,
+    "timestamp_ms": 1775759640899.5012,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.45,
+      "confidence": 0.975,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.45
+    }
+  },
+  "snapshot": {
+    "state": "TRIGGERED",
+    "dwell_ms": 0.0,
+    "fused_score": 0.45,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "TRIGGERED",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 10,
+    "timestamp_ms": 1775759641101.82,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6016666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.6016666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 0.0,
+    "fused_score": 0.6016666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 11,
+    "timestamp_ms": 1775759641303.735,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6016666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.6016666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 201.809814453125,
+    "fused_score": 0.6016666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 12,
+    "timestamp_ms": 1775759641505.371,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3416666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.3416666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 403.455078125,
+    "fused_score": 0.3416666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 13,
+    "timestamp_ms": 1775759641707.1084,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3416666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.3416666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 605.122314453125,
+    "fused_score": 0.3416666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 14,
+    "timestamp_ms": 1775759641908.7441,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.49166666666666675,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.49166666666666675
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 806.792724609375,
+    "fused_score": 0.49166666666666675,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 15,
+    "timestamp_ms": 1775759642110.2803,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.3666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1008.25244140625,
+    "fused_score": 0.3666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 16,
+    "timestamp_ms": 1775759642311.759,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.5183333333333333,
+      "confidence": 0.9375,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.5183333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1209.713623046875,
+    "fused_score": 0.5183333333333333,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 17,
+    "timestamp_ms": 1775759642513.2947,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.4766666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.4766666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1411.694580078125,
+    "fused_score": 0.4766666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 18,
+    "timestamp_ms": 1775759642715.6826,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.25833333333333336,
+      "confidence": 0.9375,
+      "trigger_score": 0.4166666666666667,
+      "anomaly_score": 0.25833333333333336
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1613.928466796875,
+    "fused_score": 0.25833333333333336,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 19,
+    "timestamp_ms": 1775759642917.8247,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.25833333333333336,
+      "confidence": 0.9375,
+      "trigger_score": 0.4166666666666667,
+      "anomaly_score": 0.25833333333333336
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1816.071533203125,
+    "fused_score": 0.25833333333333336,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 20,
+    "timestamp_ms": 1775759643119.9146,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.45,
+      "confidence": 0.975,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.45
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2018.122802734375,
+    "fused_score": 0.45,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 21,
+    "timestamp_ms": 1775759643322.0042,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.4083333333333334,
+      "confidence": 0.9375,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.4083333333333334
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2220.172607421875,
+    "fused_score": 0.4083333333333334,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 22,
+    "timestamp_ms": 1775759643524.0115,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2422.243896484375,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 23,
+    "timestamp_ms": 1775759643726.1838,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6016666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.6016666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2624.382080078125,
+    "fused_score": 0.6016666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 24,
+    "timestamp_ms": 1775759643928.5125,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3833333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.6666666666666666,
+      "anomaly_score": 0.3833333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2826.951904296875,
+    "fused_score": 0.3833333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 25,
+    "timestamp_ms": 1775759644130.8376,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.30000000000000004,
+      "confidence": 0.975,
+      "trigger_score": 0.5,
+      "anomaly_score": 0.30000000000000004
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3029.2919921875,
+    "fused_score": 0.30000000000000004,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 26,
+    "timestamp_ms": 1775759644333.2568,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.5333333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.6666666666666666,
+      "anomaly_score": 0.5333333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3231.562744140625,
+    "fused_score": 0.5333333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 27,
+    "timestamp_ms": 1775759644535.538,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.5333333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.6666666666666666,
+      "anomaly_score": 0.5333333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3433.925537109375,
+    "fused_score": 0.5333333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 28,
+    "timestamp_ms": 1775759644737.9102,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3636.2705078125,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 29,
+    "timestamp_ms": 1775759644940.2297,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3838.465087890625,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 30,
+    "timestamp_ms": 1775759645142.31,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.30000000000000004,
+      "confidence": 0.975,
+      "trigger_score": 0.5,
+      "anomaly_score": 0.30000000000000004
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 4040.586669921875,
+    "fused_score": 0.30000000000000004,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "IDLE",
+    "reason": "activity_low",
+    "frame_number": 31,
+    "timestamp_ms": 1775759645344.5237,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.21666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.3333333333333333,
+      "anomaly_score": 0.21666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "IDLE",
+    "dwell_ms": 0.0,
+    "fused_score": 0.21666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "IDLE",
+    "reason": "activity_low",
+    "frame_number": 32,
+    "timestamp_ms": 1775759645546.5786,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.45,
+      "confidence": 0.975,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.45
+    }
+  },
+  "snapshot": {
+    "state": "IDLE",
+    "dwell_ms": 202.045654296875,
+    "fused_score": 0.45,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "IDLE",
+    "current_state": "TRIGGERED",
+    "reason": "trigger_detected",
+    "frame_number": 33,
+    "timestamp_ms": 1775759645748.586,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6583333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.9166666666666666,
+      "anomaly_score": 0.6583333333333333
+    }
+  },
+  "snapshot": {
+    "state": "TRIGGERED",
+    "dwell_ms": 0.0,
+    "fused_score": 0.6583333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "TRIGGERED",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 34,
+    "timestamp_ms": 1775759645950.6619,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.6016666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.6016666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 0.0,
+    "fused_score": 0.6016666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 35,
+    "timestamp_ms": 1775759646152.6843,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.7266666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.7266666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 201.923095703125,
+    "fused_score": 0.7266666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 36,
+    "timestamp_ms": 1775759646354.5566,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3416666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.3416666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 403.71337890625,
+    "fused_score": 0.3416666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 37,
+    "timestamp_ms": 1775759646556.3088,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.42500000000000004,
+      "confidence": 1.0,
+      "trigger_score": 0.75,
+      "anomaly_score": 0.42500000000000004
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 605.65283203125,
+    "fused_score": 0.42500000000000004,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 38,
+    "timestamp_ms": 1775759646758.438,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3666666666666667,
+      "confidence": 0.9,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.3666666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 807.806396484375,
+    "fused_score": 0.3666666666666667,
+    "confidence": 0.9,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 39,
+    "timestamp_ms": 1775759646960.7578,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.45,
+      "confidence": 0.975,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.45
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1010.251708984375,
+    "fused_score": 0.45,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 40,
+    "timestamp_ms": 1775759647163.1726,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1212.514404296875,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 41,
+    "timestamp_ms": 1775759647365.349,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1414.686279296875,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 42,
+    "timestamp_ms": 1775759647567.603,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.30000000000000004,
+      "confidence": 0.975,
+      "trigger_score": 0.5,
+      "anomaly_score": 0.30000000000000004
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1617.128662109375,
+    "fused_score": 0.30000000000000004,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 43,
+    "timestamp_ms": 1775759647770.0408,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.3416666666666667,
+      "confidence": 1.0,
+      "trigger_score": 0.5833333333333334,
+      "anomaly_score": 0.3416666666666667
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 1819.483154296875,
+    "fused_score": 0.3416666666666667,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 44,
+    "timestamp_ms": 1775759647972.4016,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.4083333333333334,
+      "confidence": 0.9375,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.4083333333333334
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2021.811279296875,
+    "fused_score": 0.4083333333333334,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 45,
+    "timestamp_ms": 1775759648175.0063,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.5333333333333333,
+      "confidence": 1.0,
+      "trigger_score": 0.6666666666666666,
+      "anomaly_score": 0.5333333333333333
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2224.4052734375,
+    "fused_score": 0.5333333333333333,
+    "confidence": 1.0,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 46,
+    "timestamp_ms": 1775759648377.2148,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2426.760009765625,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 47,
+    "timestamp_ms": 1775759648579.7515,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.56,
+      "confidence": 0.975,
+      "trigger_score": 0.85,
+      "anomaly_score": 0.56
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2629.324951171875,
+    "fused_score": 0.56,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 48,
+    "timestamp_ms": 1775759648782.2888,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.25833333333333336,
+      "confidence": 0.9375,
+      "trigger_score": 0.4166666666666667,
+      "anomaly_score": 0.25833333333333336
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 2831.741455078125,
+    "fused_score": 0.25833333333333336,
+    "confidence": 0.9375,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 49,
+    "timestamp_ms": 1775759648984.6306,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.30000000000000004,
+      "confidence": 0.975,
+      "trigger_score": 0.5,
+      "anomaly_score": 0.30000000000000004
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3034.056640625,
+    "fused_score": 0.30000000000000004,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
+{
+  "event": {
+    "previous_state": "SCANNING",
+    "current_state": "SCANNING",
+    "reason": "scan_window_active",
+    "frame_number": 50,
+    "timestamp_ms": 1775759649187.02,
+    "radar_id": "radar_main",
+    "scores": {
+      "fused_score": 0.45,
+      "confidence": 0.975,
+      "trigger_score": 0.55,
+      "anomaly_score": 0.45
+    }
+  },
+  "snapshot": {
+    "state": "SCANNING",
+    "dwell_ms": 3236.543701171875,
+    "fused_score": 0.45,
+    "confidence": 0.975,
+    "health": {
+      "has_fault": false,
+      "fault_code": null,
+      "sensor_online_count": 1
+    },
+    "active_radars": [
+      "radar_main"
+    ]
+  },
+  "action_request": null
+}
 
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/mmwave/serial_manager.py", line 271, in connect
-    self.config_port = serial.Serial(
-  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialutil.py", line 244, in __init__
-    self.open()
-  File "/home/insu/Desktop/SCANU-dev_adrian/.venv/lib/python3.10/site-packages/serial/serialposix.py", line 325, in open
-    raise SerialException(msg.errno, "could not open port {}: {}".format(self._port, msg))
-serial.serialutil.SerialException: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
-    return _run_code(code, main_globals, None,
-  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
-    exec(code, run_globals)
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 257, in <module>
-    raise SystemExit(main())
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 223, in main
-    return _run_command(orchestrator, args)
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 118, in _run_command
-    hub, serial_mgr = _build_live_hub(args)
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer6_state_machine/run_layer6.py", line 65, in _build_live_hub
-    serial_mgr.connect(ports.config_port, ports.data_port)
-  File "/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/mmwave/serial_manager.py", line 307, in connect
-    raise RuntimeError(f"Failed to open serial ports: {e}{hint}")
-RuntimeError: Failed to open serial ports: [Errno 2] could not open port /dev/ttyUSB0: [Errno 2] No such file or directory: '/dev/ttyUSB0'
-(.venv) insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ 
 
