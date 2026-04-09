@@ -13,12 +13,12 @@ pip install fastapi uvicorn pyserial numpy websockets
 
 ## 2) Run Layer 8 API only
 ```bash
-PYTHONPATH=. python3 -m software.layer8_ui.run_layer8 --host 0.0.0.0 --port 8080
+PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8 --host 0.0.0.0 --port 8080
 ```
 
 ## 3) Run integrated stack (simulate)
 ```bash
-PYTHONPATH=. python3 -m software.layer8_ui.run_layer8_stack \
+PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8_stack \
   --mode simulate \
   --host 0.0.0.0 \
   --port 8080 \
@@ -30,7 +30,7 @@ PYTHONPATH=. python3 -m software.layer8_ui.run_layer8_stack \
 ## 4) Run integrated stack (live + IFX real)
 Direct command:
 ```bash
-PYTHONPATH=. python3 -m software.layer8_ui.run_layer8_stack \
+PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8_stack \
   --mode live \
   --host 0.0.0.0 \
   --port 8080 \

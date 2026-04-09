@@ -1,12 +1,9 @@
 """Public API for Layer 8 backend and streaming."""
 
-from .app import create_app
-from .backend_state_store import BackendStateStore
-from .integration import L6L7ToL8Bridge
-from .publisher import BackendPublisher
-from .websocket_stream import WebSocketStream
+from .backend import BackendPublisher, BackendStateStore, L6L7ToL8Bridge, WebSocketStream, app, create_app
 
 __all__ = [
+    "app",
     "BackendPublisher",
     "BackendStateStore",
     "L6L7ToL8Bridge",
