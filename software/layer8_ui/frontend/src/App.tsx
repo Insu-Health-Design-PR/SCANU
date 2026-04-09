@@ -7,6 +7,7 @@ import {
   fetchSensorStatus,
   fetchSensorsStatus,
   fetchStatus,
+  fetchVisualLatest,
   postKillHolders,
   postReconfig,
   postResetSoft,
@@ -38,16 +39,18 @@ export default function App() {
 
   const refreshAll = useCallback(async () => {
     try {
-      const [status, health, alerts, sensors] = await Promise.all([
+      const [status, health, alerts, sensors, visual] = await Promise.all([
         fetchStatus(),
         fetchHealth(),
         fetchRecentAlerts(100),
         fetchSensorsStatus(),
+        fetchVisualLatest(),
       ]);
       dispatch({ type: "UPSERT_STATUS", status: normalizeStatus(status), ts: Date.now() });
       dispatch({ type: "SET_HEALTH", health });
       dispatch({ type: "SET_ALERTS", alerts });
       dispatch({ type: "SET_SENSORS", sensors });
+      dispatch({ type: "SET_VISUAL", visual });
     } catch {
       dispatch({ type: "SET_CONNECTION", connection: "degraded" });
     }
@@ -114,6 +117,10 @@ export default function App() {
         }
         if (event.event_type === "control_result") {
           dispatch({ type: "ADD_CONTROL_RESULT", result: event.payload as any });
+          return;
+        }
+        if (event.event_type === "visual_update") {
+          dispatch({ type: "SET_VISUAL", visual: event.payload as any });
           return;
         }
         if (event.event_type === "sensor_fault") {
@@ -199,6 +206,7 @@ export default function App() {
                 sensors={state.sensors}
                 alerts={state.alerts}
                 scoreHistory={state.scoreHistory}
+                visual={state.visual}
                 mode={state.mode}
                 onSensorAction={(sensor, action) => {
                   void executeAction(sensor, action);

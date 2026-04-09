@@ -8,8 +8,21 @@ PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8_stack \
   --host 0.0.0.0 \
   --port 8080 \
   --radar-id radar_main \
+  --visual on \
+  --visual-width 640 \
+  --visual-height 480 \
   --interval-s 0.2 \
   --max-frames 0
+```
+
+Dedicated visual runner (same API, visual defaults enabled):
+```bash
+cd /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU
+PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8_visual_bridge \
+  --mode simulate \
+  --host 0.0.0.0 \
+  --port 8080 \
+  --radar-id radar_main
 ```
 
 ## 2) Start frontend
@@ -30,6 +43,8 @@ curl http://127.0.0.1:8080/api/status
 curl http://127.0.0.1:8080/api/health
 curl http://127.0.0.1:8080/api/sensors/status
 curl 'http://127.0.0.1:8080/api/alerts/recent?limit=10'
+curl http://127.0.0.1:8080/api/visual/latest
+curl http://127.0.0.1:8080/api/visual/presence
 ```
 
 ## 4) Control API checks

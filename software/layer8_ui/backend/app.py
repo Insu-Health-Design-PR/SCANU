@@ -15,6 +15,7 @@ from software.layer6_state_machine.models import ControlResult, SensorStatus
 from .backend_state_store import BackendStateStore
 from .publisher import BackendPublisher
 from .status_models import to_utc_iso
+from .visual_state_store import VisualStateStore
 from .websocket_stream import WebSocketStream
 
 
@@ -44,15 +45,18 @@ def create_app(
     store: BackendStateStore | None = None,
     publisher: BackendPublisher | None = None,
     orchestrator: Layer6Orchestrator | None = None,
+    visual_store: VisualStateStore | None = None,
 ) -> FastAPI:
     state_store = store if store is not None else BackendStateStore()
     stream_publisher = publisher if publisher is not None else BackendPublisher()
     layer6 = orchestrator if orchestrator is not None else Layer6Orchestrator()
+    visual = visual_store if visual_store is not None else VisualStateStore()
 
     app = FastAPI(title="SCAN-U Layer 8 API", version="0.2.0")
     app.state.layer8_store = state_store
     app.state.layer8_publisher = stream_publisher
     app.state.layer6_orchestrator = layer6
+    app.state.layer8_visual_store = visual
 
     def _publish_control_result(result: ControlResult) -> None:
         stream_publisher.publish(WebSocketStream.encode_control_result(result))
@@ -74,6 +78,50 @@ def create_app(
     @app.get("/api/health")
     def get_health() -> dict:
         return state_store.health_response()
+
+    @app.get("/api/visual/latest")
+    def get_visual_latest() -> dict:
+        return visual.latest()
+
+    @app.get("/api/visual/rgb")
+    def get_visual_rgb() -> dict:
+        latest = visual.latest()
+        return {
+            "timestamp_ms": latest.get("timestamp_ms"),
+            "source_mode": latest.get("source_mode"),
+            "rgb_jpeg_b64": latest.get("rgb_jpeg_b64"),
+            "meta": latest.get("meta", {}),
+        }
+
+    @app.get("/api/visual/thermal")
+    def get_visual_thermal() -> dict:
+        latest = visual.latest()
+        return {
+            "timestamp_ms": latest.get("timestamp_ms"),
+            "source_mode": latest.get("source_mode"),
+            "thermal_jpeg_b64": latest.get("thermal_jpeg_b64"),
+            "meta": latest.get("meta", {}),
+        }
+
+    @app.get("/api/visual/point-cloud")
+    def get_visual_point_cloud() -> dict:
+        latest = visual.latest()
+        return {
+            "timestamp_ms": latest.get("timestamp_ms"),
+            "source_mode": latest.get("source_mode"),
+            "point_cloud": latest.get("point_cloud", []),
+            "meta": latest.get("meta", {}),
+        }
+
+    @app.get("/api/visual/presence")
+    def get_visual_presence() -> dict:
+        latest = visual.latest()
+        return {
+            "timestamp_ms": latest.get("timestamp_ms"),
+            "source_mode": latest.get("source_mode"),
+            "presence": latest.get("presence"),
+            "meta": latest.get("meta", {}),
+        }
 
     @app.get("/api/sensors/status")
     def get_sensors_status() -> dict:

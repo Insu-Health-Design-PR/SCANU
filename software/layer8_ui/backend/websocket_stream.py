@@ -52,3 +52,10 @@ class WebSocketStream:
             "event_type": "heartbeat",
             "payload": {"timestamp_utc": ts_utc},
         }
+
+    @staticmethod
+    def encode_visual_update(payload: dict[str, Any]) -> dict[str, Any]:
+        return {
+            "event_type": "visual_update",
+            "payload": dict(payload),
+        }

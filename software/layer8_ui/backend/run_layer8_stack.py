@@ -3,13 +3,19 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import threading
 import time
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy as np
 import uvicorn
+try:
+    import cv2
+except Exception:  # pragma: no cover - optional dependency in some environments
+    cv2 = None
 
 from software.layer1_sensor_hub import MultiSensorHub
 from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
@@ -19,6 +25,8 @@ from software.layer7_alerts import L6ToL7Bridge
 
 from .app import create_app
 from .integration import L6L7ToL8Bridge
+from .visual_state_store import VisualStateStore
+from .websocket_stream import WebSocketStream
 
 
 def _simulate_raw(frame: int, radar_id: str) -> dict:
@@ -33,6 +41,108 @@ def _simulate_raw(frame: int, radar_id: str) -> dict:
         },
         "mmwave_frame": {
             "points": [1] * (frame % 10),
+        },
+    }
+
+
+def _encode_jpeg_b64(frame_bgr: np.ndarray | None) -> str | None:
+    if cv2 is None:
+        return None
+    if frame_bgr is None:
+        return None
+    ok, encoded = cv2.imencode(".jpg", frame_bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 72])
+    if not ok:
+        return None
+    return base64.b64encode(encoded.tobytes()).decode("ascii")
+
+
+def _extract_point_cloud(parsed_frame: object | None, *, limit: int = 256) -> list[dict[str, float]]:
+    points = getattr(parsed_frame, "points", []) if parsed_frame is not None else []
+    payload: list[dict[str, float]] = []
+    for p in points or []:
+        payload.append(
+            {
+                "x": float(getattr(p, "x", 0.0)),
+                "y": float(getattr(p, "y", 0.0)),
+                "z": float(getattr(p, "z", 0.0)),
+                "doppler": float(getattr(p, "doppler", 0.0)),
+                "snr": float(getattr(p, "snr", 0.0)),
+            }
+        )
+        if len(payload) >= limit:
+            break
+    return payload
+
+
+def _simulate_visual(frame: int, *, width: int, height: int) -> dict:
+    ts_ms = time.time() * 1000.0
+
+    rgb = np.zeros((height, width, 3), dtype=np.uint8)
+    thermal = np.zeros((height, width, 3), dtype=np.uint8)
+    if cv2 is not None:
+        cv2.putText(rgb, "RGB (simulate)", (12, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (240, 240, 240), 2)
+        cv2.putText(thermal, "Thermal (simulate)", (12, 26), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (240, 240, 240), 2)
+        cv2.circle(rgb, (80 + (frame * 9) % max(120, width - 40), height // 2), 28, (0, 190, 255), -1)
+        cv2.rectangle(thermal, (20, 50), (min(width - 20, 20 + (frame * 7) % max(120, width - 40)), height - 50), (0, 0, 255), -1)
+
+    cloud: list[dict[str, float]] = []
+    for idx in range(36):
+        x = -0.8 + (idx % 9) * 0.2
+        y = 0.5 + ((frame + idx) % 12) * 0.18
+        z = -0.4 + (idx % 5) * 0.2
+        cloud.append({"x": x, "y": y, "z": z, "doppler": 0.1 * ((idx % 3) - 1), "snr": 7.0 + (idx % 6)})
+
+    presence = {
+        "presence_raw": 0.35 + (0.45 if frame % 10 > 5 else 0.0),
+        "motion_raw": 0.4 + (0.4 if frame % 6 > 2 else 0.0),
+        "distance_m": 1.8 + 0.2 * np.sin(frame / 8.0),
+    }
+
+    return {
+        "timestamp_ms": ts_ms,
+        "source_mode": "simulate_l1_bridge",
+        "rgb_jpeg_b64": _encode_jpeg_b64(rgb),
+        "thermal_jpeg_b64": _encode_jpeg_b64(thermal),
+        "point_cloud": cloud,
+        "presence": presence,
+        "meta": {
+            "ready": True,
+            "rgb_enabled": True,
+            "thermal_enabled": True,
+            "point_cloud_enabled": True,
+            "presence_enabled": True,
+        },
+    }
+
+
+def _build_visual_from_live(raw: object, *, rgb_frame: np.ndarray | None, mode: str) -> dict:
+    ts_ms = float(getattr(raw, "timestamp_ms", time.time() * 1000.0))
+    mmwave = getattr(raw, "mmwave_frame", None)
+    presence_frame = getattr(raw, "presence_frame", None)
+    thermal_frame = getattr(raw, "thermal_frame_bgr", None)
+
+    presence = None
+    if presence_frame is not None:
+        distance = float(getattr(presence_frame, "distance_m", -1.0))
+        presence = {
+            "presence_raw": float(getattr(presence_frame, "presence_raw", 0.0)),
+            "motion_raw": float(getattr(presence_frame, "motion_raw", 0.0)),
+            "distance_m": None if distance < 0 else distance,
+        }
+
+    return {
+        "timestamp_ms": ts_ms,
+        "source_mode": mode,
+        "rgb_jpeg_b64": _encode_jpeg_b64(rgb_frame),
+        "thermal_jpeg_b64": _encode_jpeg_b64(thermal_frame),
+        "point_cloud": _extract_point_cloud(mmwave),
+        "presence": presence,
+        "meta": {
+            "ready": True,
+            "rgb_enabled": rgb_frame is not None,
+            "thermal_enabled": thermal_frame is not None,
+            "point_cloud_enabled": mmwave is not None,
+            "presence_enabled": presence is not None,
         },
     }
 
@@ -93,6 +203,7 @@ def _producer_loop(
     *,
     stop_event: threading.Event,
     l8_bridge: L6L7ToL8Bridge,
+    visual_store: VisualStateStore,
     args: argparse.Namespace,
     orchestrator: Layer6Orchestrator,
 ) -> None:
@@ -100,10 +211,17 @@ def _producer_loop(
 
     hub = None
     serial_mgr = None
+    rgb_cap = None
 
     try:
         if args.mode == "live":
             hub, serial_mgr = _build_live_hub(args)
+            if args.rgb == "on" and cv2 is not None:
+                rgb_cap = cv2.VideoCapture(int(args.rgb_device))
+                if rgb_cap.isOpened():
+                    rgb_cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(args.rgb_width))
+                    rgb_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(args.rgb_height))
+                    rgb_cap.set(cv2.CAP_PROP_FPS, int(args.rgb_fps))
 
         frame = 0
         while not stop_event.is_set():
@@ -121,6 +239,31 @@ def _producer_loop(
             state_event, snapshot, action_request = orchestrator.tick(raw, health=health, radar_id=args.radar_id)
             alert = l7_bridge.ingest(state_event, snapshot=snapshot, action_request=action_request)
             l8_bridge.ingest(snapshot=snapshot, alert=alert, action_request=action_request)
+
+            if args.visual == "on":
+                if args.mode == "simulate":
+                    visual_payload = _simulate_visual(
+                        frame=frame,
+                        width=int(args.visual_width),
+                        height=int(args.visual_height),
+                    )
+                else:
+                    rgb_frame = None
+                    if rgb_cap is not None and rgb_cap.isOpened():
+                        ok, frame_bgr = rgb_cap.read()
+                        if ok and frame_bgr is not None:
+                            if cv2 is not None:
+                                rgb_frame = cv2.resize(
+                                    frame_bgr,
+                                    (int(args.visual_width), int(args.visual_height)),
+                                    interpolation=cv2.INTER_LINEAR,
+                                )
+                            else:
+                                rgb_frame = frame_bgr
+                    visual_payload = _build_visual_from_live(raw, rgb_frame=rgb_frame, mode="live_l1_bridge")
+
+                visual_store.update(visual_payload)
+                l8_bridge.publisher.publish(WebSocketStream.encode_visual_update(visual_payload))
 
             if args.print_events:
                 payload = {
@@ -142,6 +285,11 @@ def _producer_loop(
         if serial_mgr is not None:
             try:
                 serial_mgr.disconnect()
+            except Exception:
+                pass
+        if rgb_cap is not None:
+            try:
+                rgb_cap.release()
             except Exception:
                 pass
 
@@ -172,6 +320,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--thermal-width", type=int, default=640)
     parser.add_argument("--thermal-height", type=int, default=480)
     parser.add_argument("--thermal-fps", type=int, default=30)
+
+    parser.add_argument("--visual", choices=("on", "off"), default="on")
+    parser.add_argument("--visual-width", type=int, default=640)
+    parser.add_argument("--visual-height", type=int, default=480)
+
+    parser.add_argument("--rgb", choices=("on", "off"), default="off")
+    parser.add_argument("--rgb-device", type=int, default=0)
+    parser.add_argument("--rgb-width", type=int, default=640)
+    parser.add_argument("--rgb-height", type=int, default=480)
+    parser.add_argument("--rgb-fps", type=int, default=30)
     return parser
 
 
@@ -180,7 +338,13 @@ def main() -> int:
 
     orchestrator = Layer6Orchestrator(primary_radar_id=args.radar_id)
     l8_bridge = L6L7ToL8Bridge()
-    app = create_app(store=l8_bridge.store, publisher=l8_bridge.publisher, orchestrator=orchestrator)
+    visual_store = VisualStateStore()
+    app = create_app(
+        store=l8_bridge.store,
+        publisher=l8_bridge.publisher,
+        orchestrator=orchestrator,
+        visual_store=visual_store,
+    )
 
     stop_event = threading.Event()
     producer = threading.Thread(
@@ -188,6 +352,7 @@ def main() -> int:
         kwargs={
             "stop_event": stop_event,
             "l8_bridge": l8_bridge,
+            "visual_store": visual_store,
             "args": args,
             "orchestrator": orchestrator,
         },

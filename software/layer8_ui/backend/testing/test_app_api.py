@@ -20,6 +20,10 @@ def test_api_endpoints_exist_and_return_payloads():
     assert alerts.status_code == 200
     assert "alerts" in alerts.json()
 
+    visual = client.get("/api/visual/latest")
+    assert visual.status_code == 200
+    assert "point_cloud" in visual.json()
+
 
 
 def test_sensor_status_endpoints_and_control_contracts():

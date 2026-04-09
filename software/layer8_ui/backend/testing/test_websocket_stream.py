@@ -47,3 +47,9 @@ def test_encode_control_result_event_type():
     encoded = WebSocketStream.encode_control_result(result)
     assert encoded["event_type"] == "control_result"
     assert encoded["payload"]["action"] == "reset_soft"
+
+
+def test_encode_visual_update_event_type():
+    encoded = WebSocketStream.encode_visual_update({"source_mode": "simulate", "point_cloud": []})
+    assert encoded["event_type"] == "visual_update"
+    assert encoded["payload"]["source_mode"] == "simulate"

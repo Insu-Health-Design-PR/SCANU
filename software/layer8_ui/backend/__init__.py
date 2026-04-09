@@ -4,6 +4,7 @@ from .app import app, create_app
 from .backend_state_store import BackendStateStore
 from .integration import L6L7ToL8Bridge
 from .publisher import BackendPublisher
+from .visual_state_store import VisualStateStore
 from .websocket_stream import WebSocketStream
 
 __all__ = [
@@ -11,6 +12,7 @@ __all__ = [
     "BackendPublisher",
     "BackendStateStore",
     "L6L7ToL8Bridge",
+    "VisualStateStore",
     "WebSocketStream",
     "create_app",
 ]
