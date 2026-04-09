@@ -10,7 +10,9 @@ Build compact and deterministic feature vectors from the processed output of Lay
 - `FeatureBatch(frame_number, timestamp_ms, vector)`.
 
 ## `.py` Files
-- `feature_extractor.py`: extracts statistics from `range_doppler` and `point_cloud` size.
+- `dataset.py`: groups `*_capture.json`, `*_report.json`, and `.mp4` under `safe/<scenario>/` and `unsafe/<scenario>/`; builds per-frame numpy feature matrices from rich capture JSON (for fusion / sequence models). See `CAPTURE_FRAME_FEATURE_NAMES`.
+
+- `visualizer.py`: plots Layer 2–style feature JSON (legacy path).
 
 - `__init__.py`: public exports.
 
