@@ -4,8 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import time
+from dataclasses import asdict
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from pydantic import BaseModel, Field
+
+from software.layer6_state_machine import Layer6Orchestrator
+from software.layer6_state_machine.models import ControlResult, SensorStatus
 
 from .backend_state_store import BackendStateStore
 from .publisher import BackendPublisher
@@ -13,17 +18,50 @@ from .status_models import to_utc_iso
 from .websocket_stream import WebSocketStream
 
 
+class ReconfigRequest(BaseModel):
+    radar_id: str = Field(default="radar_main")
+    config_path: str | None = None
+    config_text: str | None = None
+
+
+class ResetSoftRequest(BaseModel):
+    radar_id: str = Field(default="radar_main")
+
+
+class KillHoldersRequest(BaseModel):
+    radar_id: str = Field(default="radar_main")
+    force: bool = False
+    manual_confirm: bool = False
+
+
+class UsbResetRequest(BaseModel):
+    radar_id: str = Field(default="radar_main")
+    manual_confirm: bool = False
+
+
 def create_app(
     *,
     store: BackendStateStore | None = None,
     publisher: BackendPublisher | None = None,
+    orchestrator: Layer6Orchestrator | None = None,
 ) -> FastAPI:
     state_store = store if store is not None else BackendStateStore()
     stream_publisher = publisher if publisher is not None else BackendPublisher()
+    layer6 = orchestrator if orchestrator is not None else Layer6Orchestrator()
 
-    app = FastAPI(title="SCAN-U Layer 8 API", version="0.1.0")
+    app = FastAPI(title="SCAN-U Layer 8 API", version="0.2.0")
     app.state.layer8_store = state_store
     app.state.layer8_publisher = stream_publisher
+    app.state.layer6_orchestrator = layer6
+
+    def _publish_control_result(result: ControlResult) -> None:
+        stream_publisher.publish(WebSocketStream.encode_control_result(result))
+
+    def _sensor_status_or_404(radar_id: str) -> SensorStatus:
+        try:
+            return layer6.get_status(radar_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
 
     @app.get("/api/status")
     def get_status() -> dict:
@@ -36,6 +74,53 @@ def create_app(
     @app.get("/api/health")
     def get_health() -> dict:
         return state_store.health_response()
+
+    @app.get("/api/sensors/status")
+    def get_sensors_status() -> dict:
+        statuses = [
+            asdict(_sensor_status_or_404(radar_id))
+            for radar_id in layer6.sensor_control.list_radar_ids()
+        ]
+        return {"sensors": statuses}
+
+    @app.get("/api/sensors/status/{radar_id}")
+    def get_sensor_status(radar_id: str) -> dict:
+        return asdict(_sensor_status_or_404(radar_id))
+
+    @app.post("/api/control/reconfig")
+    def control_reconfig(body: ReconfigRequest) -> dict:
+        result = layer6.apply_config(
+            body.radar_id,
+            config_path=body.config_path,
+            config_text=body.config_text,
+        )
+        _publish_control_result(result)
+        return asdict(result)
+
+    @app.post("/api/control/reset-soft")
+    def control_reset_soft(body: ResetSoftRequest) -> dict:
+        result = layer6.reset_soft(body.radar_id)
+        _publish_control_result(result)
+        return asdict(result)
+
+    @app.post("/api/control/kill-holders")
+    def control_kill_holders(body: KillHoldersRequest) -> dict:
+        result = layer6.kill_holders(
+            body.radar_id,
+            force=bool(body.force),
+            manual_confirm=bool(body.manual_confirm),
+        )
+        _publish_control_result(result)
+        return asdict(result)
+
+    @app.post("/api/control/usb-reset")
+    def control_usb_reset(body: UsbResetRequest) -> dict:
+        result = layer6.usb_reset(
+            body.radar_id,
+            manual_confirm=bool(body.manual_confirm),
+        )
+        _publish_control_result(result)
+        return asdict(result)
 
     @app.websocket("/ws/events")
     async def websocket_events(ws: WebSocket) -> None:

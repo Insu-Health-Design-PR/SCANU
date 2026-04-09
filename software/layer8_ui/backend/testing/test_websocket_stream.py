@@ -1,6 +1,5 @@
-from software.layer6_state_machine.models import StateSnapshot, SystemState
+from software.layer6_state_machine.models import ControlResult, StateEvent, StateSnapshot, SystemState
 from software.layer7_alerts import AlertManager
-from software.layer6_state_machine.models import StateEvent
 from software.layer8_ui.websocket_stream import WebSocketStream
 
 
@@ -19,6 +18,7 @@ def test_encode_status_event_type():
     assert encoded["payload"]["state"] == "IDLE"
 
 
+
 def test_encode_alert_event_type():
     event = StateEvent(
         previous_state=SystemState.IDLE,
@@ -33,3 +33,17 @@ def test_encode_alert_event_type():
     encoded = WebSocketStream.encode_alert(alert)
     assert encoded["event_type"] == "alert_event"
     assert encoded["payload"]["state"] == "FAULT"
+
+
+
+def test_encode_control_result_event_type():
+    result = ControlResult(
+        radar_id="radar_main",
+        action="reset_soft",
+        success=True,
+        message="ok",
+        details={"x": 1},
+    )
+    encoded = WebSocketStream.encode_control_result(result)
+    assert encoded["event_type"] == "control_result"
+    assert encoded["payload"]["action"] == "reset_soft"
