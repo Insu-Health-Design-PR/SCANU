@@ -10,6 +10,7 @@ import type {
   SensorFaultPayload,
   StatusPayload,
   SystemState,
+  VisualPayload,
 } from "../types";
 import { clamp } from "../lib/utils";
 
@@ -37,6 +38,16 @@ const DEFAULT_HEALTH: HealthResponse = {
   updated_at_utc: null,
 };
 
+const DEFAULT_VISUAL: VisualPayload = {
+  timestamp_ms: null,
+  source_mode: "none",
+  rgb_jpeg_b64: null,
+  thermal_jpeg_b64: null,
+  point_cloud: [],
+  presence: null,
+  meta: { ready: false },
+};
+
 export function createInitialState(): AppState {
   return {
     mode: "monitor",
@@ -50,6 +61,7 @@ export function createInitialState(): AppState {
     controlResults: [],
     scoreHistory: [],
     lastSensorFault: null,
+    visual: DEFAULT_VISUAL,
   };
 }
 
@@ -64,6 +76,7 @@ export type AppAction =
   | { type: "ADD_ALERT"; alert: AlertPayload }
   | { type: "ADD_CONTROL_RESULT"; result: ControlResult }
   | { type: "SET_SENSOR_FAULT"; payload: SensorFaultPayload | null }
+  | { type: "SET_VISUAL"; visual: VisualPayload }
   | { type: "HEARTBEAT"; ts: number }
   | { type: "WS_MESSAGE"; ts: number };
 
@@ -99,6 +112,8 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return { ...state, controlResults: [action.result, ...state.controlResults].slice(0, 200) };
     case "SET_SENSOR_FAULT":
       return { ...state, lastSensorFault: action.payload };
+    case "SET_VISUAL":
+      return { ...state, visual: action.visual };
     case "HEARTBEAT":
       return { ...state, lastHeartbeatMs: action.ts };
     case "WS_MESSAGE":

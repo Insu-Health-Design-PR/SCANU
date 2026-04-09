@@ -1,4 +1,4 @@
-import type { AlertPayload, ControlResult, HealthResponse, SensorStatus, StatusPayload } from "../types";
+import type { AlertPayload, ControlResult, HealthResponse, SensorStatus, StatusPayload, VisualPayload } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE ?? "";
 
@@ -36,6 +36,10 @@ export async function fetchSensorsStatus(): Promise<SensorStatus[]> {
 
 export async function fetchSensorStatus(radarId: string): Promise<SensorStatus> {
   return jsonRequest<SensorStatus>(`/api/sensors/status/${encodeURIComponent(radarId)}`);
+}
+
+export async function fetchVisualLatest(): Promise<VisualPayload> {
+  return jsonRequest<VisualPayload>("/api/visual/latest");
 }
 
 export async function postReconfig(payload: {

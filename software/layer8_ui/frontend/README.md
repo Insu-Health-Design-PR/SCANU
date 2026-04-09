@@ -9,7 +9,7 @@ Primary operator console for SCAN-U Layer 8 backend.
 - React Router
 
 ## Routes
-- `/dashboard`: live status, sensor cards, alerts, score trend, state timeline
+- `/dashboard`: visual monitor (RGB, thermal, point cloud, presence) + live status + alerts
 - `/control`: sensor/radar control actions and command output log
 - `/events`: alert history with filters and JSON export
 
@@ -19,6 +19,11 @@ Primary operator console for SCAN-U Layer 8 backend.
 - `GET /api/alerts/recent`
 - `GET /api/sensors/status`
 - `GET /api/sensors/status/{radar_id}`
+- `GET /api/visual/latest`
+- `GET /api/visual/rgb`
+- `GET /api/visual/thermal`
+- `GET /api/visual/point-cloud`
+- `GET /api/visual/presence`
 - `POST /api/control/reconfig`
 - `POST /api/control/reset-soft`
 - `POST /api/control/kill-holders`
@@ -31,6 +36,7 @@ Primary operator console for SCAN-U Layer 8 backend.
 - `sensor_fault`
 - `heartbeat`
 - `control_result`
+- `visual_update`
 
 ## Operator Modes
 - `monitor`: read-only

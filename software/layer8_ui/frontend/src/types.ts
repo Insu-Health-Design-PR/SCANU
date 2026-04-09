@@ -79,6 +79,30 @@ export interface SensorFaultPayload {
   };
 }
 
+export interface PointCloudPoint {
+  x: number;
+  y: number;
+  z: number;
+  doppler: number;
+  snr: number;
+}
+
+export interface PresencePayload {
+  presence_raw: number;
+  motion_raw: number;
+  distance_m: number | null;
+}
+
+export interface VisualPayload {
+  timestamp_ms: number | null;
+  source_mode: string;
+  rgb_jpeg_b64: string | null;
+  thermal_jpeg_b64: string | null;
+  point_cloud: PointCloudPoint[];
+  presence: PresencePayload | null;
+  meta: Record<string, unknown>;
+}
+
 export interface ScorePoint {
   ts: number;
   score: number;
@@ -97,4 +121,5 @@ export interface AppState {
   controlResults: ControlResult[];
   scoreHistory: ScorePoint[];
   lastSensorFault: SensorFaultPayload | null;
+  visual: VisualPayload;
 }
