@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict, is_dataclass
 from typing import Any
 
-from software.layer6_state_machine.models import StateSnapshot
+from software.layer6_state_machine.models import ControlResult, StateSnapshot
 from software.layer7_alerts.models import AlertPayload
 
 from .status_models import alert_to_dict, snapshot_to_dict
@@ -32,6 +33,17 @@ class WebSocketStream:
         return {
             "event_type": "sensor_fault",
             "payload": dict(details),
+        }
+
+    @staticmethod
+    def encode_control_result(result: ControlResult | dict[str, Any]) -> dict[str, Any]:
+        if is_dataclass(result):
+            payload = asdict(result)
+        else:
+            payload = dict(result)
+        return {
+            "event_type": "control_result",
+            "payload": payload,
         }
 
     @staticmethod

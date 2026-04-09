@@ -94,8 +94,8 @@ def _producer_loop(
     stop_event: threading.Event,
     l8_bridge: L6L7ToL8Bridge,
     args: argparse.Namespace,
+    orchestrator: Layer6Orchestrator,
 ) -> None:
-    orchestrator = Layer6Orchestrator(primary_radar_id=args.radar_id)
     l7_bridge = L6ToL7Bridge()
 
     hub = None
@@ -178,8 +178,9 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> int:
     args = build_parser().parse_args()
 
+    orchestrator = Layer6Orchestrator(primary_radar_id=args.radar_id)
     l8_bridge = L6L7ToL8Bridge()
-    app = create_app(store=l8_bridge.store, publisher=l8_bridge.publisher)
+    app = create_app(store=l8_bridge.store, publisher=l8_bridge.publisher, orchestrator=orchestrator)
 
     stop_event = threading.Event()
     producer = threading.Thread(
@@ -188,6 +189,7 @@ def main() -> int:
             "stop_event": stop_event,
             "l8_bridge": l8_bridge,
             "args": args,
+            "orchestrator": orchestrator,
         },
         daemon=True,
     )
