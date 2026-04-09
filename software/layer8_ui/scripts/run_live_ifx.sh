@@ -17,7 +17,7 @@ cd "$ROOT_DIR"
 
 EXTRA_ARGS=("$@")
 
-exec PYTHONPATH=. python3 -m software.layer8_ui.run_layer8_stack \
+exec PYTHONPATH=. python3 -m software.layer8_ui.backend.run_layer8_stack \
   --mode live \
   --host "$HOST" \
   --port "$PORT" \

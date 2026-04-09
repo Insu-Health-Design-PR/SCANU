@@ -1,11 +1,11 @@
 """
 Layer 8 sensor dashboard: run thermal, Infineon, and mmWave captures separately.
 
-  uvicorn layer8_ui.app:app --reload --host 0.0.0.0 --port 8088
+  uvicorn software.layer8_ui.legacy.app:app --reload --host 0.0.0.0 --port 8088
 
 Or from repo `software/` directory:
 
-  python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8088
+  python3 -m uvicorn software.layer8_ui.legacy.app:app --host 0.0.0.0 --port 8088
 """
 
 from __future__ import annotations
@@ -29,9 +29,9 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from layer8_ui import sensor_runner
-from layer8_ui.settings_store import DEFAULT_SETTINGS, load, save
-from layer8_ui.thermal_device import detect_working_thermal_device
+from . import sensor_runner
+from .settings_store import DEFAULT_SETTINGS, load, save
+from .thermal_device import detect_working_thermal_device
 
 try:
     from layer4_inference import InferenceEngine, ThermalThreatDetector

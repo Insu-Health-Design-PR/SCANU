@@ -1,30 +1,8 @@
-"""Runner for Layer 8 FastAPI backend."""
+"""Compatibility wrapper for Layer 8 backend runner."""
 
-from __future__ import annotations
+from .backend.run_layer8 import build_parser, main
 
-import argparse
-
-import uvicorn
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run Layer 8 API service")
-    parser.add_argument("--host", default="0.0.0.0")
-    parser.add_argument("--port", type=int, default=8080)
-    parser.add_argument("--reload", action="store_true")
-    return parser
-
-
-def main() -> int:
-    args = build_parser().parse_args()
-    uvicorn.run(
-        "software.layer8_ui.app:app",
-        host=args.host,
-        port=args.port,
-        reload=bool(args.reload),
-    )
-    return 0
-
+__all__ = ["build_parser", "main"]
 
 if __name__ == "__main__":
     raise SystemExit(main())

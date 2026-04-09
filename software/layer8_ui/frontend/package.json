@@ -1,0 +1,12 @@
+{
+  "name": "scanu-layer8-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Layer 8 frontend workspace scaffold",
+  "scripts": {
+    "dev": "echo \"Frontend scaffold ready. Initialize Vite app here.\"",
+    "build": "echo \"Frontend scaffold ready.\"",
+    "preview": "echo \"Frontend scaffold ready.\""
+  }
+}

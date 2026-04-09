@@ -11,7 +11,7 @@ import threading
 from pathlib import Path
 from typing import Any, Literal
 
-from layer8_ui.thermal_device import detect_working_thermal_device
+from .thermal_device import detect_working_thermal_device
 
 SensorId = Literal["thermal", "infineon", "mmwave"]
 
