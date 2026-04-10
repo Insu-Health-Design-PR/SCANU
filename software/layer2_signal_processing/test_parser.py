@@ -13,8 +13,8 @@ except ModuleNotFoundError:
 
 ensure_serial_stub()
 
-from software.layer1_radar.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
-from software.layer1_radar.tlv_parser import TLVParser
+from software.layer1_radar.mmwave.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
+from software.layer1_radar.mmwave.tlv_parser import TLVParser
 
 
 def _build_frame(frame_number: int, num_detected_obj: int, tlvs: list[tuple[int, bytes]]) -> bytes:
