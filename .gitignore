@@ -5,3 +5,16 @@ __pycache__/
 
 # macOS Finder metadata
 .DS_Store
+
+# Python tooling
+.pytest_cache/
+.venv/
+
+# Layer 8 frontend caches
+software/layer8_ui/frontend/.vite/
+
+# Layer 8 legacy runtime outputs
+software/layer8_ui/legacy/logs/*
+!software/layer8_ui/legacy/logs/.gitkeep
+software/layer8_ui/legacy/artifacts/*
+!software/layer8_ui/legacy/artifacts/.gitkeep

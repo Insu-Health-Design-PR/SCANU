@@ -18,6 +18,17 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 - `GET /api/status`
 - `GET /api/health`
 - `GET /api/alerts/recent?limit=50`
+- `GET /api/sensors/status`
+- `GET /api/sensors/status/{radar_id}`
+- `GET /api/visual/latest`
+- `GET /api/visual/rgb`
+- `GET /api/visual/thermal`
+- `GET /api/visual/point-cloud`
+- `GET /api/visual/presence`
+- `POST /api/control/reconfig`
+- `POST /api/control/reset-soft`
+- `POST /api/control/kill-holders`
+- `POST /api/control/usb-reset`
 - `WS /ws/events`
 
 ## WS Event Types
@@ -25,6 +36,8 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 - `alert_event`
 - `sensor_fault`
 - `heartbeat`
+- `control_result`
+- `visual_update`
 
 ## Main Backend Modules
 - `backend/backend_state_store.py`
@@ -45,4 +58,4 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 ## Current Status
 - Backend implemented and tested.
 - Legacy tooling preserved under `legacy/`.
-- Frontend directory created and ready for React implementation.
+- Frontend directory scaffold exists; operator UI implementation is still pending.
