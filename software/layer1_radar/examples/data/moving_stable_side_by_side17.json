@@ -1,0 +1,3002 @@
+[
+  {
+    "frame": 5,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.55307291666666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 10,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.253916015625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 11,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.905673828125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 12,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.99592447916666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 13,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.940537109375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 14,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.35957356770834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 18,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.98498372395834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 19,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.63763020833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 20,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.46994466145833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 21,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.55365234375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 22,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.22680013020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 23,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.36258463541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 24,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.7040625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 25,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.36119466145833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 26,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.53280924479166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 27,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.011162109375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 28,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.98974283854167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 29,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.127880859375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 30,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.14358072916667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 31,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.22905598958333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 32,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.49046875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 33,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.37138997395833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 34,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.21524088541666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 35,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.18502604166666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 36,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.08961263020834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 37,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.03046875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 38,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.98178059895834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 39,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.617734375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 40,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.76890299479167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 41,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.22974609375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 42,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.77344075520833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 43,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.05737630208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 44,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.95252278645833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 45,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.197666015625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 46,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.07844401041666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 47,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.23824544270833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 48,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.602822265625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 49,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.92821614583333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 50,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.26474283854166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 51,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.28679036458334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 52,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.28632161458333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 53,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.23181315104166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 54,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.85660807291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 55,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.212802734375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 56,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.77044596354166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 57,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.74842447916667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 58,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.598642578125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 59,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.046337890625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 60,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.08447265625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 61,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.03693359375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 62,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.47466145833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 63,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 79.93485677083333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 64,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.17700520833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 65,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.46561197916667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 66,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 80.19731119791666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 67,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.96414388020834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 68,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.88254557291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 69,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.29671223958333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 70,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.10703125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 71,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.88616536458333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 72,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.67688151041666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 73,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.445556640625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 74,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.24215169270833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 75,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.15883138020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 76,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.10366861979166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 77,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.58601888020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 78,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.42379231770833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 79,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.29700846354167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 80,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.54055013020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 81,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.44675130208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 82,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.36356770833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 83,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.63169921875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 84,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.40289713541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 85,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.02363932291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 86,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.92425455729166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 87,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.89397135416667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 88,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.711142578125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 89,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.82063151041666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 90,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.80245768229166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 91,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.69924479166667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 92,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.64986002604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 93,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.814404296875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 94,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.49292317708333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 95,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.37909505208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 96,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.70465494791667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 97,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.4278515625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 98,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.39126302083334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 99,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.11234375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 100,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.12504231770833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 101,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.84633138020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 102,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.77220052083334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 103,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.96062825520833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 104,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.90819986979167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 105,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.893857421875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 106,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.02166015625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 107,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.11408203125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 108,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.595908203125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 109,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.91516276041666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 110,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.52345703125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 111,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.74656901041666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 112,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.33998372395833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 113,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.061484375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 114,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.03032552083333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 115,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.780322265625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 116,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.88976888020834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 117,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.44407877604166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 118,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.05275716145833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 119,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.67682942708333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 120,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.232685546875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 121,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.03470703125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 122,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.953251953125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 123,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.94216471354167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 124,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.29659505208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 125,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.155791015625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 126,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.27779296875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 127,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.664970703125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 128,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.77468098958333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 129,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.52137369791667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 130,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.54060546875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 131,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.976884765625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 132,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.81231770833334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 133,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.24319661458334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 134,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.13210611979167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 135,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.14833984375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 136,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.08144856770834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 137,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.17739583333334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 138,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.17929361979166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 139,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.07679036458333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 140,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.08419921875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 141,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.07869140625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 142,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.66457682291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 143,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.29603515625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 144,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.39888020833334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 145,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.96149088541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 146,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.53489908854166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 147,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.115927734375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 148,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.34351236979167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 149,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.00478841145834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 150,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.01146809895833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 151,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.69163736979166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 152,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.43270833333334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 153,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.2929296875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 154,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.93794270833334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 155,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.82635091145833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 156,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.72487630208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 157,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.719794921875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 158,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.56779296875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 159,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.39904622395834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 160,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.87784505208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 161,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.08601888020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 162,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.09482096354166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 163,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 73.93157877604166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 164,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.14712565104166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 165,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.22129557291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 166,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.6583984375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 167,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.42986979166666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 168,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.322333984375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 169,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.08954427083333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 170,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.257109375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 171,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.215322265625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 172,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.1611328125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 173,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.5207421875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 174,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.15017252604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 175,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.2933984375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 176,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.237177734375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 177,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.32973958333334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 178,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.12890299479167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 179,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.30289388020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 180,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.08873046875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 181,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.589013671875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 182,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.26625325520833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 183,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.327685546875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 184,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.490126953125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 185,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.32905598958334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 186,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.58317708333334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 187,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.43513346354166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 188,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.0394140625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 189,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.18394856770833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 190,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.85241536458334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 191,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.43132161458334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 192,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.0784765625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 193,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.037724609375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 194,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.451484375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 195,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.23748372395833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 196,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.15217122395833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 197,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.07972330729167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 198,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.85354817708334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 199,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.70908854166667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 200,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.09788736979166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 201,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.77485026041667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 202,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.77905924479167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 203,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.68621744791666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 204,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.62554036458333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 205,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.23992513020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 206,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.54944010416666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 207,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.36410481770834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 208,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.15047526041667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 209,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.08018880208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 210,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.19815755208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 211,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.17927408854166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 212,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.096240234375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 213,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.85945963541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 214,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.48142578125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 215,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.67448567708334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 216,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.04642903645833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 217,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 74.71696940104167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 218,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.43577473958334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 219,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.76331380208333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 220,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.684580078125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 221,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.16839192708333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 222,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.455439453125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 223,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.65729817708333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 224,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.50221028645834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 225,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.25352213541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 226,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.71624348958333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 227,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.24263020833334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 228,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.38590169270833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 229,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.00923502604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 230,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.96689453125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 231,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.59919921875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 232,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.98199544270834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 233,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.881171875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 234,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.969169921875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 235,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.90228190104166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 236,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.90821940104166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 237,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.0216796875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 238,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.77719075520834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 239,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.95478515625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 240,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.041376953125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 241,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.21119791666666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 242,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.10105794270834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 243,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.195048828125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 244,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.05814127604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 245,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.07718098958334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 246,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.13474283854167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 247,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.937646484375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 248,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.95223958333334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 249,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.3996484375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 250,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.22415690104167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 251,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 79.60459635416667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 252,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.86133138020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 253,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.77418294270834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 254,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.03170572916666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 255,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.75216145833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 256,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.89171549479167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 257,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.93048502604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 258,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.33124348958333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 259,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.823916015625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 260,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.55620768229167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 261,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.37747721354167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 262,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.051171875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 263,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.7305078125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 264,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 79.64890625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 265,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.90431315104166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 266,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.31570638020834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 267,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.87180338541667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 268,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.90930989583333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 269,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.93785481770833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 270,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.79939453125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 271,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.49383138020833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 272,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.21682942708334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 273,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.36099609375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 274,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.218837890625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 275,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.07434895833333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 276,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.94363932291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 277,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.7678515625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 278,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.18625325520833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 279,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.20121744791666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 280,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.21268229166667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 281,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.125576171875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 282,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.60542317708334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 283,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.45154296875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 284,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.37779947916667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 285,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.47432291666667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 286,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.73540364583333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 287,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.81177734375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 288,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.615888671875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 289,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.65727864583333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 290,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.42926432291667,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 291,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.52095377604167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 292,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.564384765625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 293,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.478212890625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 294,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.775810546875,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 295,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.735625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 296,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 76.77235677083333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 297,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.70177083333333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 298,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 75.49142578125,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 299,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 79.36137369791666,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 300,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.15862955729166,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 301,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.986259765625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 302,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.27741536458333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 303,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.94134114583333,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 304,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.073369140625,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 305,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.6971484375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 306,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.79491861979167,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 307,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.01408528645834,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 308,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.9608984375,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 309,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.12635091145833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 310,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 77.77996419270833,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  },
+  {
+    "frame": 311,
+    "points": [],
+    "thermal": {
+      "mean_intensity_u8": 78.02561848958334,
+      "width": 640,
+      "height": 480
+    },
+    "infineon": null
+  }
+]

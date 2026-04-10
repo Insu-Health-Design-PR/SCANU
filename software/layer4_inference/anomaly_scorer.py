@@ -1,4 +1,4 @@
-"""Anomaly scoring contract for Layer 4."""
+"""Thresholding layer for inference results."""
 
 from __future__ import annotations
 
@@ -9,27 +9,58 @@ from .inference_engine import InferenceResult
 
 @dataclass(frozen=True, slots=True)
 class AnomalyDecision:
-    """Thresholded anomaly decision exposed to Layer 5."""
-
     frame_number: int
     timestamp_ms: float
     anomaly_score: float
     confidence: float
     is_anomaly: bool
+    label: str
 
 
 class AnomalyScorer:
-    """Maps inference outputs into binary anomaly decisions."""
+    """
+    Converts continuous scores into labels.
 
-    def __init__(self, threshold: float = 0.35) -> None:
-        self.threshold = threshold
+    Labels:
+    - unarmed
+    - suspicious
+    - armed
+    """
+
+    def __init__(
+        self,
+        *,
+        suspicious_threshold: float = 0.25,
+        armed_threshold: float = 0.55,
+        min_confidence: float = 0.20,
+    ) -> None:
+        self.suspicious_threshold = float(suspicious_threshold)
+        self.armed_threshold = float(armed_threshold)
+        self.min_confidence = float(min_confidence)
 
     def evaluate(self, result: InferenceResult) -> AnomalyDecision:
-        anomaly_score = float(result.raw_score * result.confidence)
+        score = float(result.raw_score)
+        conf = float(result.confidence)
+
+        if conf < self.min_confidence:
+            label = "unarmed"
+            is_anomaly = False
+        elif score >= self.armed_threshold:
+            label = "armed"
+            is_anomaly = True
+        elif score >= self.suspicious_threshold:
+            label = "suspicious"
+            is_anomaly = True
+        else:
+            label = "unarmed"
+            is_anomaly = False
+
         return AnomalyDecision(
             frame_number=result.frame_number,
             timestamp_ms=result.timestamp_ms,
-            anomaly_score=anomaly_score,
-            confidence=result.confidence,
-            is_anomaly=anomaly_score >= self.threshold,
+            anomaly_score=score,
+            confidence=conf,
+            is_anomaly=is_anomaly,
+            label=label,
         )
+

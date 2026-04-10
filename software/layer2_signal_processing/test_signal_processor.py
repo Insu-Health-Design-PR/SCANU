@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 
 ensure_serial_stub()
 
-from software.layer1_radar.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
+from software.layer1_radar.mmwave.radar_constants import FRAME_HEADER_SIZE, MAGIC_WORD, TLVType
 from software.layer2_signal_processing import SignalProcessor
 
 
