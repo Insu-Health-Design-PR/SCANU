@@ -2,3 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Radar example captures — keep JSON; omit large video binaries
+software/layer1_radar/examples/data/*.mp4
