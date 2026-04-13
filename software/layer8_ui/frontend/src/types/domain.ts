@@ -1,6 +1,6 @@
 export type SystemState = 'UNKNOWN' | 'IDLE' | 'TRIGGERED' | 'SCANNING' | 'ALERT' | 'FAULT';
 export type DashboardMode = 'live' | 'simulated';
-export type FeedSource = 'live' | 'fallback';
+export type FeedSource = 'live';
 
 export interface RenderPoint {
   id: number;

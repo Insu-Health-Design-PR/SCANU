@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { CustomLayoutBuilder } from '@/components/view-layout/CustomLayoutBuilder';
@@ -210,7 +211,9 @@ export function LayoutPreviewModal({
     }
   };
 
-  return (
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {open ? (
         <motion.div
@@ -219,7 +222,7 @@ export function LayoutPreviewModal({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.16 }}
           onClick={onClose}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/88 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[300] flex items-center justify-center bg-slate-950/88 p-4 backdrop-blur-sm"
         >
           <motion.div
             initial={{ opacity: 0, y: 16, scale: 0.98 }}
@@ -288,6 +291,7 @@ export function LayoutPreviewModal({
           </motion.div>
         </motion.div>
       ) : null}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

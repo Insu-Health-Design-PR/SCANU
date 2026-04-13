@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { dashboardSnapshot } from '@/data/mock/dashboardSnapshot';
+import { emptyDashboardSnapshot } from '@/data/initial/emptyDashboardSnapshot';
 import { dashboardApi } from '@/services/dashboardApi';
 import type { LayoutPreset, FocusView, LayoutStyle, CustomLayoutModules, UiPreferences } from '@/types/layout';
 import type { DashboardSnapshot } from '@/types/domain';
@@ -76,7 +76,7 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   previewLayout: prefs.previewLayout,
   focusView: prefs.focusView,
   layoutStyle: prefs.layoutStyle,
-  snapshot: dashboardSnapshot,
+  snapshot: emptyDashboardSnapshot,
   customModules: prefs.customModules,
   setSnapshot: (snapshot) => set({ snapshot }),
   updateSnapshot: (updater) =>
