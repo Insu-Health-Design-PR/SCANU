@@ -9,23 +9,34 @@ interface LayoutPopoverProps {
 
 export function LayoutPopover({ selected, onSelect, onOpenPreview }: LayoutPopoverProps) {
   return (
-    <div className="w-[320px] rounded-[1.75rem] border border-white/10 bg-surface-800/95 p-4 shadow-panel backdrop-blur-xl">
-      <div className="mb-4 text-lg font-medium text-white">View Layout</div>
-      <div className="space-y-2">
+    <div className="w-[330px] overflow-hidden rounded-[1.2rem] border border-white/12 bg-[linear-gradient(180deg,rgba(12,19,32,0.98),rgba(8,13,23,0.95))] shadow-panel backdrop-blur-xl">
+      <div className="border-b border-white/10 px-4 py-3 text-lg font-medium text-white">View Layout</div>
+
+      <div className="space-y-0 px-2 py-2">
         {layoutPresets.map((layout) => (
           <button
             key={layout}
+            type="button"
             onClick={() => onSelect(layout)}
-            className={layout === selected ? 'flex w-full items-center justify-between rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-left text-sm text-cyan-200' : 'flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-left text-sm text-slate-200'}
+            className="flex w-full items-center gap-3 rounded-lg border border-transparent px-3 py-2 text-left text-sm text-slate-200 transition hover:border-white/10 hover:bg-white/[0.05]"
           >
-            <span>{layout}</span>
-            <span>{layout === selected ? '✓' : ''}</span>
+            <span
+              className={`h-3.5 w-3.5 rounded-full border ${layout === selected ? 'border-cyan-300 bg-cyan-300/90' : 'border-slate-500'}`}
+            />
+            <span className={layout === selected ? 'text-cyan-100' : 'text-slate-200'}>{layout}</span>
           </button>
         ))}
       </div>
-      <button onClick={onOpenPreview} className="mt-4 w-full rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-medium text-cyan-200">
-        Open Preview
-      </button>
+
+      <div className="border-t border-white/10 p-3">
+        <button
+          type="button"
+          onClick={onOpenPreview}
+          className="w-full rounded-xl border border-cyan-400/25 bg-cyan-400/12 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
+        >
+          Open Preview
+        </button>
+      </div>
     </div>
   );
 }
