@@ -2,6 +2,14 @@ export type SystemState = 'UNKNOWN' | 'IDLE' | 'TRIGGERED' | 'SCANNING' | 'ALERT
 export type DashboardMode = 'live' | 'simulated';
 export type FeedSource = 'live' | 'fallback';
 
+export interface RenderPoint {
+  id: number;
+  left: string;
+  top: string;
+  size: string;
+  opacity: number;
+}
+
 export interface CameraStream {
   label: string;
   resolution: string;
@@ -22,6 +30,7 @@ export interface PointCloudSnapshot {
   source: FeedSource;
   stale: boolean;
   lastFrameAtMs: number;
+  renderPoints: RenderPoint[];
 }
 
 export interface PresenceSnapshot {

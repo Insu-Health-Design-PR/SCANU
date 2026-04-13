@@ -1,6 +1,7 @@
-import type { DashboardSnapshot } from '@/types/domain';
+import type { DashboardSnapshot, RenderPoint } from '@/types/domain';
 import type { UiPreferences } from '@/types/layout';
 import { dashboardSnapshot } from '@/data/mock/dashboardSnapshot';
+import { pointCloudPoints } from '@/data/mock/pointCloud';
 
 type AlertLevel = 'info' | 'warning' | 'fault';
 
@@ -85,6 +86,67 @@ function toAlertLevel(level: string | undefined): AlertLevel {
   return 'info';
 }
 
+function toRenderPoints(raw: unknown[]): RenderPoint[] {
+  if (!Array.isArray(raw) || raw.length === 0) return pointCloudPoints;
+
+  const parsed = raw
+    .map((item, idx) => {
+      if (!item || typeof item !== 'object') return null;
+      const obj = item as Record<string, unknown>;
+      const x =
+        typeof obj.x === 'number'
+          ? obj.x
+          : typeof obj.x_m === 'number'
+            ? obj.x_m
+            : typeof obj.pos_x === 'number'
+              ? obj.pos_x
+              : null;
+      const y =
+        typeof obj.y === 'number'
+          ? obj.y
+          : typeof obj.y_m === 'number'
+            ? obj.y_m
+            : typeof obj.pos_y === 'number'
+              ? obj.pos_y
+              : null;
+      const z =
+        typeof obj.z === 'number'
+          ? obj.z
+          : typeof obj.z_m === 'number'
+            ? obj.z_m
+            : typeof obj.pos_z === 'number'
+              ? obj.pos_z
+              : 0;
+      if (x === null || y === null) return null;
+      return { idx, x, y, z };
+    })
+    .filter(Boolean) as Array<{ idx: number; x: number; y: number; z: number }>;
+
+  if (parsed.length === 0) return pointCloudPoints;
+
+  const xs = parsed.map((p) => p.x);
+  const ys = parsed.map((p) => p.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  const dx = maxX - minX || 1;
+  const dy = maxY - minY || 1;
+
+  return parsed.map((p) => {
+    const nx = (p.x - minX) / dx;
+    const ny = (p.y - minY) / dy;
+    const depthInfluence = Math.max(0, Math.min(1, 1 - Math.abs(p.z) / 6));
+    return {
+      id: p.idx,
+      left: `${8 + nx * 84}%`,
+      top: `${10 + (1 - ny) * 74}%`,
+      size: `${2 + depthInfluence * 3}px`,
+      opacity: 0.3 + depthInfluence * 0.55,
+    };
+  });
+}
+
 function toDashboardSnapshot(
   status: BackendStatusResponse,
   health: BackendHealthResponse,
@@ -95,7 +157,7 @@ function toDashboardSnapshot(
   const onlineCount = health.sensor_online_count || 0;
   const nowMs = Date.now();
   const timestampMs = visual.timestamp_ms ?? nowMs;
-  const pointCloud = Array.isArray(visual.point_cloud) ? visual.point_cloud : [];
+  const pointCloudRaw = Array.isArray(visual.point_cloud) ? visual.point_cloud : [];
   const detected =
     typeof visual.presence === 'boolean'
       ? visual.presence
@@ -148,13 +210,14 @@ function toDashboardSnapshot(
       lastFrameAtMs: timestampMs,
     },
     pointCloud: {
-      trackedPoints: pointCloud.length,
+      trackedPoints: pointCloudRaw.length,
       confidence: status.confidence ?? 0,
       lastUpdateMs: Math.max(0, nowMs - timestampMs),
       updateRateHz: 0,
       source: 'live',
-      stale: pointCloud.length === 0,
+      stale: pointCloudRaw.length === 0,
       lastFrameAtMs: timestampMs,
+      renderPoints: toRenderPoints(pointCloudRaw),
     },
     presence: {
       detected,
@@ -213,7 +276,7 @@ function updateFromWs(current: DashboardSnapshot, event: BackendWsEvent): Dashbo
 
   if (event.event_type === 'visual_update' && event.payload && typeof event.payload === 'object') {
     const payload = event.payload as BackendVisualLatest;
-    const pointCloud = Array.isArray(payload.point_cloud) ? payload.point_cloud : [];
+    const pointCloudRaw = Array.isArray(payload.point_cloud) ? payload.point_cloud : [];
     const detected =
       typeof payload.presence === 'boolean'
         ? payload.presence
@@ -247,11 +310,12 @@ function updateFromWs(current: DashboardSnapshot, event: BackendWsEvent): Dashbo
     };
     next.pointCloud = {
       ...next.pointCloud,
-      trackedPoints: pointCloud.length,
+      trackedPoints: pointCloudRaw.length,
       source: 'live',
-      stale: pointCloud.length === 0,
+      stale: pointCloudRaw.length === 0,
       lastFrameAtMs: eventTs,
       lastUpdateMs: Math.max(0, nowMs - eventTs),
+      renderPoints: toRenderPoints(pointCloudRaw),
     };
     next.presence = {
       ...next.presence,
@@ -328,7 +392,7 @@ function toFallbackSnapshot(reason: string): DashboardSnapshot {
     ...dashboardSnapshot,
     rgb: { ...dashboardSnapshot.rgb, source: 'fallback', stale: false, lastFrameAtMs: now },
     thermal: { ...dashboardSnapshot.thermal, source: 'fallback', stale: false, lastFrameAtMs: now },
-    pointCloud: { ...dashboardSnapshot.pointCloud, source: 'fallback', stale: false, lastFrameAtMs: now },
+    pointCloud: { ...dashboardSnapshot.pointCloud, source: 'fallback', stale: false, lastFrameAtMs: now, renderPoints: pointCloudPoints },
     alerts: [
       {
         id: `fallback-${now}`,
