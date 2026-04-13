@@ -503,7 +503,7 @@
         <a class="btn" id="link-mp4-thermal" href="/api/preview/video/thermal" target="_blank" rel="noopener">Thermal MP4</a>
         <a class="btn" id="link-mp4-webcam" href="/api/preview/video/webcam" target="_blank" rel="noopener">Webcam MP4</a>
         <button type="button" class="btn ghost" id="refresh-main">Reconnect stream</button>
-        <p class="hint">Segment shows which feed fills this panel. Weapon inference runs in the <strong>webcam</strong> runner; thermal uses the thermal capture path and optional DETR / CNN overlays on direct preview.</p>
+        <p class="hint">Segment shows which feed fills this panel. Weapon inference runs in the <strong>webcam</strong> runner (<code>weapon_ai.infer_thermal_objects</code> via <code>webcam_layer8_runner</code>). Thermal shows the capture / direct colormap stream only.</p>
       </div>
     </section>
   </main>
@@ -520,14 +520,7 @@
         ["frames", "number"], ["fps", "number"], ["video", "text"], ["live_frame", "text"], ["output", "text"],
         ["thermal_device", "number"], ["thermal_auto_detect", "number"], ["thermal_detect_max_index", "number"], ["thermal_detect_retry_s", "number"],
         ["thermal_width", "number"], ["thermal_height", "number"],
-        ["thermal_fps", "number"], ["panel_w", "number"], ["panel_h", "number"],
-        ["thermal_inference_enabled", "number"], ["thermal_inference_every_n", "number"],
-        ["thermal_inference_threshold", "number"], ["thermal_inference_device", "number"],
-        ["thermal_inference_model_id", "text"],
-        ["thermal_classifier_enabled", "number"],
-        ["thermal_classifier_weights", "text"],
-        ["thermal_classifier_every_n", "number"],
-        ["thermal_classifier_device", "number"]
+        ["thermal_fps", "number"], ["panel_w", "number"], ["panel_h", "number"]
       ],
       webcam: [
         ["frames", "number"],
@@ -600,18 +593,6 @@
       root.innerHTML = "";
       const sec = settings[sensor] || {};
       FIELD_DEFS[sensor].forEach(([key, type]) => {
-        if (sensor === "thermal" && key === "thermal_inference_enabled") {
-          const h = document.createElement("div");
-          h.className = "config-section";
-          h.textContent = "Layer 4 · DETR (direct thermal preview)";
-          root.appendChild(h);
-        }
-        if (sensor === "thermal" && key === "thermal_classifier_enabled") {
-          const h = document.createElement("div");
-          h.className = "config-section";
-          h.textContent = "Safe / unsafe CNN overlay";
-          root.appendChild(h);
-        }
         if (sensor === "webcam" && key === "frames") {
           const h = document.createElement("div");
           h.className = "config-section";

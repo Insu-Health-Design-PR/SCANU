@@ -33,143 +33,7 @@ from layer8_ui import sensor_runner
 from layer8_ui.settings_store import DEFAULT_SETTINGS, load, save
 from layer8_ui.thermal_device import detect_working_thermal_device
 
-try:
-    from layer4_inference import InferenceEngine, ThermalThreatDetector
-    from layer4_inference.thermal_detector import draw_detections_on_image
-except ImportError:  # pragma: no cover - optional heavy deps
-    InferenceEngine = None  # type: ignore[misc, assignment]
-    ThermalThreatDetector = None  # type: ignore[misc, assignment]
-    draw_detections_on_image = None  # type: ignore[misc, assignment]
-
-try:
-    from layer4_inference.safe_unsafe_live import load_safe_unsafe_classifier, predict_safe_unsafe
-except ImportError:  # pragma: no cover - optional torch/torchvision
-    load_safe_unsafe_classifier = None  # type: ignore[misc, assignment]
-    predict_safe_unsafe = None  # type: ignore[misc, assignment]
-
 _THERMAL_CAM_CFG_LEN = 9
-_THERMAL_LAYER4_CFG_LEN = 5
-_THERMAL_CLF_CFG_LEN = 4
-
-
-def _layer8_classifier_torch_device(code: int) -> Any:
-    """-1 = auto, -2 = CPU, else CUDA device index if available."""
-    import torch
-
-    c = int(code)
-    if c == -2:
-        return torch.device("cpu")
-    if c == -1:
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if torch.cuda.is_available():
-        return torch.device(f"cuda:{c}")
-    return torch.device("cpu")
-
-
-class _ThermalRunnerClfOverlay:
-    """
-    Safe/unsafe CNN overlay for ``/api/preview/live/thermal`` (runner-written JPG).
-
-    Separate from :class:`_ThermalSharedStream` so the same checkpoint works while
-    capture is running (direct V4L preview is disabled in that mode).
-    """
-
-    _lock = threading.Lock()
-    _frame = 0
-    _key: tuple[str, str] | None = None
-    _model: Any = None
-    _meta: dict[str, Any] | None = None
-    _tfm: Any = None
-    _dev: Any = None
-    _label = ""
-    _conf = 0.0
-
-    @classmethod
-    def overlay_jpg(cls, jpg: bytes, settings: dict[str, Any]) -> bytes:
-        if (
-            load_safe_unsafe_classifier is None
-            or predict_safe_unsafe is None
-            or not jpg
-        ):
-            return jpg
-        t = settings.get("thermal") or {}
-        if not int(t.get("thermal_classifier_enabled", 0)):
-            with cls._lock:
-                cls._key = None
-                cls._model = None
-                cls._meta = None
-                cls._tfm = None
-                cls._dev = None
-                cls._label = ""
-                cls._conf = 0.0
-            return jpg
-        rel = str(t.get("thermal_classifier_weights") or "").strip()
-        resolved = ""
-        if rel:
-            p = _resolved_artifact_path(settings, relative_to_software=rel)
-            if p is not None and p.is_file():
-                resolved = str(p.resolve())
-        if not resolved:
-            return jpg
-
-        arr = np.frombuffer(jpg, dtype=np.uint8)
-        bgr = cv2.imdecode(arr, cv2.IMREAD_COLOR)
-        if bgr is None:
-            return jpg
-
-        every = max(1, int(t.get("thermal_classifier_every_n", 5)))
-        dev = _layer8_classifier_torch_device(int(t.get("thermal_classifier_device", -1)))
-        ck = (resolved, str(dev))
-
-        with cls._lock:
-            cls._frame += 1
-            if cls._key != ck:
-                try:
-                    m, meta, tfm = load_safe_unsafe_classifier(resolved, device=dev)
-                    cls._model = m
-                    cls._meta = meta
-                    cls._tfm = tfm
-                    cls._dev = dev
-                    cls._key = ck
-                except Exception:
-                    cls._model = None
-                    cls._meta = None
-                    cls._tfm = None
-                    cls._dev = None
-                    cls._key = None
-            if cls._model is not None and cls._meta is not None and cls._tfm is not None and cls._dev is not None:
-                if cls._frame % every == 0:
-                    try:
-                        cls._label, cls._conf, _ = predict_safe_unsafe(
-                            cls._model,
-                            cls._meta,
-                            cls._tfm,
-                            bgr,
-                            device=cls._dev,
-                        )
-                    except Exception:
-                        cls._label = "?"
-                        cls._conf = 0.0
-            label, conf = cls._label, cls._conf
-
-        if label and label != "?":
-            out = bgr.copy()
-            color = (40, 40, 255) if label.lower() == "unsafe" else (60, 200, 80)
-            cv2.putText(
-                out,
-                f"{label} {conf:.2f}",
-                (12, 32),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.9,
-                color,
-                2,
-                cv2.LINE_AA,
-            )
-            ok, buf = cv2.imencode(".jpg", out, [int(cv2.IMWRITE_JPEG_QUALITY), 85])
-            if ok:
-                return buf.tobytes()
-        return jpg
-
 
 LAYER8_DIR = Path(__file__).resolve().parent
 ARTIFACTS = LAYER8_DIR / "artifacts"
@@ -193,7 +57,7 @@ class _ThermalSharedStream:
 
     def __init__(self) -> None:
         self._lock = threading.Lock()
-        # camera (9) + inference (5): see _cfg_from_settings
+        # camera-only tuple; see _cfg_from_settings
         self._cfg: tuple[Any, ...] | None = None
         self._cfg_dirty = False
         self._latest_jpg: bytes | None = None
@@ -204,11 +68,7 @@ class _ThermalSharedStream:
         self._next_detect_retry_ts = 0.0
 
     @staticmethod
-    def _cfg_from_settings(
-        settings: dict[str, Any],
-        *,
-        thermal_classifier_weights_resolved: str = "",
-    ) -> tuple[Any, ...]:
+    def _cfg_from_settings(settings: dict[str, Any]) -> tuple[Any, ...]:
         t = settings.get("thermal") or {}
         requested_device = int(t.get("thermal_device", 0))
         thermal_auto_detect = int(t.get("thermal_auto_detect", 1))
@@ -217,7 +77,6 @@ class _ThermalSharedStream:
         thermal_width = int(t.get("thermal_width", 160))
         thermal_height = int(t.get("thermal_height", 120))
         thermal_fps = int(t.get("thermal_fps", 9))
-        mid = (t.get("thermal_inference_model_id") or "").strip()
         return (
             requested_device,
             thermal_width,
@@ -228,29 +87,10 @@ class _ThermalSharedStream:
             thermal_auto_detect,
             thermal_detect_max_index,
             thermal_detect_retry_s,
-            int(t.get("thermal_inference_enabled", 0)),
-            int(t.get("thermal_inference_every_n", 3)),
-            float(t.get("thermal_inference_threshold", 0.25)),
-            int(t.get("thermal_inference_device", -1)),
-            mid,
-            int(t.get("thermal_classifier_enabled", 0)),
-            str(thermal_classifier_weights_resolved),
-            int(t.get("thermal_classifier_every_n", 5)),
-            int(t.get("thermal_classifier_device", -1)),
         )
 
     def add_client(self, settings: dict[str, Any]) -> None:
-        t = settings.get("thermal") or {}
-        rel = str(t.get("thermal_classifier_weights") or "").strip()
-        resolved_weights = ""
-        if rel:
-            p = _resolved_artifact_path(settings, relative_to_software=rel)
-            if p is not None and p.is_file():
-                resolved_weights = str(p.resolve())
-        new_cfg = self._cfg_from_settings(
-            settings,
-            thermal_classifier_weights_resolved=resolved_weights,
-        )
+        new_cfg = self._cfg_from_settings(settings)
         with self._lock:
             self._clients += 1
             if self._cfg != new_cfg:
@@ -277,19 +117,6 @@ class _ThermalSharedStream:
         cap: cv2.VideoCapture | None = None
         active_camera_cfg: tuple[Any, ...] | None = None
         next_open_retry_ts = 0.0
-        infer_frame = 0
-        last_dets: list[Any] = []
-        last_src_wh = (1, 1)
-        infer_engine: Any | None = None
-        infer_key: tuple[str, float, int] | None = None
-        clf_frame = 0
-        clf_model: Any = None
-        clf_meta: dict[str, Any] | None = None
-        clf_tfm: Any = None
-        clf_dev: Any = None
-        clf_key: tuple[str, str] | None = None
-        last_clf_label = ""
-        last_clf_conf = 0.0
         try:
             while not self._stop_event.is_set():
                 with self._lock:
@@ -402,104 +229,6 @@ class _ThermalSharedStream:
 
                 heat = cv2.applyColorMap(gray, cv2.COLORMAP_INFERNO)
                 heat = cv2.resize(heat, (panel_w, panel_h), interpolation=cv2.INTER_LINEAR)
-
-                L4 = _THERMAL_CAM_CFG_LEN
-                if len(cfg) >= L4 + _THERMAL_LAYER4_CFG_LEN and draw_detections_on_image is not None:
-                    ien, ievery, ithresh, idev, imid = cfg[L4 : L4 + _THERMAL_LAYER4_CFG_LEN]
-                    if int(ien) and InferenceEngine is not None and ThermalThreatDetector is not None:
-                        infer_frame += 1
-                        model_id = str(imid).strip() or None
-                        key = (model_id or ThermalThreatDetector.DEFAULT_MODEL_ID, float(ithresh), int(idev))
-                        if infer_key != key:
-                            try:
-                                det = ThermalThreatDetector(
-                                    model_id=model_id,
-                                    threshold=float(ithresh),
-                                    device=int(idev),
-                                )
-                                infer_engine = InferenceEngine(detector=det)
-                                infer_key = key
-                            except Exception:
-                                infer_engine = None
-                                infer_key = None
-                        if infer_engine is not None and infer_frame % max(1, int(ievery)) == 0:
-                            try:
-                                bgr_in = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-                                h0, w0 = bgr_in.shape[:2]
-                                res = infer_engine.infer(infer_frame, time.time() * 1000.0, bgr_in)
-                                last_dets = list(res.detections)
-                                last_src_wh = (w0, h0)
-                            except Exception:
-                                last_dets = []
-                        if last_dets:
-                            draw_detections_on_image(
-                                heat,
-                                last_dets,
-                                box_source_width=last_src_wh[0],
-                                box_source_height=last_src_wh[1],
-                            )
-                    else:
-                        last_dets = []
-                        infer_engine = None
-                        infer_key = None
-
-                clf_base = _THERMAL_CAM_CFG_LEN + _THERMAL_LAYER4_CFG_LEN
-                if (
-                    len(cfg) >= clf_base + _THERMAL_CLF_CFG_LEN
-                    and load_safe_unsafe_classifier is not None
-                    and predict_safe_unsafe is not None
-                ):
-                    cen, cw, cevery, cdev = cfg[clf_base : clf_base + _THERMAL_CLF_CFG_LEN]
-                    if int(cen) and cw:
-                        clf_frame += 1
-                        dev = _layer8_classifier_torch_device(int(cdev))
-                        ck = (cw, str(dev))
-                        if clf_key != ck:
-                            try:
-                                clf_model, clf_meta, clf_tfm = load_safe_unsafe_classifier(cw, device=dev)
-                                clf_dev = dev
-                                clf_key = ck
-                            except Exception:
-                                clf_model = None
-                                clf_meta = None
-                                clf_tfm = None
-                                clf_dev = None
-                                clf_key = None
-                        if (
-                            clf_model is not None
-                            and clf_meta is not None
-                            and clf_tfm is not None
-                            and clf_dev is not None
-                        ):
-                            if clf_frame % max(1, int(cevery)) == 0:
-                                try:
-                                    last_clf_label, last_clf_conf, _ = predict_safe_unsafe(
-                                        clf_model,
-                                        clf_meta,
-                                        clf_tfm,
-                                        heat,
-                                        device=clf_dev,
-                                    )
-                                except Exception:
-                                    last_clf_label = "?"
-                                    last_clf_conf = 0.0
-                            if last_clf_label and last_clf_label != "?":
-                                color = (
-                                    (40, 40, 255)
-                                    if last_clf_label.lower() == "unsafe"
-                                    else (60, 200, 80)
-                                )
-                                font = cv2.FONT_HERSHEY_SIMPLEX
-                                txt = f"{last_clf_label} {last_clf_conf:.2f}"
-                                cv2.putText(heat, txt, (12, 32), font, 0.9, color, 2, cv2.LINE_AA)
-                    else:
-                        clf_model = None
-                        clf_meta = None
-                        clf_tfm = None
-                        clf_dev = None
-                        clf_key = None
-                        last_clf_label = ""
-                        last_clf_conf = 0.0
 
                 ok_enc, jpg = cv2.imencode(".jpg", heat, [int(cv2.IMWRITE_JPEG_QUALITY), 80])
                 if ok_enc:
@@ -628,8 +357,6 @@ async def preview_live(sensor: SensorName) -> StreamingResponse:
             if path.is_file():
                 try:
                     jpg = path.read_bytes()
-                    if sensor == "thermal":
-                        jpg = _ThermalRunnerClfOverlay.overlay_jpg(jpg, load(LAYER8_DIR))
                     chunk = (
                         f"--{boundary}\r\n"
                         "Content-Type: image/jpeg\r\n"

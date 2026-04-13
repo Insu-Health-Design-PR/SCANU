@@ -132,9 +132,6 @@ def _webcam_structured_weapon_args(w: dict, sw: Path) -> str:
     if manual:
         return f"{built} {manual}".strip() if built else manual
     return built
-    d = layer8_dir / "logs"
-    d.mkdir(parents=True, exist_ok=True)
-    return d
 
 
 def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> list[str]:
