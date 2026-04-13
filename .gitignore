@@ -8,3 +8,20 @@ software/layer1_radar/examples/data/*.mp4
 
 # Local/vendor SDK copies (testing only; not part of product tree)
 software/vendor/
+
+# macOS Finder metadata
+.DS_Store
+
+# Python tooling
+.pytest_cache/
+.venv/
+
+# Layer 8 frontend caches
+software/layer8_ui/frontend/.vite/
+software/layer8_ui/frontend/node_modules/
+
+# Layer 8 legacy runtime outputs
+software/layer8_ui/legacy/logs/*
+!software/layer8_ui/legacy/logs/.gitkeep
+software/layer8_ui/legacy/artifacts/*
+!software/layer8_ui/legacy/artifacts/.gitkeep
