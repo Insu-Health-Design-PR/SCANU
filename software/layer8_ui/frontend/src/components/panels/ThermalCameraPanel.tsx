@@ -1,5 +1,6 @@
 import { Maximize2, Thermometer } from 'lucide-react';
 import { PanelCard } from '@/components/shared/PanelCard';
+import { StatusChip } from '@/components/shared/StatusChip';
 import { useDashboardStore } from '@/store/dashboardStore';
 
 export function ThermalCameraPanel() {
@@ -8,6 +9,10 @@ export function ThermalCameraPanel() {
 
   return (
     <PanelCard title="Thermal Camera" icon={<Thermometer className="h-4 w-4" />} action={<Maximize2 className="h-4 w-4 text-slate-500" />}>
+      <div className="mb-3 flex flex-wrap gap-2">
+        <StatusChip label={thermal.source === 'live' ? 'Live Feed' : 'Fallback'} tone={thermal.source === 'live' ? 'cyan' : 'amber'} />
+        {thermal.stale ? <StatusChip label="Stale" tone="red" /> : null}
+      </div>
       <div className="overflow-hidden rounded-[1.2rem] border border-orange-400/10 bg-slate-950">
         {imageSrc ? (
           <img src={imageSrc} alt="Thermal stream" className="aspect-[16/9] w-full object-cover" />
