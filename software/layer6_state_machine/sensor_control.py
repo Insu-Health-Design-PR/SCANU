@@ -13,6 +13,27 @@ from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager
 from .models import ControlResult, RadarRuntimeSpec, SensorStatus
 
 
+class _NoopKillSwitch:
+    """Fallback when optional kill-switch script is not present in this checkout."""
+
+    @staticmethod
+    def try_soft_uart_reset(_config_port: str, _data_port: str) -> None:
+        return None
+
+    @staticmethod
+    def pids_holding_device(_device: str) -> list[int]:
+        return []
+
+    @staticmethod
+    def terminate_pids(_pids: list[int], *, force: bool = False) -> None:
+        _ = force
+        return None
+
+    @staticmethod
+    def usb_reset_by_port(_port: str) -> None:
+        return None
+
+
 class SensorControlManager:
     """Runtime manager for radar status/config/reset and manual destructive controls."""
 
@@ -67,10 +88,13 @@ class SensorControlManager:
         )
         spec = importlib.util.spec_from_file_location("layer1_radar_kill_switch", path)
         if spec is None or spec.loader is None:
-            raise RuntimeError(f"Unable to load kill switch module from {path}")
+            return _NoopKillSwitch()
         module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        return module
+        try:
+            spec.loader.exec_module(module)
+            return module
+        except FileNotFoundError:
+            return _NoopKillSwitch()
 
     def list_radar_ids(self) -> tuple[str, ...]:
         return tuple(sorted(self._radars.keys()))
