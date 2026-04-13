@@ -1,7 +1,6 @@
 import { Radar } from 'lucide-react';
 import { PanelCard } from '@/components/shared/PanelCard';
 import { StatusChip } from '@/components/shared/StatusChip';
-import { pointCloudPoints } from '@/data/mock/pointCloud';
 import { useDashboardStore } from '@/store/dashboardStore';
 
 export function PointCloudPanel() {
@@ -17,7 +16,7 @@ export function PointCloudPanel() {
         <div className="aspect-[16/7]">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(29,211,242,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(29,211,242,0.06)_1px,transparent_1px)] bg-[size:40px_40px]" />
           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-[linear-gradient(to_top,rgba(29,211,242,0.12),transparent)]" />
-          {pointCloudPoints.map((point) => (
+          {pointCloud.renderPoints.map((point) => (
             <span
               key={point.id}
               className="absolute rounded-full bg-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.75)]"

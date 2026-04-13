@@ -1,4 +1,5 @@
 import type { DashboardSnapshot } from '@/types/domain';
+import { pointCloudPoints } from '@/data/mock/pointCloud';
 
 const now = Date.now();
 
@@ -43,6 +44,7 @@ export const dashboardSnapshot: DashboardSnapshot = {
     source: 'fallback',
     stale: false,
     lastFrameAtMs: now,
+    renderPoints: pointCloudPoints,
   },
   presence: {
     detected: true,
