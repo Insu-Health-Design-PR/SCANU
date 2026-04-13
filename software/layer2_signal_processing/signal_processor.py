@@ -192,7 +192,7 @@ class SignalProcessor:
         return np.asarray(rows, dtype=np.float32)
 
     def _parse_layer1_raw_frame(self, frame: bytes) -> Any:
-        from software.layer1_radar.tlv_parser import parse_frame
+        from software.layer1_radar.mmwave.tlv_parser import parse_frame
 
         return parse_frame(frame)
 

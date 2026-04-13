@@ -1,0 +1,1502 @@
+[
+  {
+    "index": 0,
+    "thermal_mean_u8": 74.23937174479167,
+    "infineon": null
+  },
+  {
+    "index": 1,
+    "thermal_mean_u8": 73.8815234375,
+    "infineon": null
+  },
+  {
+    "index": 2,
+    "thermal_mean_u8": 73.87346354166667,
+    "infineon": null
+  },
+  {
+    "index": 3,
+    "thermal_mean_u8": 74.09229166666667,
+    "infineon": null
+  },
+  {
+    "index": 4,
+    "thermal_mean_u8": 73.79633138020833,
+    "infineon": null
+  },
+  {
+    "index": 5,
+    "thermal_mean_u8": 73.520009765625,
+    "infineon": null
+  },
+  {
+    "index": 6,
+    "thermal_mean_u8": 73.96942708333333,
+    "infineon": null
+  },
+  {
+    "index": 7,
+    "thermal_mean_u8": 74.085791015625,
+    "infineon": null
+  },
+  {
+    "index": 8,
+    "thermal_mean_u8": 73.79743815104166,
+    "infineon": null
+  },
+  {
+    "index": 9,
+    "thermal_mean_u8": 73.80185872395833,
+    "infineon": null
+  },
+  {
+    "index": 10,
+    "thermal_mean_u8": 75.93732096354167,
+    "infineon": null
+  },
+  {
+    "index": 11,
+    "thermal_mean_u8": 74.864541015625,
+    "infineon": null
+  },
+  {
+    "index": 12,
+    "thermal_mean_u8": 74.89158854166666,
+    "infineon": null
+  },
+  {
+    "index": 13,
+    "thermal_mean_u8": 74.93364583333333,
+    "infineon": null
+  },
+  {
+    "index": 14,
+    "thermal_mean_u8": 74.91509440104167,
+    "infineon": null
+  },
+  {
+    "index": 15,
+    "thermal_mean_u8": 74.879267578125,
+    "infineon": null
+  },
+  {
+    "index": 16,
+    "thermal_mean_u8": 75.03813151041666,
+    "infineon": null
+  },
+  {
+    "index": 17,
+    "thermal_mean_u8": 74.63,
+    "infineon": null
+  },
+  {
+    "index": 18,
+    "thermal_mean_u8": 74.6508203125,
+    "infineon": null
+  },
+  {
+    "index": 19,
+    "thermal_mean_u8": 74.68627604166667,
+    "infineon": null
+  },
+  {
+    "index": 20,
+    "thermal_mean_u8": 74.655361328125,
+    "infineon": null
+  },
+  {
+    "index": 21,
+    "thermal_mean_u8": 74.99950520833333,
+    "infineon": null
+  },
+  {
+    "index": 22,
+    "thermal_mean_u8": 74.91461263020834,
+    "infineon": null
+  },
+  {
+    "index": 23,
+    "thermal_mean_u8": 75.00005533854167,
+    "infineon": null
+  },
+  {
+    "index": 24,
+    "thermal_mean_u8": 74.71057942708333,
+    "infineon": null
+  },
+  {
+    "index": 25,
+    "thermal_mean_u8": 74.82628255208333,
+    "infineon": null
+  },
+  {
+    "index": 26,
+    "thermal_mean_u8": 75.58208333333333,
+    "infineon": null
+  },
+  {
+    "index": 27,
+    "thermal_mean_u8": 75.70083984375,
+    "infineon": null
+  },
+  {
+    "index": 28,
+    "thermal_mean_u8": 75.74232747395833,
+    "infineon": null
+  },
+  {
+    "index": 29,
+    "thermal_mean_u8": 75.137568359375,
+    "infineon": null
+  },
+  {
+    "index": 30,
+    "thermal_mean_u8": 75.31938151041666,
+    "infineon": null
+  },
+  {
+    "index": 31,
+    "thermal_mean_u8": 74.97724609375,
+    "infineon": null
+  },
+  {
+    "index": 32,
+    "thermal_mean_u8": 74.72600260416667,
+    "infineon": null
+  },
+  {
+    "index": 33,
+    "thermal_mean_u8": 74.71264322916667,
+    "infineon": null
+  },
+  {
+    "index": 34,
+    "thermal_mean_u8": 75.63576171875,
+    "infineon": null
+  },
+  {
+    "index": 35,
+    "thermal_mean_u8": 75.57581380208333,
+    "infineon": null
+  },
+  {
+    "index": 36,
+    "thermal_mean_u8": 75.34738932291667,
+    "infineon": null
+  },
+  {
+    "index": 37,
+    "thermal_mean_u8": 75.31332682291666,
+    "infineon": null
+  },
+  {
+    "index": 38,
+    "thermal_mean_u8": 75.06533854166666,
+    "infineon": null
+  },
+  {
+    "index": 39,
+    "thermal_mean_u8": 75.12840169270834,
+    "infineon": null
+  },
+  {
+    "index": 40,
+    "thermal_mean_u8": 75.37461588541667,
+    "infineon": null
+  },
+  {
+    "index": 41,
+    "thermal_mean_u8": 75.40508463541667,
+    "infineon": null
+  },
+  {
+    "index": 42,
+    "thermal_mean_u8": 74.982578125,
+    "infineon": null
+  },
+  {
+    "index": 43,
+    "thermal_mean_u8": 75.40337890625,
+    "infineon": null
+  },
+  {
+    "index": 44,
+    "thermal_mean_u8": 75.326796875,
+    "infineon": null
+  },
+  {
+    "index": 45,
+    "thermal_mean_u8": 75.346328125,
+    "infineon": null
+  },
+  {
+    "index": 46,
+    "thermal_mean_u8": 74.986962890625,
+    "infineon": null
+  },
+  {
+    "index": 47,
+    "thermal_mean_u8": 74.656796875,
+    "infineon": null
+  },
+  {
+    "index": 48,
+    "thermal_mean_u8": 74.45540690104167,
+    "infineon": null
+  },
+  {
+    "index": 49,
+    "thermal_mean_u8": 74.429287109375,
+    "infineon": null
+  },
+  {
+    "index": 50,
+    "thermal_mean_u8": 74.62704752604166,
+    "infineon": null
+  },
+  {
+    "index": 51,
+    "thermal_mean_u8": 74.75339192708333,
+    "infineon": null
+  },
+  {
+    "index": 52,
+    "thermal_mean_u8": 74.831435546875,
+    "infineon": null
+  },
+  {
+    "index": 53,
+    "thermal_mean_u8": 74.50759765625,
+    "infineon": null
+  },
+  {
+    "index": 54,
+    "thermal_mean_u8": 74.67941080729166,
+    "infineon": null
+  },
+  {
+    "index": 55,
+    "thermal_mean_u8": 74.42234049479167,
+    "infineon": null
+  },
+  {
+    "index": 56,
+    "thermal_mean_u8": 74.906201171875,
+    "infineon": null
+  },
+  {
+    "index": 57,
+    "thermal_mean_u8": 74.631552734375,
+    "infineon": null
+  },
+  {
+    "index": 58,
+    "thermal_mean_u8": 74.51786458333333,
+    "infineon": null
+  },
+  {
+    "index": 59,
+    "thermal_mean_u8": 74.259775390625,
+    "infineon": null
+  },
+  {
+    "index": 60,
+    "thermal_mean_u8": 74.14105794270833,
+    "infineon": null
+  },
+  {
+    "index": 61,
+    "thermal_mean_u8": 74.00652994791666,
+    "infineon": null
+  },
+  {
+    "index": 62,
+    "thermal_mean_u8": 74.01631510416667,
+    "infineon": null
+  },
+  {
+    "index": 63,
+    "thermal_mean_u8": 73.666083984375,
+    "infineon": null
+  },
+  {
+    "index": 64,
+    "thermal_mean_u8": 73.95072265625,
+    "infineon": null
+  },
+  {
+    "index": 65,
+    "thermal_mean_u8": 73.798349609375,
+    "infineon": null
+  },
+  {
+    "index": 66,
+    "thermal_mean_u8": 73.715673828125,
+    "infineon": null
+  },
+  {
+    "index": 67,
+    "thermal_mean_u8": 73.61166666666666,
+    "infineon": null
+  },
+  {
+    "index": 68,
+    "thermal_mean_u8": 73.62169921875,
+    "infineon": null
+  },
+  {
+    "index": 69,
+    "thermal_mean_u8": 75.16199869791667,
+    "infineon": null
+  },
+  {
+    "index": 70,
+    "thermal_mean_u8": 74.891259765625,
+    "infineon": null
+  },
+  {
+    "index": 71,
+    "thermal_mean_u8": 74.895908203125,
+    "infineon": null
+  },
+  {
+    "index": 72,
+    "thermal_mean_u8": 73.84271158854166,
+    "infineon": null
+  },
+  {
+    "index": 73,
+    "thermal_mean_u8": 75.62158854166667,
+    "infineon": null
+  },
+  {
+    "index": 74,
+    "thermal_mean_u8": 74.98365559895834,
+    "infineon": null
+  },
+  {
+    "index": 75,
+    "thermal_mean_u8": 74.10047526041667,
+    "infineon": null
+  },
+  {
+    "index": 76,
+    "thermal_mean_u8": 75.12939778645833,
+    "infineon": null
+  },
+  {
+    "index": 77,
+    "thermal_mean_u8": 76.43381184895833,
+    "infineon": null
+  },
+  {
+    "index": 78,
+    "thermal_mean_u8": 76.24417317708334,
+    "infineon": null
+  },
+  {
+    "index": 79,
+    "thermal_mean_u8": 76.91441731770833,
+    "infineon": null
+  },
+  {
+    "index": 80,
+    "thermal_mean_u8": 75.06137044270834,
+    "infineon": null
+  },
+  {
+    "index": 81,
+    "thermal_mean_u8": 75.38639973958334,
+    "infineon": null
+  },
+  {
+    "index": 82,
+    "thermal_mean_u8": 74.96855794270833,
+    "infineon": null
+  },
+  {
+    "index": 83,
+    "thermal_mean_u8": 76.27491536458334,
+    "infineon": null
+  },
+  {
+    "index": 84,
+    "thermal_mean_u8": 76.196015625,
+    "infineon": null
+  },
+  {
+    "index": 85,
+    "thermal_mean_u8": 76.45972330729167,
+    "infineon": null
+  },
+  {
+    "index": 86,
+    "thermal_mean_u8": 76.7080078125,
+    "infineon": null
+  },
+  {
+    "index": 87,
+    "thermal_mean_u8": 76.10759440104167,
+    "infineon": null
+  },
+  {
+    "index": 88,
+    "thermal_mean_u8": 75.663310546875,
+    "infineon": null
+  },
+  {
+    "index": 89,
+    "thermal_mean_u8": 75.05062825520834,
+    "infineon": null
+  },
+  {
+    "index": 90,
+    "thermal_mean_u8": 75.49626302083334,
+    "infineon": null
+  },
+  {
+    "index": 91,
+    "thermal_mean_u8": 76.17000325520833,
+    "infineon": null
+  },
+  {
+    "index": 92,
+    "thermal_mean_u8": 75.60236328125,
+    "infineon": null
+  },
+  {
+    "index": 93,
+    "thermal_mean_u8": 75.61617513020833,
+    "infineon": null
+  },
+  {
+    "index": 94,
+    "thermal_mean_u8": 75.529638671875,
+    "infineon": null
+  },
+  {
+    "index": 95,
+    "thermal_mean_u8": 75.803544921875,
+    "infineon": null
+  },
+  {
+    "index": 96,
+    "thermal_mean_u8": 76.11518880208334,
+    "infineon": null
+  },
+  {
+    "index": 97,
+    "thermal_mean_u8": 76.123408203125,
+    "infineon": null
+  },
+  {
+    "index": 98,
+    "thermal_mean_u8": 76.0008984375,
+    "infineon": null
+  },
+  {
+    "index": 99,
+    "thermal_mean_u8": 76.68986979166667,
+    "infineon": null
+  },
+  {
+    "index": 100,
+    "thermal_mean_u8": 76.05763020833334,
+    "infineon": null
+  },
+  {
+    "index": 101,
+    "thermal_mean_u8": 76.41859700520833,
+    "infineon": null
+  },
+  {
+    "index": 102,
+    "thermal_mean_u8": 76.11575520833334,
+    "infineon": null
+  },
+  {
+    "index": 103,
+    "thermal_mean_u8": 76.5442578125,
+    "infineon": null
+  },
+  {
+    "index": 104,
+    "thermal_mean_u8": 77.37880859375,
+    "infineon": null
+  },
+  {
+    "index": 105,
+    "thermal_mean_u8": 77.0659765625,
+    "infineon": null
+  },
+  {
+    "index": 106,
+    "thermal_mean_u8": 77.316484375,
+    "infineon": null
+  },
+  {
+    "index": 107,
+    "thermal_mean_u8": 76.85708333333334,
+    "infineon": null
+  },
+  {
+    "index": 108,
+    "thermal_mean_u8": 76.92632486979167,
+    "infineon": null
+  },
+  {
+    "index": 109,
+    "thermal_mean_u8": 76.80123372395833,
+    "infineon": null
+  },
+  {
+    "index": 110,
+    "thermal_mean_u8": 76.74067708333334,
+    "infineon": null
+  },
+  {
+    "index": 111,
+    "thermal_mean_u8": 76.421630859375,
+    "infineon": null
+  },
+  {
+    "index": 112,
+    "thermal_mean_u8": 76.16031575520833,
+    "infineon": null
+  },
+  {
+    "index": 113,
+    "thermal_mean_u8": 76.569599609375,
+    "infineon": null
+  },
+  {
+    "index": 114,
+    "thermal_mean_u8": 76.168486328125,
+    "infineon": null
+  },
+  {
+    "index": 115,
+    "thermal_mean_u8": 76.457353515625,
+    "infineon": null
+  },
+  {
+    "index": 116,
+    "thermal_mean_u8": 76.38143229166667,
+    "infineon": null
+  },
+  {
+    "index": 117,
+    "thermal_mean_u8": 76.18880859375,
+    "infineon": null
+  },
+  {
+    "index": 118,
+    "thermal_mean_u8": 76.65150065104167,
+    "infineon": null
+  },
+  {
+    "index": 119,
+    "thermal_mean_u8": 76.599267578125,
+    "infineon": null
+  },
+  {
+    "index": 120,
+    "thermal_mean_u8": 77.138955078125,
+    "infineon": null
+  },
+  {
+    "index": 121,
+    "thermal_mean_u8": 76.70015950520833,
+    "infineon": null
+  },
+  {
+    "index": 122,
+    "thermal_mean_u8": 76.60814127604166,
+    "infineon": null
+  },
+  {
+    "index": 123,
+    "thermal_mean_u8": 77.01014973958333,
+    "infineon": null
+  },
+  {
+    "index": 124,
+    "thermal_mean_u8": 76.7905078125,
+    "infineon": null
+  },
+  {
+    "index": 125,
+    "thermal_mean_u8": 76.94557942708333,
+    "infineon": null
+  },
+  {
+    "index": 126,
+    "thermal_mean_u8": 76.78575520833333,
+    "infineon": null
+  },
+  {
+    "index": 127,
+    "thermal_mean_u8": 78.94982421875,
+    "infineon": null
+  },
+  {
+    "index": 128,
+    "thermal_mean_u8": 78.02725260416666,
+    "infineon": null
+  },
+  {
+    "index": 129,
+    "thermal_mean_u8": 78.13567708333333,
+    "infineon": null
+  },
+  {
+    "index": 130,
+    "thermal_mean_u8": 76.96440104166666,
+    "infineon": null
+  },
+  {
+    "index": 131,
+    "thermal_mean_u8": 78.49410807291666,
+    "infineon": null
+  },
+  {
+    "index": 132,
+    "thermal_mean_u8": 77.1866015625,
+    "infineon": null
+  },
+  {
+    "index": 133,
+    "thermal_mean_u8": 77.31162434895833,
+    "infineon": null
+  },
+  {
+    "index": 134,
+    "thermal_mean_u8": 76.823232421875,
+    "infineon": null
+  },
+  {
+    "index": 135,
+    "thermal_mean_u8": 77.39686848958333,
+    "infineon": null
+  },
+  {
+    "index": 136,
+    "thermal_mean_u8": 77.28896158854167,
+    "infineon": null
+  },
+  {
+    "index": 137,
+    "thermal_mean_u8": 76.52290364583334,
+    "infineon": null
+  },
+  {
+    "index": 138,
+    "thermal_mean_u8": 76.534384765625,
+    "infineon": null
+  },
+  {
+    "index": 139,
+    "thermal_mean_u8": 76.2292578125,
+    "infineon": null
+  },
+  {
+    "index": 140,
+    "thermal_mean_u8": 76.454658203125,
+    "infineon": null
+  },
+  {
+    "index": 141,
+    "thermal_mean_u8": 78.18355143229167,
+    "infineon": null
+  },
+  {
+    "index": 142,
+    "thermal_mean_u8": 77.462470703125,
+    "infineon": null
+  },
+  {
+    "index": 143,
+    "thermal_mean_u8": 77.46339518229166,
+    "infineon": null
+  },
+  {
+    "index": 144,
+    "thermal_mean_u8": 77.81594401041667,
+    "infineon": null
+  },
+  {
+    "index": 145,
+    "thermal_mean_u8": 78.40069661458334,
+    "infineon": null
+  },
+  {
+    "index": 146,
+    "thermal_mean_u8": 78.36576497395833,
+    "infineon": null
+  },
+  {
+    "index": 147,
+    "thermal_mean_u8": 78.67786458333333,
+    "infineon": null
+  },
+  {
+    "index": 148,
+    "thermal_mean_u8": 78.262783203125,
+    "infineon": null
+  },
+  {
+    "index": 149,
+    "thermal_mean_u8": 78.21056315104167,
+    "infineon": null
+  },
+  {
+    "index": 150,
+    "thermal_mean_u8": 78.398486328125,
+    "infineon": null
+  },
+  {
+    "index": 151,
+    "thermal_mean_u8": 78.008037109375,
+    "infineon": null
+  },
+  {
+    "index": 152,
+    "thermal_mean_u8": 77.99827473958334,
+    "infineon": null
+  },
+  {
+    "index": 153,
+    "thermal_mean_u8": 77.57054361979166,
+    "infineon": null
+  },
+  {
+    "index": 154,
+    "thermal_mean_u8": 77.864775390625,
+    "infineon": null
+  },
+  {
+    "index": 155,
+    "thermal_mean_u8": 77.13309244791667,
+    "infineon": null
+  },
+  {
+    "index": 156,
+    "thermal_mean_u8": 77.47078125,
+    "infineon": null
+  },
+  {
+    "index": 157,
+    "thermal_mean_u8": 77.17005208333333,
+    "infineon": null
+  },
+  {
+    "index": 158,
+    "thermal_mean_u8": 76.773994140625,
+    "infineon": null
+  },
+  {
+    "index": 159,
+    "thermal_mean_u8": 78.924296875,
+    "infineon": null
+  },
+  {
+    "index": 160,
+    "thermal_mean_u8": 78.97144856770834,
+    "infineon": null
+  },
+  {
+    "index": 161,
+    "thermal_mean_u8": 78.49646484375,
+    "infineon": null
+  },
+  {
+    "index": 162,
+    "thermal_mean_u8": 79.04100911458333,
+    "infineon": null
+  },
+  {
+    "index": 163,
+    "thermal_mean_u8": 79.10707682291667,
+    "infineon": null
+  },
+  {
+    "index": 164,
+    "thermal_mean_u8": 78.98083333333334,
+    "infineon": null
+  },
+  {
+    "index": 165,
+    "thermal_mean_u8": 78.55664713541667,
+    "infineon": null
+  },
+  {
+    "index": 166,
+    "thermal_mean_u8": 78.385302734375,
+    "infineon": null
+  },
+  {
+    "index": 167,
+    "thermal_mean_u8": 78.12263997395833,
+    "infineon": null
+  },
+  {
+    "index": 168,
+    "thermal_mean_u8": 77.52674153645833,
+    "infineon": null
+  },
+  {
+    "index": 169,
+    "thermal_mean_u8": 77.84525065104167,
+    "infineon": null
+  },
+  {
+    "index": 170,
+    "thermal_mean_u8": 77.54304361979166,
+    "infineon": null
+  },
+  {
+    "index": 171,
+    "thermal_mean_u8": 77.87834309895834,
+    "infineon": null
+  },
+  {
+    "index": 172,
+    "thermal_mean_u8": 77.775712890625,
+    "infineon": null
+  },
+  {
+    "index": 173,
+    "thermal_mean_u8": 77.61252278645833,
+    "infineon": null
+  },
+  {
+    "index": 174,
+    "thermal_mean_u8": 77.60719401041666,
+    "infineon": null
+  },
+  {
+    "index": 175,
+    "thermal_mean_u8": 77.61388020833333,
+    "infineon": null
+  },
+  {
+    "index": 176,
+    "thermal_mean_u8": 77.77029296875,
+    "infineon": null
+  },
+  {
+    "index": 177,
+    "thermal_mean_u8": 77.951201171875,
+    "infineon": null
+  },
+  {
+    "index": 178,
+    "thermal_mean_u8": 77.96743815104166,
+    "infineon": null
+  },
+  {
+    "index": 179,
+    "thermal_mean_u8": 77.75794270833333,
+    "infineon": null
+  },
+  {
+    "index": 180,
+    "thermal_mean_u8": 77.169228515625,
+    "infineon": null
+  },
+  {
+    "index": 181,
+    "thermal_mean_u8": 78.680478515625,
+    "infineon": null
+  },
+  {
+    "index": 182,
+    "thermal_mean_u8": 78.11147135416667,
+    "infineon": null
+  },
+  {
+    "index": 183,
+    "thermal_mean_u8": 77.51477864583333,
+    "infineon": null
+  },
+  {
+    "index": 184,
+    "thermal_mean_u8": 77.88078776041667,
+    "infineon": null
+  },
+  {
+    "index": 185,
+    "thermal_mean_u8": 77.53026692708333,
+    "infineon": null
+  },
+  {
+    "index": 186,
+    "thermal_mean_u8": 77.4833984375,
+    "infineon": null
+  },
+  {
+    "index": 187,
+    "thermal_mean_u8": 77.71279296875,
+    "infineon": null
+  },
+  {
+    "index": 188,
+    "thermal_mean_u8": 77.599853515625,
+    "infineon": null
+  },
+  {
+    "index": 189,
+    "thermal_mean_u8": 77.88156575520833,
+    "infineon": null
+  },
+  {
+    "index": 190,
+    "thermal_mean_u8": 78.37297200520834,
+    "infineon": null
+  },
+  {
+    "index": 191,
+    "thermal_mean_u8": 77.65241861979166,
+    "infineon": null
+  },
+  {
+    "index": 192,
+    "thermal_mean_u8": 77.69902669270833,
+    "infineon": null
+  },
+  {
+    "index": 193,
+    "thermal_mean_u8": 77.69548177083334,
+    "infineon": null
+  },
+  {
+    "index": 194,
+    "thermal_mean_u8": 79.29848958333334,
+    "infineon": null
+  },
+  {
+    "index": 195,
+    "thermal_mean_u8": 78.33152994791666,
+    "infineon": null
+  },
+  {
+    "index": 196,
+    "thermal_mean_u8": 79.00297200520833,
+    "infineon": null
+  },
+  {
+    "index": 197,
+    "thermal_mean_u8": 78.506279296875,
+    "infineon": null
+  },
+  {
+    "index": 198,
+    "thermal_mean_u8": 78.55059244791667,
+    "infineon": null
+  },
+  {
+    "index": 199,
+    "thermal_mean_u8": 78.73410481770833,
+    "infineon": null
+  },
+  {
+    "index": 200,
+    "thermal_mean_u8": 78.45696614583333,
+    "infineon": null
+  },
+  {
+    "index": 201,
+    "thermal_mean_u8": 78.429521484375,
+    "infineon": null
+  },
+  {
+    "index": 202,
+    "thermal_mean_u8": 78.50405924479166,
+    "infineon": null
+  },
+  {
+    "index": 203,
+    "thermal_mean_u8": 77.48015299479167,
+    "infineon": null
+  },
+  {
+    "index": 204,
+    "thermal_mean_u8": 78.36220377604167,
+    "infineon": null
+  },
+  {
+    "index": 205,
+    "thermal_mean_u8": 78.08764322916667,
+    "infineon": null
+  },
+  {
+    "index": 206,
+    "thermal_mean_u8": 78.01912434895833,
+    "infineon": null
+  },
+  {
+    "index": 207,
+    "thermal_mean_u8": 77.96816731770834,
+    "infineon": null
+  },
+  {
+    "index": 208,
+    "thermal_mean_u8": 78.28063151041667,
+    "infineon": null
+  },
+  {
+    "index": 209,
+    "thermal_mean_u8": 78.25172526041666,
+    "infineon": null
+  },
+  {
+    "index": 210,
+    "thermal_mean_u8": 80.11365885416667,
+    "infineon": null
+  },
+  {
+    "index": 211,
+    "thermal_mean_u8": 79.22161783854166,
+    "infineon": null
+  },
+  {
+    "index": 212,
+    "thermal_mean_u8": 78.32876302083334,
+    "infineon": null
+  },
+  {
+    "index": 213,
+    "thermal_mean_u8": 78.52894856770833,
+    "infineon": null
+  },
+  {
+    "index": 214,
+    "thermal_mean_u8": 78.45328125,
+    "infineon": null
+  },
+  {
+    "index": 215,
+    "thermal_mean_u8": 79.50969401041667,
+    "infineon": null
+  },
+  {
+    "index": 216,
+    "thermal_mean_u8": 78.93599609375,
+    "infineon": null
+  },
+  {
+    "index": 217,
+    "thermal_mean_u8": 78.471357421875,
+    "infineon": null
+  },
+  {
+    "index": 218,
+    "thermal_mean_u8": 78.21927408854167,
+    "infineon": null
+  },
+  {
+    "index": 219,
+    "thermal_mean_u8": 78.04566080729167,
+    "infineon": null
+  },
+  {
+    "index": 220,
+    "thermal_mean_u8": 78.01912434895833,
+    "infineon": null
+  },
+  {
+    "index": 221,
+    "thermal_mean_u8": 78.66911783854167,
+    "infineon": null
+  },
+  {
+    "index": 222,
+    "thermal_mean_u8": 80.12066080729167,
+    "infineon": null
+  },
+  {
+    "index": 223,
+    "thermal_mean_u8": 79.46615234375,
+    "infineon": null
+  },
+  {
+    "index": 224,
+    "thermal_mean_u8": 79.76008463541666,
+    "infineon": null
+  },
+  {
+    "index": 225,
+    "thermal_mean_u8": 79.02077473958333,
+    "infineon": null
+  },
+  {
+    "index": 226,
+    "thermal_mean_u8": 79.08206705729167,
+    "infineon": null
+  },
+  {
+    "index": 227,
+    "thermal_mean_u8": 78.69970377604167,
+    "infineon": null
+  },
+  {
+    "index": 228,
+    "thermal_mean_u8": 78.55437825520833,
+    "infineon": null
+  },
+  {
+    "index": 229,
+    "thermal_mean_u8": 78.773232421875,
+    "infineon": null
+  },
+  {
+    "index": 230,
+    "thermal_mean_u8": 78.84179036458333,
+    "infineon": null
+  },
+  {
+    "index": 231,
+    "thermal_mean_u8": 78.98903645833333,
+    "infineon": null
+  },
+  {
+    "index": 232,
+    "thermal_mean_u8": 78.74376953125,
+    "infineon": null
+  },
+  {
+    "index": 233,
+    "thermal_mean_u8": 78.48083984375,
+    "infineon": null
+  },
+  {
+    "index": 234,
+    "thermal_mean_u8": 78.59673177083333,
+    "infineon": null
+  },
+  {
+    "index": 235,
+    "thermal_mean_u8": 78.55480794270834,
+    "infineon": null
+  },
+  {
+    "index": 236,
+    "thermal_mean_u8": 78.51134440104167,
+    "infineon": null
+  },
+  {
+    "index": 237,
+    "thermal_mean_u8": 78.62226888020834,
+    "infineon": null
+  },
+  {
+    "index": 238,
+    "thermal_mean_u8": 78.052578125,
+    "infineon": null
+  },
+  {
+    "index": 239,
+    "thermal_mean_u8": 79.090751953125,
+    "infineon": null
+  },
+  {
+    "index": 240,
+    "thermal_mean_u8": 78.54040690104166,
+    "infineon": null
+  },
+  {
+    "index": 241,
+    "thermal_mean_u8": 78.84724609375,
+    "infineon": null
+  },
+  {
+    "index": 242,
+    "thermal_mean_u8": 78.15597005208333,
+    "infineon": null
+  },
+  {
+    "index": 243,
+    "thermal_mean_u8": 78.8833984375,
+    "infineon": null
+  },
+  {
+    "index": 244,
+    "thermal_mean_u8": 78.99935546875,
+    "infineon": null
+  },
+  {
+    "index": 245,
+    "thermal_mean_u8": 79.01061848958334,
+    "infineon": null
+  },
+  {
+    "index": 246,
+    "thermal_mean_u8": 78.82619140625,
+    "infineon": null
+  },
+  {
+    "index": 247,
+    "thermal_mean_u8": 78.85730143229166,
+    "infineon": null
+  },
+  {
+    "index": 248,
+    "thermal_mean_u8": 78.569853515625,
+    "infineon": null
+  },
+  {
+    "index": 249,
+    "thermal_mean_u8": 78.64920247395834,
+    "infineon": null
+  },
+  {
+    "index": 250,
+    "thermal_mean_u8": 78.610927734375,
+    "infineon": null
+  },
+  {
+    "index": 251,
+    "thermal_mean_u8": 79.134091796875,
+    "infineon": null
+  },
+  {
+    "index": 252,
+    "thermal_mean_u8": 80.80710286458333,
+    "infineon": null
+  },
+  {
+    "index": 253,
+    "thermal_mean_u8": 80.17103190104167,
+    "infineon": null
+  },
+  {
+    "index": 254,
+    "thermal_mean_u8": 80.0223828125,
+    "infineon": null
+  },
+  {
+    "index": 255,
+    "thermal_mean_u8": 79.98529947916667,
+    "infineon": null
+  },
+  {
+    "index": 256,
+    "thermal_mean_u8": 79.995498046875,
+    "infineon": null
+  },
+  {
+    "index": 257,
+    "thermal_mean_u8": 79.99497395833333,
+    "infineon": null
+  },
+  {
+    "index": 258,
+    "thermal_mean_u8": 80.064580078125,
+    "infineon": null
+  },
+  {
+    "index": 259,
+    "thermal_mean_u8": 80.32703776041667,
+    "infineon": null
+  },
+  {
+    "index": 260,
+    "thermal_mean_u8": 78.664375,
+    "infineon": null
+  },
+  {
+    "index": 261,
+    "thermal_mean_u8": 78.4449609375,
+    "infineon": null
+  },
+  {
+    "index": 262,
+    "thermal_mean_u8": 78.36252278645833,
+    "infineon": null
+  },
+  {
+    "index": 263,
+    "thermal_mean_u8": 78.57858723958333,
+    "infineon": null
+  },
+  {
+    "index": 264,
+    "thermal_mean_u8": 78.56085286458334,
+    "infineon": null
+  },
+  {
+    "index": 265,
+    "thermal_mean_u8": 78.18589192708333,
+    "infineon": null
+  },
+  {
+    "index": 266,
+    "thermal_mean_u8": 78.18981770833334,
+    "infineon": null
+  },
+  {
+    "index": 267,
+    "thermal_mean_u8": 78.28587565104166,
+    "infineon": null
+  },
+  {
+    "index": 268,
+    "thermal_mean_u8": 78.3460546875,
+    "infineon": null
+  },
+  {
+    "index": 269,
+    "thermal_mean_u8": 78.911787109375,
+    "infineon": null
+  },
+  {
+    "index": 270,
+    "thermal_mean_u8": 78.599375,
+    "infineon": null
+  },
+  {
+    "index": 271,
+    "thermal_mean_u8": 78.57228190104166,
+    "infineon": null
+  },
+  {
+    "index": 272,
+    "thermal_mean_u8": 78.54288411458333,
+    "infineon": null
+  },
+  {
+    "index": 273,
+    "thermal_mean_u8": 78.8947265625,
+    "infineon": null
+  },
+  {
+    "index": 274,
+    "thermal_mean_u8": 79.115419921875,
+    "infineon": null
+  },
+  {
+    "index": 275,
+    "thermal_mean_u8": 79.38057942708333,
+    "infineon": null
+  },
+  {
+    "index": 276,
+    "thermal_mean_u8": 79.59114583333333,
+    "infineon": null
+  },
+  {
+    "index": 277,
+    "thermal_mean_u8": 79.0536328125,
+    "infineon": null
+  },
+  {
+    "index": 278,
+    "thermal_mean_u8": 79.06447591145833,
+    "infineon": null
+  },
+  {
+    "index": 279,
+    "thermal_mean_u8": 79.40232421875,
+    "infineon": null
+  },
+  {
+    "index": 280,
+    "thermal_mean_u8": 79.22801106770834,
+    "infineon": null
+  },
+  {
+    "index": 281,
+    "thermal_mean_u8": 79.14024739583333,
+    "infineon": null
+  },
+  {
+    "index": 282,
+    "thermal_mean_u8": 79.48470703125,
+    "infineon": null
+  },
+  {
+    "index": 283,
+    "thermal_mean_u8": 79.50228515625,
+    "infineon": null
+  },
+  {
+    "index": 284,
+    "thermal_mean_u8": 79.182060546875,
+    "infineon": null
+  },
+  {
+    "index": 285,
+    "thermal_mean_u8": 79.722431640625,
+    "infineon": null
+  },
+  {
+    "index": 286,
+    "thermal_mean_u8": 79.61910807291666,
+    "infineon": null
+  },
+  {
+    "index": 287,
+    "thermal_mean_u8": 79.699794921875,
+    "infineon": null
+  },
+  {
+    "index": 288,
+    "thermal_mean_u8": 79.37138346354166,
+    "infineon": null
+  },
+  {
+    "index": 289,
+    "thermal_mean_u8": 79.978798828125,
+    "infineon": null
+  },
+  {
+    "index": 290,
+    "thermal_mean_u8": 79.5948046875,
+    "infineon": null
+  },
+  {
+    "index": 291,
+    "thermal_mean_u8": 79.471083984375,
+    "infineon": null
+  },
+  {
+    "index": 292,
+    "thermal_mean_u8": 80.023369140625,
+    "infineon": null
+  },
+  {
+    "index": 293,
+    "thermal_mean_u8": 79.93744466145833,
+    "infineon": null
+  },
+  {
+    "index": 294,
+    "thermal_mean_u8": 79.64330729166667,
+    "infineon": null
+  },
+  {
+    "index": 295,
+    "thermal_mean_u8": 79.69568033854166,
+    "infineon": null
+  },
+  {
+    "index": 296,
+    "thermal_mean_u8": 78.952431640625,
+    "infineon": null
+  },
+  {
+    "index": 297,
+    "thermal_mean_u8": 79.29969075520833,
+    "infineon": null
+  },
+  {
+    "index": 298,
+    "thermal_mean_u8": 79.467841796875,
+    "infineon": null
+  },
+  {
+    "index": 299,
+    "thermal_mean_u8": 78.85710611979167,
+    "infineon": null
+  }
+]

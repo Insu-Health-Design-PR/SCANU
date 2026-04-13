@@ -1,0 +1,5102 @@
+[
+  {
+    "index": 0,
+    "thermal_mean_u8": 77.24240234375,
+    "infineon": {
+      "presence_raw": 0.0,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9287632703781128,
+        "motion_energy": 0.0
+      }
+    }
+  },
+  {
+    "index": 1,
+    "thermal_mean_u8": 76.36400390625,
+    "infineon": {
+      "presence_raw": 0.10314667224884033,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9331804513931274,
+        "motion_energy": 0.10314667224884033
+      }
+    }
+  },
+  {
+    "index": 2,
+    "thermal_mean_u8": 76.61202799479166,
+    "infineon": {
+      "presence_raw": 0.10071471333503723,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9243921637535095,
+        "motion_energy": 0.10071471333503723
+      }
+    }
+  },
+  {
+    "index": 3,
+    "thermal_mean_u8": 76.30177408854166,
+    "infineon": {
+      "presence_raw": 0.05874432623386383,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.928702712059021,
+        "motion_energy": 0.05874432623386383
+      }
+    }
+  },
+  {
+    "index": 4,
+    "thermal_mean_u8": 76.14988606770834,
+    "infineon": {
+      "presence_raw": 0.0645185336470604,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9181951284408569,
+        "motion_energy": 0.0645185336470604
+      }
+    }
+  },
+  {
+    "index": 5,
+    "thermal_mean_u8": 75.99408203125,
+    "infineon": {
+      "presence_raw": 0.04419858753681183,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9325122237205505,
+        "motion_energy": 0.04419858753681183
+      }
+    }
+  },
+  {
+    "index": 6,
+    "thermal_mean_u8": 75.87569010416667,
+    "infineon": {
+      "presence_raw": 0.04901531711220741,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.927503228187561,
+        "motion_energy": 0.04901531711220741
+      }
+    }
+  },
+  {
+    "index": 7,
+    "thermal_mean_u8": 75.62814453125,
+    "infineon": {
+      "presence_raw": 0.047527533024549484,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.927299976348877,
+        "motion_energy": 0.047527533024549484
+      }
+    }
+  },
+  {
+    "index": 8,
+    "thermal_mean_u8": 75.969228515625,
+    "infineon": {
+      "presence_raw": 0.03978598490357399,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9225424528121948,
+        "motion_energy": 0.03978598490357399
+      }
+    }
+  },
+  {
+    "index": 9,
+    "thermal_mean_u8": 76.08322265625,
+    "infineon": {
+      "presence_raw": 0.030173946171998978,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9288212656974792,
+        "motion_energy": 0.030173946171998978
+      }
+    }
+  },
+  {
+    "index": 10,
+    "thermal_mean_u8": 75.97106770833334,
+    "infineon": {
+      "presence_raw": 0.025693243369460106,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9234338998794556,
+        "motion_energy": 0.025693243369460106
+      }
+    }
+  },
+  {
+    "index": 11,
+    "thermal_mean_u8": 75.91563802083333,
+    "infineon": {
+      "presence_raw": 0.030582301318645477,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9254401326179504,
+        "motion_energy": 0.030582301318645477
+      }
+    }
+  },
+  {
+    "index": 12,
+    "thermal_mean_u8": 76.17373697916666,
+    "infineon": {
+      "presence_raw": 0.03208351135253906,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9274763464927673,
+        "motion_energy": 0.03208351135253906
+      }
+    }
+  },
+  {
+    "index": 13,
+    "thermal_mean_u8": 76.32968098958334,
+    "infineon": {
+      "presence_raw": 0.01891864649951458,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9312180280685425,
+        "motion_energy": 0.01891864649951458
+      }
+    }
+  },
+  {
+    "index": 14,
+    "thermal_mean_u8": 76.42976236979166,
+    "infineon": {
+      "presence_raw": 0.019653743132948875,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9243955612182617,
+        "motion_energy": 0.019653743132948875
+      }
+    }
+  },
+  {
+    "index": 15,
+    "thermal_mean_u8": 76.06634114583333,
+    "infineon": {
+      "presence_raw": 0.0197056382894516,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9233196973800659,
+        "motion_energy": 0.0197056382894516
+      }
+    }
+  },
+  {
+    "index": 16,
+    "thermal_mean_u8": 75.48751627604166,
+    "infineon": {
+      "presence_raw": 0.020544420927762985,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9206948280334473,
+        "motion_energy": 0.020544420927762985
+      }
+    }
+  },
+  {
+    "index": 17,
+    "thermal_mean_u8": 75.57708984375,
+    "infineon": {
+      "presence_raw": 0.02130802907049656,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9264364838600159,
+        "motion_energy": 0.02130802907049656
+      }
+    }
+  },
+  {
+    "index": 18,
+    "thermal_mean_u8": 75.666337890625,
+    "infineon": {
+      "presence_raw": 0.021783409640192986,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9273539781570435,
+        "motion_energy": 0.021783409640192986
+      }
+    }
+  },
+  {
+    "index": 19,
+    "thermal_mean_u8": 75.99191080729166,
+    "infineon": {
+      "presence_raw": 0.026371682062745094,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9264019131660461,
+        "motion_energy": 0.026371682062745094
+      }
+    }
+  },
+  {
+    "index": 20,
+    "thermal_mean_u8": 75.414541015625,
+    "infineon": {
+      "presence_raw": 0.0190120879560709,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9261564612388611,
+        "motion_energy": 0.0190120879560709
+      }
+    }
+  },
+  {
+    "index": 21,
+    "thermal_mean_u8": 75.941533203125,
+    "infineon": {
+      "presence_raw": 0.019396843388676643,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9282606244087219,
+        "motion_energy": 0.019396843388676643
+      }
+    }
+  },
+  {
+    "index": 22,
+    "thermal_mean_u8": 75.80890625,
+    "infineon": {
+      "presence_raw": 0.016384944319725037,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9271128177642822,
+        "motion_energy": 0.016384944319725037
+      }
+    }
+  },
+  {
+    "index": 23,
+    "thermal_mean_u8": 75.840771484375,
+    "infineon": {
+      "presence_raw": 0.02370872162282467,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9227648377418518,
+        "motion_energy": 0.02370872162282467
+      }
+    }
+  },
+  {
+    "index": 24,
+    "thermal_mean_u8": 75.910751953125,
+    "infineon": {
+      "presence_raw": 0.021276993677020073,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9274933338165283,
+        "motion_energy": 0.021276993677020073
+      }
+    }
+  },
+  {
+    "index": 25,
+    "thermal_mean_u8": 75.59655924479166,
+    "infineon": {
+      "presence_raw": 0.02313808538019657,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9279874563217163,
+        "motion_energy": 0.02313808538019657
+      }
+    }
+  },
+  {
+    "index": 26,
+    "thermal_mean_u8": 75.53155598958334,
+    "infineon": {
+      "presence_raw": 0.021729569882154465,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9235479235649109,
+        "motion_energy": 0.021729569882154465
+      }
+    }
+  },
+  {
+    "index": 27,
+    "thermal_mean_u8": 75.52024088541667,
+    "infineon": {
+      "presence_raw": 0.024910932406783104,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9331766366958618,
+        "motion_energy": 0.024910932406783104
+      }
+    }
+  },
+  {
+    "index": 28,
+    "thermal_mean_u8": 77.493837890625,
+    "infineon": {
+      "presence_raw": 0.030989157035946846,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9171080589294434,
+        "motion_energy": 0.030989157035946846
+      }
+    }
+  },
+  {
+    "index": 29,
+    "thermal_mean_u8": 77.03222330729167,
+    "infineon": {
+      "presence_raw": 0.03347630053758621,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9309674501419067,
+        "motion_energy": 0.03347630053758621
+      }
+    }
+  },
+  {
+    "index": 30,
+    "thermal_mean_u8": 76.85393229166667,
+    "infineon": {
+      "presence_raw": 0.03453274071216583,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9260991811752319,
+        "motion_energy": 0.03453274071216583
+      }
+    }
+  },
+  {
+    "index": 31,
+    "thermal_mean_u8": 75.51872395833334,
+    "infineon": {
+      "presence_raw": 0.018980463966727257,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9231839179992676,
+        "motion_energy": 0.018980463966727257
+      }
+    }
+  },
+  {
+    "index": 32,
+    "thermal_mean_u8": 74.88930989583334,
+    "infineon": {
+      "presence_raw": 0.012787447310984135,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9275115728378296,
+        "motion_energy": 0.012787447310984135
+      }
+    }
+  },
+  {
+    "index": 33,
+    "thermal_mean_u8": 77.03430338541666,
+    "infineon": {
+      "presence_raw": 0.012803878635168076,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9238681197166443,
+        "motion_energy": 0.012803878635168076
+      }
+    }
+  },
+  {
+    "index": 34,
+    "thermal_mean_u8": 76.3262890625,
+    "infineon": {
+      "presence_raw": 0.017701439559459686,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9243600964546204,
+        "motion_energy": 0.017701439559459686
+      }
+    }
+  },
+  {
+    "index": 35,
+    "thermal_mean_u8": 76.02595052083333,
+    "infineon": {
+      "presence_raw": 0.03955885022878647,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9216105341911316,
+        "motion_energy": 0.03955885022878647
+      }
+    }
+  },
+  {
+    "index": 36,
+    "thermal_mean_u8": 75.9360546875,
+    "infineon": {
+      "presence_raw": 0.025604240596294403,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9277614951133728,
+        "motion_energy": 0.025604240596294403
+      }
+    }
+  },
+  {
+    "index": 37,
+    "thermal_mean_u8": 76.2083203125,
+    "infineon": {
+      "presence_raw": 0.031682178378105164,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9292311668395996,
+        "motion_energy": 0.031682178378105164
+      }
+    }
+  },
+  {
+    "index": 38,
+    "thermal_mean_u8": 76.03097330729166,
+    "infineon": {
+      "presence_raw": 0.02485661394894123,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.922691285610199,
+        "motion_energy": 0.02485661394894123
+      }
+    }
+  },
+  {
+    "index": 39,
+    "thermal_mean_u8": 76.25110677083333,
+    "infineon": {
+      "presence_raw": 0.01673859916627407,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9216238260269165,
+        "motion_energy": 0.01673859916627407
+      }
+    }
+  },
+  {
+    "index": 40,
+    "thermal_mean_u8": 76.545830078125,
+    "infineon": {
+      "presence_raw": 0.019665967673063278,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9311452507972717,
+        "motion_energy": 0.019665967673063278
+      }
+    }
+  },
+  {
+    "index": 41,
+    "thermal_mean_u8": 76.98117513020833,
+    "infineon": {
+      "presence_raw": 0.025885416194796562,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9262523055076599,
+        "motion_energy": 0.025885416194796562
+      }
+    }
+  },
+  {
+    "index": 42,
+    "thermal_mean_u8": 77.06525716145833,
+    "infineon": {
+      "presence_raw": 0.023076990619301796,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9239184260368347,
+        "motion_energy": 0.023076990619301796
+      }
+    }
+  },
+  {
+    "index": 43,
+    "thermal_mean_u8": 76.858720703125,
+    "infineon": {
+      "presence_raw": 0.03577088192105293,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9230804443359375,
+        "motion_energy": 0.03577088192105293
+      }
+    }
+  },
+  {
+    "index": 44,
+    "thermal_mean_u8": 76.42064778645833,
+    "infineon": {
+      "presence_raw": 0.030502645298838615,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9261444211006165,
+        "motion_energy": 0.030502645298838615
+      }
+    }
+  },
+  {
+    "index": 45,
+    "thermal_mean_u8": 75.92721354166666,
+    "infineon": {
+      "presence_raw": 0.032955434173345566,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9244605898857117,
+        "motion_energy": 0.032955434173345566
+      }
+    }
+  },
+  {
+    "index": 46,
+    "thermal_mean_u8": 76.141962890625,
+    "infineon": {
+      "presence_raw": 0.04035939276218414,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9276371002197266,
+        "motion_energy": 0.04035939276218414
+      }
+    }
+  },
+  {
+    "index": 47,
+    "thermal_mean_u8": 76.05118815104167,
+    "infineon": {
+      "presence_raw": 0.029247907921671867,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9254102110862732,
+        "motion_energy": 0.029247907921671867
+      }
+    }
+  },
+  {
+    "index": 48,
+    "thermal_mean_u8": 76.46801432291667,
+    "infineon": {
+      "presence_raw": 0.02039474807679653,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.92641681432724,
+        "motion_energy": 0.02039474807679653
+      }
+    }
+  },
+  {
+    "index": 49,
+    "thermal_mean_u8": 76.423056640625,
+    "infineon": {
+      "presence_raw": 0.0161950271576643,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9255052804946899,
+        "motion_energy": 0.0161950271576643
+      }
+    }
+  },
+  {
+    "index": 50,
+    "thermal_mean_u8": 75.88773111979167,
+    "infineon": {
+      "presence_raw": 0.019455596804618835,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9245637059211731,
+        "motion_energy": 0.019455596804618835
+      }
+    }
+  },
+  {
+    "index": 51,
+    "thermal_mean_u8": 76.07045572916667,
+    "infineon": {
+      "presence_raw": 0.01859840378165245,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9258570075035095,
+        "motion_energy": 0.01859840378165245
+      }
+    }
+  },
+  {
+    "index": 52,
+    "thermal_mean_u8": 76.05453776041666,
+    "infineon": {
+      "presence_raw": 0.020919660106301308,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.925230860710144,
+        "motion_energy": 0.020919660106301308
+      }
+    }
+  },
+  {
+    "index": 53,
+    "thermal_mean_u8": 76.11924479166667,
+    "infineon": {
+      "presence_raw": 0.019219499081373215,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9248447418212891,
+        "motion_energy": 0.019219499081373215
+      }
+    }
+  },
+  {
+    "index": 54,
+    "thermal_mean_u8": 75.818642578125,
+    "infineon": {
+      "presence_raw": 0.022722847759723663,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9250786900520325,
+        "motion_energy": 0.022722847759723663
+      }
+    }
+  },
+  {
+    "index": 55,
+    "thermal_mean_u8": 75.819287109375,
+    "infineon": {
+      "presence_raw": 0.02165895700454712,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9253814220428467,
+        "motion_energy": 0.02165895700454712
+      }
+    }
+  },
+  {
+    "index": 56,
+    "thermal_mean_u8": 75.82197591145834,
+    "infineon": {
+      "presence_raw": 0.02078714407980442,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9277481436729431,
+        "motion_energy": 0.02078714407980442
+      }
+    }
+  },
+  {
+    "index": 57,
+    "thermal_mean_u8": 76.562861328125,
+    "infineon": {
+      "presence_raw": 0.028070947155356407,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9263739585876465,
+        "motion_energy": 0.028070947155356407
+      }
+    }
+  },
+  {
+    "index": 58,
+    "thermal_mean_u8": 76.45994791666666,
+    "infineon": {
+      "presence_raw": 0.028927799314260483,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9234928488731384,
+        "motion_energy": 0.028927799314260483
+      }
+    }
+  },
+  {
+    "index": 59,
+    "thermal_mean_u8": 76.75877278645834,
+    "infineon": {
+      "presence_raw": 0.03216578811407089,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9268815517425537,
+        "motion_energy": 0.03216578811407089
+      }
+    }
+  },
+  {
+    "index": 60,
+    "thermal_mean_u8": 76.02191731770833,
+    "infineon": {
+      "presence_raw": 0.04278557747602463,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9281607270240784,
+        "motion_energy": 0.04278557747602463
+      }
+    }
+  },
+  {
+    "index": 61,
+    "thermal_mean_u8": 76.63623697916667,
+    "infineon": {
+      "presence_raw": 0.054473552852869034,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.92584627866745,
+        "motion_energy": 0.054473552852869034
+      }
+    }
+  },
+  {
+    "index": 62,
+    "thermal_mean_u8": 76.61876302083333,
+    "infineon": {
+      "presence_raw": 0.057806774973869324,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9258619546890259,
+        "motion_energy": 0.057806774973869324
+      }
+    }
+  },
+  {
+    "index": 63,
+    "thermal_mean_u8": 76.68182291666666,
+    "infineon": {
+      "presence_raw": 0.05408397689461708,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.925607442855835,
+        "motion_energy": 0.05408397689461708
+      }
+    }
+  },
+  {
+    "index": 64,
+    "thermal_mean_u8": 75.60789713541666,
+    "infineon": {
+      "presence_raw": 0.04655701294541359,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9282900094985962,
+        "motion_energy": 0.04655701294541359
+      }
+    }
+  },
+  {
+    "index": 65,
+    "thermal_mean_u8": 75.29637369791666,
+    "infineon": {
+      "presence_raw": 0.05423649027943611,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9263850450515747,
+        "motion_energy": 0.05423649027943611
+      }
+    }
+  },
+  {
+    "index": 66,
+    "thermal_mean_u8": 75.700234375,
+    "infineon": {
+      "presence_raw": 0.05352853238582611,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9294677972793579,
+        "motion_energy": 0.05352853238582611
+      }
+    }
+  },
+  {
+    "index": 67,
+    "thermal_mean_u8": 75.51315755208333,
+    "infineon": {
+      "presence_raw": 0.0700375884771347,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9288342595100403,
+        "motion_energy": 0.0700375884771347
+      }
+    }
+  },
+  {
+    "index": 68,
+    "thermal_mean_u8": 75.93908203125,
+    "infineon": {
+      "presence_raw": 0.09505917131900787,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9211344122886658,
+        "motion_energy": 0.09505917131900787
+      }
+    }
+  },
+  {
+    "index": 69,
+    "thermal_mean_u8": 76.36449544270833,
+    "infineon": {
+      "presence_raw": 0.1107102632522583,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9332740306854248,
+        "motion_energy": 0.1107102632522583
+      }
+    }
+  },
+  {
+    "index": 70,
+    "thermal_mean_u8": 76.37573567708333,
+    "infineon": {
+      "presence_raw": 0.1744624525308609,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.937893271446228,
+        "motion_energy": 0.1744624525308609
+      }
+    }
+  },
+  {
+    "index": 71,
+    "thermal_mean_u8": 75.80693684895833,
+    "infineon": {
+      "presence_raw": 0.22794592380523682,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9353697299957275,
+        "motion_energy": 0.22794592380523682
+      }
+    }
+  },
+  {
+    "index": 72,
+    "thermal_mean_u8": 76.37902994791666,
+    "infineon": {
+      "presence_raw": 0.25619322061538696,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9321672320365906,
+        "motion_energy": 0.25619322061538696
+      }
+    }
+  },
+  {
+    "index": 73,
+    "thermal_mean_u8": 76.194248046875,
+    "infineon": {
+      "presence_raw": 0.2705593705177307,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.93741774559021,
+        "motion_energy": 0.2705593705177307
+      }
+    }
+  },
+  {
+    "index": 74,
+    "thermal_mean_u8": 76.49174479166666,
+    "infineon": {
+      "presence_raw": 0.23323702812194824,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9349188804626465,
+        "motion_energy": 0.23323702812194824
+      }
+    }
+  },
+  {
+    "index": 75,
+    "thermal_mean_u8": 76.27768880208333,
+    "infineon": {
+      "presence_raw": 0.23457956314086914,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.974187433719635,
+        "motion_energy": 0.23457956314086914
+      }
+    }
+  },
+  {
+    "index": 76,
+    "thermal_mean_u8": 75.46345703125,
+    "infineon": {
+      "presence_raw": 0.29783838987350464,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9388068914413452,
+        "motion_energy": 0.29783838987350464
+      }
+    }
+  },
+  {
+    "index": 77,
+    "thermal_mean_u8": 74.108583984375,
+    "infineon": {
+      "presence_raw": 0.22302250564098358,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9466264247894287,
+        "motion_energy": 0.22302250564098358
+      }
+    }
+  },
+  {
+    "index": 78,
+    "thermal_mean_u8": 75.71378255208333,
+    "infineon": {
+      "presence_raw": 0.15700800716876984,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9433549046516418,
+        "motion_energy": 0.15700800716876984
+      }
+    }
+  },
+  {
+    "index": 79,
+    "thermal_mean_u8": 75.74114908854166,
+    "infineon": {
+      "presence_raw": 0.14979560673236847,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9204705953598022,
+        "motion_energy": 0.14979560673236847
+      }
+    }
+  },
+  {
+    "index": 80,
+    "thermal_mean_u8": 79.10725911458333,
+    "infineon": {
+      "presence_raw": 0.1883450448513031,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9332478046417236,
+        "motion_energy": 0.1883450448513031
+      }
+    }
+  },
+  {
+    "index": 81,
+    "thermal_mean_u8": 78.33850911458333,
+    "infineon": {
+      "presence_raw": 0.2023831605911255,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9381647706031799,
+        "motion_energy": 0.2023831605911255
+      }
+    }
+  },
+  {
+    "index": 82,
+    "thermal_mean_u8": 79.32586263020833,
+    "infineon": {
+      "presence_raw": 0.18234585225582123,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.948655903339386,
+        "motion_energy": 0.18234585225582123
+      }
+    }
+  },
+  {
+    "index": 83,
+    "thermal_mean_u8": 80.69134765625,
+    "infineon": {
+      "presence_raw": 0.15519854426383972,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9281567931175232,
+        "motion_energy": 0.15519854426383972
+      }
+    }
+  },
+  {
+    "index": 84,
+    "thermal_mean_u8": 81.3259765625,
+    "infineon": {
+      "presence_raw": 0.1975436955690384,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9381054639816284,
+        "motion_energy": 0.1975436955690384
+      }
+    }
+  },
+  {
+    "index": 85,
+    "thermal_mean_u8": 81.44810546875,
+    "infineon": {
+      "presence_raw": 0.26023396849632263,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9361965656280518,
+        "motion_energy": 0.26023396849632263
+      }
+    }
+  },
+  {
+    "index": 86,
+    "thermal_mean_u8": 82.3673046875,
+    "infineon": {
+      "presence_raw": 0.2201307713985443,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.931951105594635,
+        "motion_energy": 0.2201307713985443
+      }
+    }
+  },
+  {
+    "index": 87,
+    "thermal_mean_u8": 83.42025065104167,
+    "infineon": {
+      "presence_raw": 0.2053070217370987,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9221093058586121,
+        "motion_energy": 0.2053070217370987
+      }
+    }
+  },
+  {
+    "index": 88,
+    "thermal_mean_u8": 85.443564453125,
+    "infineon": {
+      "presence_raw": 0.180327370762825,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9354725480079651,
+        "motion_energy": 0.180327370762825
+      }
+    }
+  },
+  {
+    "index": 89,
+    "thermal_mean_u8": 85.50387044270833,
+    "infineon": {
+      "presence_raw": 0.2312486618757248,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9401727318763733,
+        "motion_energy": 0.2312486618757248
+      }
+    }
+  },
+  {
+    "index": 90,
+    "thermal_mean_u8": 84.742080078125,
+    "infineon": {
+      "presence_raw": 0.19466185569763184,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9355388879776001,
+        "motion_energy": 0.19466185569763184
+      }
+    }
+  },
+  {
+    "index": 91,
+    "thermal_mean_u8": 84.67374348958333,
+    "infineon": {
+      "presence_raw": 0.1150815486907959,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9374090433120728,
+        "motion_energy": 0.1150815486907959
+      }
+    }
+  },
+  {
+    "index": 92,
+    "thermal_mean_u8": 84.31885416666667,
+    "infineon": {
+      "presence_raw": 0.09008077532052994,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9293203949928284,
+        "motion_energy": 0.09008077532052994
+      }
+    }
+  },
+  {
+    "index": 93,
+    "thermal_mean_u8": 85.975810546875,
+    "infineon": {
+      "presence_raw": 0.07656008750200272,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9267333745956421,
+        "motion_energy": 0.07656008750200272
+      }
+    }
+  },
+  {
+    "index": 94,
+    "thermal_mean_u8": 85.77033528645833,
+    "infineon": {
+      "presence_raw": 0.08663478493690491,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9265959858894348,
+        "motion_energy": 0.08663478493690491
+      }
+    }
+  },
+  {
+    "index": 95,
+    "thermal_mean_u8": 85.34560546875,
+    "infineon": {
+      "presence_raw": 0.10005764663219452,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9259578585624695,
+        "motion_energy": 0.10005764663219452
+      }
+    }
+  },
+  {
+    "index": 96,
+    "thermal_mean_u8": 84.89486653645834,
+    "infineon": {
+      "presence_raw": 0.10039269924163818,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9272575378417969,
+        "motion_energy": 0.10039269924163818
+      }
+    }
+  },
+  {
+    "index": 97,
+    "thermal_mean_u8": 84.82896158854167,
+    "infineon": {
+      "presence_raw": 0.07960593700408936,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9258663058280945,
+        "motion_energy": 0.07960593700408936
+      }
+    }
+  },
+  {
+    "index": 98,
+    "thermal_mean_u8": 83.83357096354166,
+    "infineon": {
+      "presence_raw": 0.06344820559024811,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9248103499412537,
+        "motion_energy": 0.06344820559024811
+      }
+    }
+  },
+  {
+    "index": 99,
+    "thermal_mean_u8": 84.22234375,
+    "infineon": {
+      "presence_raw": 0.06180116534233093,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9258642792701721,
+        "motion_energy": 0.06180116534233093
+      }
+    }
+  },
+  {
+    "index": 100,
+    "thermal_mean_u8": 83.45703776041667,
+    "infineon": {
+      "presence_raw": 0.0807124599814415,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9343993067741394,
+        "motion_energy": 0.0807124599814415
+      }
+    }
+  },
+  {
+    "index": 101,
+    "thermal_mean_u8": 84.57531575520834,
+    "infineon": {
+      "presence_raw": 0.07685259729623795,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9303849935531616,
+        "motion_energy": 0.07685259729623795
+      }
+    }
+  },
+  {
+    "index": 102,
+    "thermal_mean_u8": 84.34171875,
+    "infineon": {
+      "presence_raw": 0.07649218291044235,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.922894299030304,
+        "motion_energy": 0.07649218291044235
+      }
+    }
+  },
+  {
+    "index": 103,
+    "thermal_mean_u8": 84.80352864583334,
+    "infineon": {
+      "presence_raw": 0.07793847471475601,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9201065897941589,
+        "motion_energy": 0.07793847471475601
+      }
+    }
+  },
+  {
+    "index": 104,
+    "thermal_mean_u8": 84.46970052083333,
+    "infineon": {
+      "presence_raw": 0.0748424381017685,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9351630210876465,
+        "motion_energy": 0.0748424381017685
+      }
+    }
+  },
+  {
+    "index": 105,
+    "thermal_mean_u8": 83.82152018229166,
+    "infineon": {
+      "presence_raw": 0.04614942893385887,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9220406413078308,
+        "motion_energy": 0.04614942893385887
+      }
+    }
+  },
+  {
+    "index": 106,
+    "thermal_mean_u8": 83.91041341145834,
+    "infineon": {
+      "presence_raw": 0.061127759516239166,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269129037857056,
+        "motion_energy": 0.061127759516239166
+      }
+    }
+  },
+  {
+    "index": 107,
+    "thermal_mean_u8": 82.79490559895834,
+    "infineon": {
+      "presence_raw": 0.07342884689569473,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9296199679374695,
+        "motion_energy": 0.07342884689569473
+      }
+    }
+  },
+  {
+    "index": 108,
+    "thermal_mean_u8": 81.51426432291667,
+    "infineon": {
+      "presence_raw": 0.06906720995903015,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9241644144058228,
+        "motion_energy": 0.06906720995903015
+      }
+    }
+  },
+  {
+    "index": 109,
+    "thermal_mean_u8": 81.59021809895833,
+    "infineon": {
+      "presence_raw": 0.06420305371284485,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9258623123168945,
+        "motion_energy": 0.06420305371284485
+      }
+    }
+  },
+  {
+    "index": 110,
+    "thermal_mean_u8": 80.8453515625,
+    "infineon": {
+      "presence_raw": 0.03828318417072296,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9265511631965637,
+        "motion_energy": 0.03828318417072296
+      }
+    }
+  },
+  {
+    "index": 111,
+    "thermal_mean_u8": 79.48802734375,
+    "infineon": {
+      "presence_raw": 0.04297330975532532,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9251390099525452,
+        "motion_energy": 0.04297330975532532
+      }
+    }
+  },
+  {
+    "index": 112,
+    "thermal_mean_u8": 79.58205729166667,
+    "infineon": {
+      "presence_raw": 0.04973074793815613,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9287111163139343,
+        "motion_energy": 0.04973074793815613
+      }
+    }
+  },
+  {
+    "index": 113,
+    "thermal_mean_u8": 79.06042317708334,
+    "infineon": {
+      "presence_raw": 0.046413570642471313,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9286258220672607,
+        "motion_energy": 0.046413570642471313
+      }
+    }
+  },
+  {
+    "index": 114,
+    "thermal_mean_u8": 78.85026692708334,
+    "infineon": {
+      "presence_raw": 0.04481475427746773,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9230123162269592,
+        "motion_energy": 0.04481475427746773
+      }
+    }
+  },
+  {
+    "index": 115,
+    "thermal_mean_u8": 78.94493815104167,
+    "infineon": {
+      "presence_raw": 0.044834185391664505,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9288157224655151,
+        "motion_energy": 0.044834185391664505
+      }
+    }
+  },
+  {
+    "index": 116,
+    "thermal_mean_u8": 78.75402018229167,
+    "infineon": {
+      "presence_raw": 0.052210479974746704,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9279561638832092,
+        "motion_energy": 0.052210479974746704
+      }
+    }
+  },
+  {
+    "index": 117,
+    "thermal_mean_u8": 78.65265299479167,
+    "infineon": {
+      "presence_raw": 0.056395452469587326,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9209197759628296,
+        "motion_energy": 0.056395452469587326
+      }
+    }
+  },
+  {
+    "index": 118,
+    "thermal_mean_u8": 79.18123046875,
+    "infineon": {
+      "presence_raw": 0.04153815284371376,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9276598691940308,
+        "motion_energy": 0.04153815284371376
+      }
+    }
+  },
+  {
+    "index": 119,
+    "thermal_mean_u8": 79.85972981770833,
+    "infineon": {
+      "presence_raw": 0.04511401802301407,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.926782488822937,
+        "motion_energy": 0.04511401802301407
+      }
+    }
+  },
+  {
+    "index": 120,
+    "thermal_mean_u8": 81.11259114583333,
+    "infineon": {
+      "presence_raw": 0.0455031618475914,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9309617877006531,
+        "motion_energy": 0.0455031618475914
+      }
+    }
+  },
+  {
+    "index": 121,
+    "thermal_mean_u8": 80.14931315104167,
+    "infineon": {
+      "presence_raw": 0.034543175250291824,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9270531535148621,
+        "motion_energy": 0.034543175250291824
+      }
+    }
+  },
+  {
+    "index": 122,
+    "thermal_mean_u8": 81.26087890625,
+    "infineon": {
+      "presence_raw": 0.03948056697845459,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9279926419258118,
+        "motion_energy": 0.03948056697845459
+      }
+    }
+  },
+  {
+    "index": 123,
+    "thermal_mean_u8": 80.9200390625,
+    "infineon": {
+      "presence_raw": 0.03375152125954628,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9245433807373047,
+        "motion_energy": 0.03375152125954628
+      }
+    }
+  },
+  {
+    "index": 124,
+    "thermal_mean_u8": 80.44704427083333,
+    "infineon": {
+      "presence_raw": 0.03832709416747093,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.923213005065918,
+        "motion_energy": 0.03832709416747093
+      }
+    }
+  },
+  {
+    "index": 125,
+    "thermal_mean_u8": 80.533486328125,
+    "infineon": {
+      "presence_raw": 0.034172505140304565,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9305858612060547,
+        "motion_energy": 0.034172505140304565
+      }
+    }
+  },
+  {
+    "index": 126,
+    "thermal_mean_u8": 82.05276041666667,
+    "infineon": {
+      "presence_raw": 0.03866571933031082,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9276072382926941,
+        "motion_energy": 0.03866571933031082
+      }
+    }
+  },
+  {
+    "index": 127,
+    "thermal_mean_u8": 80.27096354166666,
+    "infineon": {
+      "presence_raw": 0.038685910403728485,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9223417043685913,
+        "motion_energy": 0.038685910403728485
+      }
+    }
+  },
+  {
+    "index": 128,
+    "thermal_mean_u8": 80.12340169270833,
+    "infineon": {
+      "presence_raw": 0.031274739652872086,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9235522150993347,
+        "motion_energy": 0.031274739652872086
+      }
+    }
+  },
+  {
+    "index": 129,
+    "thermal_mean_u8": 79.37396158854166,
+    "infineon": {
+      "presence_raw": 0.03181274235248566,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9197542667388916,
+        "motion_energy": 0.03181274235248566
+      }
+    }
+  },
+  {
+    "index": 130,
+    "thermal_mean_u8": 80.08130533854167,
+    "infineon": {
+      "presence_raw": 0.02434256486594677,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9234455227851868,
+        "motion_energy": 0.02434256486594677
+      }
+    }
+  },
+  {
+    "index": 131,
+    "thermal_mean_u8": 79.951396484375,
+    "infineon": {
+      "presence_raw": 0.03182312473654747,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9294127821922302,
+        "motion_energy": 0.03182312473654747
+      }
+    }
+  },
+  {
+    "index": 132,
+    "thermal_mean_u8": 79.48332682291667,
+    "infineon": {
+      "presence_raw": 0.03736197575926781,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9257988333702087,
+        "motion_energy": 0.03736197575926781
+      }
+    }
+  },
+  {
+    "index": 133,
+    "thermal_mean_u8": 79.12159505208334,
+    "infineon": {
+      "presence_raw": 0.03840772807598114,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9293566942214966,
+        "motion_energy": 0.03840772807598114
+      }
+    }
+  },
+  {
+    "index": 134,
+    "thermal_mean_u8": 79.466123046875,
+    "infineon": {
+      "presence_raw": 0.03294723108410835,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9259181618690491,
+        "motion_energy": 0.03294723108410835
+      }
+    }
+  },
+  {
+    "index": 135,
+    "thermal_mean_u8": 78.58365559895833,
+    "infineon": {
+      "presence_raw": 0.04579005762934685,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9245073795318604,
+        "motion_energy": 0.04579005762934685
+      }
+    }
+  },
+  {
+    "index": 136,
+    "thermal_mean_u8": 78.56249674479167,
+    "infineon": {
+      "presence_raw": 0.04180125147104263,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9256826639175415,
+        "motion_energy": 0.04180125147104263
+      }
+    }
+  },
+  {
+    "index": 137,
+    "thermal_mean_u8": 78.24465169270833,
+    "infineon": {
+      "presence_raw": 0.03420061618089676,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9266825318336487,
+        "motion_energy": 0.03420061618089676
+      }
+    }
+  },
+  {
+    "index": 138,
+    "thermal_mean_u8": 78.32350911458333,
+    "infineon": {
+      "presence_raw": 0.03140699490904808,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9237999320030212,
+        "motion_energy": 0.03140699490904808
+      }
+    }
+  },
+  {
+    "index": 139,
+    "thermal_mean_u8": 78.391484375,
+    "infineon": {
+      "presence_raw": 0.029891913756728172,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269902110099792,
+        "motion_energy": 0.029891913756728172
+      }
+    }
+  },
+  {
+    "index": 140,
+    "thermal_mean_u8": 78.60200520833334,
+    "infineon": {
+      "presence_raw": 0.04151138663291931,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9296614527702332,
+        "motion_energy": 0.04151138663291931
+      }
+    }
+  },
+  {
+    "index": 141,
+    "thermal_mean_u8": 78.54623372395834,
+    "infineon": {
+      "presence_raw": 0.03740295395255089,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9245049953460693,
+        "motion_energy": 0.03740295395255089
+      }
+    }
+  },
+  {
+    "index": 142,
+    "thermal_mean_u8": 78.432861328125,
+    "infineon": {
+      "presence_raw": 0.03932429477572441,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9284950494766235,
+        "motion_energy": 0.03932429477572441
+      }
+    }
+  },
+  {
+    "index": 143,
+    "thermal_mean_u8": 78.72595377604166,
+    "infineon": {
+      "presence_raw": 0.03399007022380829,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9234690070152283,
+        "motion_energy": 0.03399007022380829
+      }
+    }
+  },
+  {
+    "index": 144,
+    "thermal_mean_u8": 79.36142252604166,
+    "infineon": {
+      "presence_raw": 0.03426028788089752,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9206313490867615,
+        "motion_energy": 0.03426028788089752
+      }
+    }
+  },
+  {
+    "index": 145,
+    "thermal_mean_u8": 80.93232747395834,
+    "infineon": {
+      "presence_raw": 0.043910183012485504,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9323360919952393,
+        "motion_energy": 0.043910183012485504
+      }
+    }
+  },
+  {
+    "index": 146,
+    "thermal_mean_u8": 80.57603190104167,
+    "infineon": {
+      "presence_raw": 0.05227372795343399,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9325236678123474,
+        "motion_energy": 0.05227372795343399
+      }
+    }
+  },
+  {
+    "index": 147,
+    "thermal_mean_u8": 79.561552734375,
+    "infineon": {
+      "presence_raw": 0.056195903569459915,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9304308891296387,
+        "motion_energy": 0.056195903569459915
+      }
+    }
+  },
+  {
+    "index": 148,
+    "thermal_mean_u8": 83.15525065104167,
+    "infineon": {
+      "presence_raw": 0.06128381937742233,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9307445287704468,
+        "motion_energy": 0.06128381937742233
+      }
+    }
+  },
+  {
+    "index": 149,
+    "thermal_mean_u8": 82.84717122395833,
+    "infineon": {
+      "presence_raw": 0.05351618677377701,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9277986884117126,
+        "motion_energy": 0.05351618677377701
+      }
+    }
+  },
+  {
+    "index": 150,
+    "thermal_mean_u8": 81.12457356770834,
+    "infineon": {
+      "presence_raw": 0.0647425428032875,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9241445064544678,
+        "motion_energy": 0.0647425428032875
+      }
+    }
+  },
+  {
+    "index": 151,
+    "thermal_mean_u8": 80.97720703125,
+    "infineon": {
+      "presence_raw": 0.06561215221881866,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9249265193939209,
+        "motion_energy": 0.06561215221881866
+      }
+    }
+  },
+  {
+    "index": 152,
+    "thermal_mean_u8": 81.77811197916667,
+    "infineon": {
+      "presence_raw": 0.05700887367129326,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9168659448623657,
+        "motion_energy": 0.05700887367129326
+      }
+    }
+  },
+  {
+    "index": 153,
+    "thermal_mean_u8": 82.85712239583333,
+    "infineon": {
+      "presence_raw": 0.04576709493994713,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9252939820289612,
+        "motion_energy": 0.04576709493994713
+      }
+    }
+  },
+  {
+    "index": 154,
+    "thermal_mean_u8": 82.43259114583333,
+    "infineon": {
+      "presence_raw": 0.04841228947043419,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9220513105392456,
+        "motion_energy": 0.04841228947043419
+      }
+    }
+  },
+  {
+    "index": 155,
+    "thermal_mean_u8": 83.05876302083334,
+    "infineon": {
+      "presence_raw": 0.07213547825813293,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9287347197532654,
+        "motion_energy": 0.07213547825813293
+      }
+    }
+  },
+  {
+    "index": 156,
+    "thermal_mean_u8": 83.10025390625,
+    "infineon": {
+      "presence_raw": 0.09469541907310486,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9353570342063904,
+        "motion_energy": 0.09469541907310486
+      }
+    }
+  },
+  {
+    "index": 157,
+    "thermal_mean_u8": 82.17229166666667,
+    "infineon": {
+      "presence_raw": 0.09941044449806213,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9352538585662842,
+        "motion_energy": 0.09941044449806213
+      }
+    }
+  },
+  {
+    "index": 158,
+    "thermal_mean_u8": 82.6743359375,
+    "infineon": {
+      "presence_raw": 0.10906806588172913,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9294964075088501,
+        "motion_energy": 0.10906806588172913
+      }
+    }
+  },
+  {
+    "index": 159,
+    "thermal_mean_u8": 82.6676171875,
+    "infineon": {
+      "presence_raw": 0.12140742689371109,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9294326901435852,
+        "motion_energy": 0.12140742689371109
+      }
+    }
+  },
+  {
+    "index": 160,
+    "thermal_mean_u8": 81.92202473958334,
+    "infineon": {
+      "presence_raw": 0.12803669273853302,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9362224340438843,
+        "motion_energy": 0.12803669273853302
+      }
+    }
+  },
+  {
+    "index": 161,
+    "thermal_mean_u8": 81.47768229166667,
+    "infineon": {
+      "presence_raw": 0.1914166957139969,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9354613423347473,
+        "motion_energy": 0.1914166957139969
+      }
+    }
+  },
+  {
+    "index": 162,
+    "thermal_mean_u8": 81.28094075520833,
+    "infineon": {
+      "presence_raw": 0.17437395453453064,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9390327334403992,
+        "motion_energy": 0.17437395453453064
+      }
+    }
+  },
+  {
+    "index": 163,
+    "thermal_mean_u8": 82.95298828125,
+    "infineon": {
+      "presence_raw": 0.1715812236070633,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9348110556602478,
+        "motion_energy": 0.1715812236070633
+      }
+    }
+  },
+  {
+    "index": 164,
+    "thermal_mean_u8": 82.39947916666667,
+    "infineon": {
+      "presence_raw": 0.19735004007816315,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9507683515548706,
+        "motion_energy": 0.19735004007816315
+      }
+    }
+  },
+  {
+    "index": 165,
+    "thermal_mean_u8": 82.3753125,
+    "infineon": {
+      "presence_raw": 0.24438844621181488,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9465860724449158,
+        "motion_energy": 0.24438844621181488
+      }
+    }
+  },
+  {
+    "index": 166,
+    "thermal_mean_u8": 82.12730143229167,
+    "infineon": {
+      "presence_raw": 0.2981789708137512,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9473111629486084,
+        "motion_energy": 0.2981789708137512
+      }
+    }
+  },
+  {
+    "index": 167,
+    "thermal_mean_u8": 83.06836588541667,
+    "infineon": {
+      "presence_raw": 0.23681721091270447,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9394049644470215,
+        "motion_energy": 0.23681721091270447
+      }
+    }
+  },
+  {
+    "index": 168,
+    "thermal_mean_u8": 84.73521809895833,
+    "infineon": {
+      "presence_raw": 0.20577041804790497,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9333836436271667,
+        "motion_energy": 0.20577041804790497
+      }
+    }
+  },
+  {
+    "index": 169,
+    "thermal_mean_u8": 82.49626953125,
+    "infineon": {
+      "presence_raw": 0.3003421127796173,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9513595700263977,
+        "motion_energy": 0.3003421127796173
+      }
+    }
+  },
+  {
+    "index": 170,
+    "thermal_mean_u8": 81.3123828125,
+    "infineon": {
+      "presence_raw": 0.37306296825408936,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.960970401763916,
+        "motion_energy": 0.37306296825408936
+      }
+    }
+  },
+  {
+    "index": 171,
+    "thermal_mean_u8": 81.70650390625,
+    "infineon": {
+      "presence_raw": 0.31605038046836853,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9420432448387146,
+        "motion_energy": 0.31605038046836853
+      }
+    }
+  },
+  {
+    "index": 172,
+    "thermal_mean_u8": 79.60672200520834,
+    "infineon": {
+      "presence_raw": 0.27509400248527527,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.960267961025238,
+        "motion_energy": 0.27509400248527527
+      }
+    }
+  },
+  {
+    "index": 173,
+    "thermal_mean_u8": 79.531025390625,
+    "infineon": {
+      "presence_raw": 0.3303588628768921,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9765318632125854,
+        "motion_energy": 0.3303588628768921
+      }
+    }
+  },
+  {
+    "index": 174,
+    "thermal_mean_u8": 82.10944661458333,
+    "infineon": {
+      "presence_raw": 0.3725021779537201,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9382533431053162,
+        "motion_energy": 0.3725021779537201
+      }
+    }
+  },
+  {
+    "index": 175,
+    "thermal_mean_u8": 80.13971354166667,
+    "infineon": {
+      "presence_raw": 0.3720892667770386,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9606658220291138,
+        "motion_energy": 0.3720892667770386
+      }
+    }
+  },
+  {
+    "index": 176,
+    "thermal_mean_u8": 78.227333984375,
+    "infineon": {
+      "presence_raw": 0.2995264530181885,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9463160037994385,
+        "motion_energy": 0.2995264530181885
+      }
+    }
+  },
+  {
+    "index": 177,
+    "thermal_mean_u8": 77.5108203125,
+    "infineon": {
+      "presence_raw": 0.22451139986515045,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9412157535552979,
+        "motion_energy": 0.22451139986515045
+      }
+    }
+  },
+  {
+    "index": 178,
+    "thermal_mean_u8": 76.108056640625,
+    "infineon": {
+      "presence_raw": 0.19983412325382233,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9602564573287964,
+        "motion_energy": 0.19983412325382233
+      }
+    }
+  },
+  {
+    "index": 179,
+    "thermal_mean_u8": 75.74870442708334,
+    "infineon": {
+      "presence_raw": 0.30249348282814026,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9340190291404724,
+        "motion_energy": 0.30249348282814026
+      }
+    }
+  },
+  {
+    "index": 180,
+    "thermal_mean_u8": 76.50184244791667,
+    "infineon": {
+      "presence_raw": 0.22409896552562714,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9273383617401123,
+        "motion_energy": 0.22409896552562714
+      }
+    }
+  },
+  {
+    "index": 181,
+    "thermal_mean_u8": 76.434365234375,
+    "infineon": {
+      "presence_raw": 0.1974349468946457,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9382586479187012,
+        "motion_energy": 0.1974349468946457
+      }
+    }
+  },
+  {
+    "index": 182,
+    "thermal_mean_u8": 74.783779296875,
+    "infineon": {
+      "presence_raw": 0.15977026522159576,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9512951374053955,
+        "motion_energy": 0.15977026522159576
+      }
+    }
+  },
+  {
+    "index": 183,
+    "thermal_mean_u8": 73.90897135416667,
+    "infineon": {
+      "presence_raw": 0.2762781083583832,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9534860849380493,
+        "motion_energy": 0.2762781083583832
+      }
+    }
+  },
+  {
+    "index": 184,
+    "thermal_mean_u8": 74.495166015625,
+    "infineon": {
+      "presence_raw": 0.26607826352119446,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.941484272480011,
+        "motion_energy": 0.26607826352119446
+      }
+    }
+  },
+  {
+    "index": 185,
+    "thermal_mean_u8": 74.612080078125,
+    "infineon": {
+      "presence_raw": 0.16166867315769196,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8725085258483887,
+        "motion_energy": 0.16166867315769196
+      }
+    }
+  },
+  {
+    "index": 186,
+    "thermal_mean_u8": 74.540576171875,
+    "infineon": {
+      "presence_raw": 0.11556234955787659,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.947467029094696,
+        "motion_energy": 0.11556234955787659
+      }
+    }
+  },
+  {
+    "index": 187,
+    "thermal_mean_u8": 74.58696614583333,
+    "infineon": {
+      "presence_raw": 0.13726933300495148,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9931986927986145,
+        "motion_energy": 0.13726933300495148
+      }
+    }
+  },
+  {
+    "index": 188,
+    "thermal_mean_u8": 73.94565104166666,
+    "infineon": {
+      "presence_raw": 0.159394770860672,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8853992819786072,
+        "motion_energy": 0.159394770860672
+      }
+    }
+  },
+  {
+    "index": 189,
+    "thermal_mean_u8": 74.39512044270833,
+    "infineon": {
+      "presence_raw": 0.1156870499253273,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9185195565223694,
+        "motion_energy": 0.1156870499253273
+      }
+    }
+  },
+  {
+    "index": 190,
+    "thermal_mean_u8": 73.692255859375,
+    "infineon": {
+      "presence_raw": 0.08022084832191467,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9339389204978943,
+        "motion_energy": 0.08022084832191467
+      }
+    }
+  },
+  {
+    "index": 191,
+    "thermal_mean_u8": 73.62771809895834,
+    "infineon": {
+      "presence_raw": 0.17939803004264832,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.950684130191803,
+        "motion_energy": 0.17939803004264832
+      }
+    }
+  },
+  {
+    "index": 192,
+    "thermal_mean_u8": 73.252177734375,
+    "infineon": {
+      "presence_raw": 0.09860315173864365,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9504902362823486,
+        "motion_energy": 0.09860315173864365
+      }
+    }
+  },
+  {
+    "index": 193,
+    "thermal_mean_u8": 73.78203776041667,
+    "infineon": {
+      "presence_raw": 0.11453422904014587,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9350569844245911,
+        "motion_energy": 0.11453422904014587
+      }
+    }
+  },
+  {
+    "index": 194,
+    "thermal_mean_u8": 73.81353841145834,
+    "infineon": {
+      "presence_raw": 0.2151142656803131,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9558923244476318,
+        "motion_energy": 0.2151142656803131
+      }
+    }
+  },
+  {
+    "index": 195,
+    "thermal_mean_u8": 73.583623046875,
+    "infineon": {
+      "presence_raw": 0.3222966492176056,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.907740592956543,
+        "motion_energy": 0.3222966492176056
+      }
+    }
+  },
+  {
+    "index": 196,
+    "thermal_mean_u8": 73.881630859375,
+    "infineon": {
+      "presence_raw": 0.1402500569820404,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8833757042884827,
+        "motion_energy": 0.1402500569820404
+      }
+    }
+  },
+  {
+    "index": 197,
+    "thermal_mean_u8": 74.26765625,
+    "infineon": {
+      "presence_raw": 0.23435397446155548,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 1.0202745199203491,
+        "motion_energy": 0.23435397446155548
+      }
+    }
+  },
+  {
+    "index": 198,
+    "thermal_mean_u8": 74.23206380208333,
+    "infineon": {
+      "presence_raw": 0.1960434913635254,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8978114128112793,
+        "motion_energy": 0.1960434913635254
+      }
+    }
+  },
+  {
+    "index": 199,
+    "thermal_mean_u8": 74.66078450520833,
+    "infineon": {
+      "presence_raw": 0.149958536028862,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9402911067008972,
+        "motion_energy": 0.149958536028862
+      }
+    }
+  },
+  {
+    "index": 200,
+    "thermal_mean_u8": 74.54912109375,
+    "infineon": {
+      "presence_raw": 0.08650154620409012,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9253366589546204,
+        "motion_energy": 0.08650154620409012
+      }
+    }
+  },
+  {
+    "index": 201,
+    "thermal_mean_u8": 74.491298828125,
+    "infineon": {
+      "presence_raw": 0.09565325081348419,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8951675295829773,
+        "motion_energy": 0.09565325081348419
+      }
+    }
+  },
+  {
+    "index": 202,
+    "thermal_mean_u8": 74.44808268229167,
+    "infineon": {
+      "presence_raw": 0.11640504747629166,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9574571251869202,
+        "motion_energy": 0.11640504747629166
+      }
+    }
+  },
+  {
+    "index": 203,
+    "thermal_mean_u8": 74.49196614583333,
+    "infineon": {
+      "presence_raw": 0.15792778134346008,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.8982566595077515,
+        "motion_energy": 0.15792778134346008
+      }
+    }
+  },
+  {
+    "index": 204,
+    "thermal_mean_u8": 74.46484700520833,
+    "infineon": {
+      "presence_raw": 0.1337474137544632,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9696573615074158,
+        "motion_energy": 0.1337474137544632
+      }
+    }
+  },
+  {
+    "index": 205,
+    "thermal_mean_u8": 74.73112955729167,
+    "infineon": {
+      "presence_raw": 0.21542736887931824,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9377376437187195,
+        "motion_energy": 0.21542736887931824
+      }
+    }
+  },
+  {
+    "index": 206,
+    "thermal_mean_u8": 74.33472005208333,
+    "infineon": {
+      "presence_raw": 0.22871363162994385,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9303072690963745,
+        "motion_energy": 0.22871363162994385
+      }
+    }
+  },
+  {
+    "index": 207,
+    "thermal_mean_u8": 74.05864908854167,
+    "infineon": {
+      "presence_raw": 0.20125189423561096,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9670974612236023,
+        "motion_energy": 0.20125189423561096
+      }
+    }
+  },
+  {
+    "index": 208,
+    "thermal_mean_u8": 74.38550455729167,
+    "infineon": {
+      "presence_raw": 0.25638192892074585,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9149423837661743,
+        "motion_energy": 0.25638192892074585
+      }
+    }
+  },
+  {
+    "index": 209,
+    "thermal_mean_u8": 74.01442708333333,
+    "infineon": {
+      "presence_raw": 0.23991279304027557,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9511741399765015,
+        "motion_energy": 0.23991279304027557
+      }
+    }
+  },
+  {
+    "index": 210,
+    "thermal_mean_u8": 74.18643880208333,
+    "infineon": {
+      "presence_raw": 0.17841924726963043,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.94393390417099,
+        "motion_energy": 0.17841924726963043
+      }
+    }
+  },
+  {
+    "index": 211,
+    "thermal_mean_u8": 74.46140299479167,
+    "infineon": {
+      "presence_raw": 0.15411131083965302,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9184086322784424,
+        "motion_energy": 0.15411131083965302
+      }
+    }
+  },
+  {
+    "index": 212,
+    "thermal_mean_u8": 74.527880859375,
+    "infineon": {
+      "presence_raw": 0.08742856234312057,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9225198030471802,
+        "motion_energy": 0.08742856234312057
+      }
+    }
+  },
+  {
+    "index": 213,
+    "thermal_mean_u8": 74.29085611979167,
+    "infineon": {
+      "presence_raw": 0.1006598174571991,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9315465688705444,
+        "motion_energy": 0.1006598174571991
+      }
+    }
+  },
+  {
+    "index": 214,
+    "thermal_mean_u8": 74.30576497395833,
+    "infineon": {
+      "presence_raw": 0.056535352021455765,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9250336289405823,
+        "motion_energy": 0.056535352021455765
+      }
+    }
+  },
+  {
+    "index": 215,
+    "thermal_mean_u8": 74.382900390625,
+    "infineon": {
+      "presence_raw": 0.0405835285782814,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269489049911499,
+        "motion_energy": 0.0405835285782814
+      }
+    }
+  },
+  {
+    "index": 216,
+    "thermal_mean_u8": 74.17455403645833,
+    "infineon": {
+      "presence_raw": 0.031292982399463654,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9270220994949341,
+        "motion_energy": 0.031292982399463654
+      }
+    }
+  },
+  {
+    "index": 217,
+    "thermal_mean_u8": 74.45685221354167,
+    "infineon": {
+      "presence_raw": 0.029305363073945045,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.926230251789093,
+        "motion_energy": 0.029305363073945045
+      }
+    }
+  },
+  {
+    "index": 218,
+    "thermal_mean_u8": 74.6359765625,
+    "infineon": {
+      "presence_raw": 0.028059175238013268,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9279420971870422,
+        "motion_energy": 0.028059175238013268
+      }
+    }
+  },
+  {
+    "index": 219,
+    "thermal_mean_u8": 74.19879557291667,
+    "infineon": {
+      "presence_raw": 0.030894020572304726,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9248751401901245,
+        "motion_energy": 0.030894020572304726
+      }
+    }
+  },
+  {
+    "index": 220,
+    "thermal_mean_u8": 74.428896484375,
+    "infineon": {
+      "presence_raw": 0.02504921145737171,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9271373748779297,
+        "motion_energy": 0.02504921145737171
+      }
+    }
+  },
+  {
+    "index": 221,
+    "thermal_mean_u8": 74.43101888020833,
+    "infineon": {
+      "presence_raw": 0.026132555678486824,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9265453219413757,
+        "motion_energy": 0.026132555678486824
+      }
+    }
+  },
+  {
+    "index": 222,
+    "thermal_mean_u8": 74.538544921875,
+    "infineon": {
+      "presence_raw": 0.026219762861728668,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9256173968315125,
+        "motion_energy": 0.026219762861728668
+      }
+    }
+  },
+  {
+    "index": 223,
+    "thermal_mean_u8": 74.33701822916667,
+    "infineon": {
+      "presence_raw": 0.023923125118017197,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9282678961753845,
+        "motion_energy": 0.023923125118017197
+      }
+    }
+  },
+  {
+    "index": 224,
+    "thermal_mean_u8": 74.42849283854167,
+    "infineon": {
+      "presence_raw": 0.02206835150718689,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.925509512424469,
+        "motion_energy": 0.02206835150718689
+      }
+    }
+  },
+  {
+    "index": 225,
+    "thermal_mean_u8": 74.16124674479167,
+    "infineon": {
+      "presence_raw": 0.020807364955544472,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9270271062850952,
+        "motion_energy": 0.020807364955544472
+      }
+    }
+  },
+  {
+    "index": 226,
+    "thermal_mean_u8": 73.67567708333333,
+    "infineon": {
+      "presence_raw": 0.02205609902739525,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9263772368431091,
+        "motion_energy": 0.02205609902739525
+      }
+    }
+  },
+  {
+    "index": 227,
+    "thermal_mean_u8": 73.56032877604167,
+    "infineon": {
+      "presence_raw": 0.020772689953446388,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9252322912216187,
+        "motion_energy": 0.020772689953446388
+      }
+    }
+  },
+  {
+    "index": 228,
+    "thermal_mean_u8": 74.22852864583334,
+    "infineon": {
+      "presence_raw": 0.01732584647834301,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9251111745834351,
+        "motion_energy": 0.01732584647834301
+      }
+    }
+  },
+  {
+    "index": 229,
+    "thermal_mean_u8": 73.899638671875,
+    "infineon": {
+      "presence_raw": 0.017407137900590897,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9261755347251892,
+        "motion_energy": 0.017407137900590897
+      }
+    }
+  },
+  {
+    "index": 230,
+    "thermal_mean_u8": 73.31912434895834,
+    "infineon": {
+      "presence_raw": 0.01632249727845192,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9263522028923035,
+        "motion_energy": 0.01632249727845192
+      }
+    }
+  },
+  {
+    "index": 231,
+    "thermal_mean_u8": 72.98293294270833,
+    "infineon": {
+      "presence_raw": 0.013075468130409718,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269841909408569,
+        "motion_energy": 0.013075468130409718
+      }
+    }
+  },
+  {
+    "index": 232,
+    "thermal_mean_u8": 73.35734049479167,
+    "infineon": {
+      "presence_raw": 0.012077141553163528,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9262117147445679,
+        "motion_energy": 0.012077141553163528
+      }
+    }
+  },
+  {
+    "index": 233,
+    "thermal_mean_u8": 73.125634765625,
+    "infineon": {
+      "presence_raw": 0.010179685428738594,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9258238673210144,
+        "motion_energy": 0.010179685428738594
+      }
+    }
+  },
+  {
+    "index": 234,
+    "thermal_mean_u8": 73.10140950520834,
+    "infineon": {
+      "presence_raw": 0.018191823735833168,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.919622004032135,
+        "motion_energy": 0.018191823735833168
+      }
+    }
+  },
+  {
+    "index": 235,
+    "thermal_mean_u8": 72.81522135416667,
+    "infineon": {
+      "presence_raw": 0.016661258414387703,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9245797395706177,
+        "motion_energy": 0.016661258414387703
+      }
+    }
+  },
+  {
+    "index": 236,
+    "thermal_mean_u8": 73.97912434895834,
+    "infineon": {
+      "presence_raw": 0.014266305603086948,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9272289872169495,
+        "motion_energy": 0.014266305603086948
+      }
+    }
+  },
+  {
+    "index": 237,
+    "thermal_mean_u8": 73.65478190104167,
+    "infineon": {
+      "presence_raw": 0.015661360695958138,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9262564778327942,
+        "motion_energy": 0.015661360695958138
+      }
+    }
+  },
+  {
+    "index": 238,
+    "thermal_mean_u8": 73.77667643229167,
+    "infineon": {
+      "presence_raw": 0.017116548493504524,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9272293448448181,
+        "motion_energy": 0.017116548493504524
+      }
+    }
+  },
+  {
+    "index": 239,
+    "thermal_mean_u8": 73.98158203125,
+    "infineon": {
+      "presence_raw": 0.016945475712418556,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269999861717224,
+        "motion_energy": 0.016945475712418556
+      }
+    }
+  },
+  {
+    "index": 240,
+    "thermal_mean_u8": 74.26278645833334,
+    "infineon": {
+      "presence_raw": 0.016010360792279243,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.925809919834137,
+        "motion_energy": 0.016010360792279243
+      }
+    }
+  },
+  {
+    "index": 241,
+    "thermal_mean_u8": 73.81255533854167,
+    "infineon": {
+      "presence_raw": 0.01568818837404251,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9267288446426392,
+        "motion_energy": 0.01568818837404251
+      }
+    }
+  },
+  {
+    "index": 242,
+    "thermal_mean_u8": 73.76278971354166,
+    "infineon": {
+      "presence_raw": 0.014983088709414005,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9262737035751343,
+        "motion_energy": 0.014983088709414005
+      }
+    }
+  },
+  {
+    "index": 243,
+    "thermal_mean_u8": 73.83533203125,
+    "infineon": {
+      "presence_raw": 0.01367945596575737,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9272059798240662,
+        "motion_energy": 0.01367945596575737
+      }
+    }
+  },
+  {
+    "index": 244,
+    "thermal_mean_u8": 73.885693359375,
+    "infineon": {
+      "presence_raw": 0.013782269321382046,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9264384508132935,
+        "motion_energy": 0.013782269321382046
+      }
+    }
+  },
+  {
+    "index": 245,
+    "thermal_mean_u8": 73.59926106770833,
+    "infineon": {
+      "presence_raw": 0.014030657708644867,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9265445470809937,
+        "motion_energy": 0.014030657708644867
+      }
+    }
+  },
+  {
+    "index": 246,
+    "thermal_mean_u8": 73.38746744791666,
+    "infineon": {
+      "presence_raw": 0.012447021901607513,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9269627928733826,
+        "motion_energy": 0.012447021901607513
+      }
+    }
+  },
+  {
+    "index": 247,
+    "thermal_mean_u8": 73.358466796875,
+    "infineon": {
+      "presence_raw": 0.01730850338935852,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9263092279434204,
+        "motion_energy": 0.01730850338935852
+      }
+    }
+  },
+  {
+    "index": 248,
+    "thermal_mean_u8": 75.11206705729167,
+    "infineon": {
+      "presence_raw": 0.016079626977443695,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9266165494918823,
+        "motion_energy": 0.016079626977443695
+      }
+    }
+  },
+  {
+    "index": 249,
+    "thermal_mean_u8": 74.46591471354166,
+    "infineon": {
+      "presence_raw": 0.01290435902774334,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9268379211425781,
+        "motion_energy": 0.01290435902774334
+      }
+    }
+  },
+  {
+    "index": 250,
+    "thermal_mean_u8": 73.9388671875,
+    "infineon": {
+      "presence_raw": 0.01650185137987137,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9268273711204529,
+        "motion_energy": 0.01650185137987137
+      }
+    }
+  },
+  {
+    "index": 251,
+    "thermal_mean_u8": 73.79099283854167,
+    "infineon": {
+      "presence_raw": 0.016467230394482613,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9281694889068604,
+        "motion_energy": 0.016467230394482613
+      }
+    }
+  },
+  {
+    "index": 252,
+    "thermal_mean_u8": 74.453349609375,
+    "infineon": {
+      "presence_raw": 0.016111349686980247,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9244295358657837,
+        "motion_energy": 0.016111349686980247
+      }
+    }
+  },
+  {
+    "index": 253,
+    "thermal_mean_u8": 74.34625,
+    "infineon": {
+      "presence_raw": 0.014325135387480259,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9271793961524963,
+        "motion_energy": 0.014325135387480259
+      }
+    }
+  },
+  {
+    "index": 254,
+    "thermal_mean_u8": 74.52555338541667,
+    "infineon": {
+      "presence_raw": 0.011335617862641811,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9261070489883423,
+        "motion_energy": 0.011335617862641811
+      }
+    }
+  },
+  {
+    "index": 255,
+    "thermal_mean_u8": 74.43275390625,
+    "infineon": {
+      "presence_raw": 0.012864728458225727,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9273582696914673,
+        "motion_energy": 0.012864728458225727
+      }
+    }
+  },
+  {
+    "index": 256,
+    "thermal_mean_u8": 74.22950846354166,
+    "infineon": {
+      "presence_raw": 0.012364703230559826,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9273410439491272,
+        "motion_energy": 0.012364703230559826
+      }
+    }
+  },
+  {
+    "index": 257,
+    "thermal_mean_u8": 74.00756184895833,
+    "infineon": {
+      "presence_raw": 0.013352781534194946,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9271023273468018,
+        "motion_energy": 0.013352781534194946
+      }
+    }
+  },
+  {
+    "index": 258,
+    "thermal_mean_u8": 73.85990234375,
+    "infineon": {
+      "presence_raw": 0.013905937783420086,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.926234245300293,
+        "motion_energy": 0.013905937783420086
+      }
+    }
+  },
+  {
+    "index": 259,
+    "thermal_mean_u8": 74.035927734375,
+    "infineon": {
+      "presence_raw": 0.015098913572728634,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9249173998832703,
+        "motion_energy": 0.015098913572728634
+      }
+    }
+  },
+  {
+    "index": 260,
+    "thermal_mean_u8": 73.91601236979167,
+    "infineon": {
+      "presence_raw": 0.014308352023363113,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9263244867324829,
+        "motion_energy": 0.014308352023363113
+      }
+    }
+  },
+  {
+    "index": 261,
+    "thermal_mean_u8": 74.40686197916666,
+    "infineon": {
+      "presence_raw": 0.017455385997891426,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9267513751983643,
+        "motion_energy": 0.017455385997891426
+      }
+    }
+  },
+  {
+    "index": 262,
+    "thermal_mean_u8": 73.92781901041667,
+    "infineon": {
+      "presence_raw": 0.017759039998054504,
+      "motion_raw": 1.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": true,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9264046549797058,
+        "motion_energy": 0.017759039998054504
+      }
+    }
+  },
+  {
+    "index": 263,
+    "thermal_mean_u8": 74.13287760416667,
+    "infineon": {
+      "presence_raw": 0.023923125118017197,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9313958287239075,
+        "motion_energy": 0.023923125118017197
+      }
+    }
+  },
+  {
+    "index": 264,
+    "thermal_mean_u8": 74.13586263020834,
+    "infineon": {
+      "presence_raw": 0.022107787430286407,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9291300773620605,
+        "motion_energy": 0.022107787430286407
+      }
+    }
+  },
+  {
+    "index": 265,
+    "thermal_mean_u8": 73.70308268229167,
+    "infineon": {
+      "presence_raw": 0.019967593252658844,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9305034875869751,
+        "motion_energy": 0.019967593252658844
+      }
+    }
+  },
+  {
+    "index": 266,
+    "thermal_mean_u8": 73.648056640625,
+    "infineon": {
+      "presence_raw": 0.024034608155488968,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9222450852394104,
+        "motion_energy": 0.024034608155488968
+      }
+    }
+  },
+  {
+    "index": 267,
+    "thermal_mean_u8": 73.71832682291667,
+    "infineon": {
+      "presence_raw": 0.022762469947338104,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9268465638160706,
+        "motion_energy": 0.022762469947338104
+      }
+    }
+  },
+  {
+    "index": 268,
+    "thermal_mean_u8": 74.20311848958333,
+    "infineon": {
+      "presence_raw": 0.025381553918123245,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9280930757522583,
+        "motion_energy": 0.025381553918123245
+      }
+    }
+  },
+  {
+    "index": 269,
+    "thermal_mean_u8": 74.17416666666666,
+    "infineon": {
+      "presence_raw": 0.024365998804569244,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9256673455238342,
+        "motion_energy": 0.024365998804569244
+      }
+    }
+  },
+  {
+    "index": 270,
+    "thermal_mean_u8": 73.83085286458333,
+    "infineon": {
+      "presence_raw": 0.02233218401670456,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9260401725769043,
+        "motion_energy": 0.02233218401670456
+      }
+    }
+  },
+  {
+    "index": 271,
+    "thermal_mean_u8": 74.238359375,
+    "infineon": {
+      "presence_raw": 0.025929473340511322,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9261282682418823,
+        "motion_energy": 0.025929473340511322
+      }
+    }
+  },
+  {
+    "index": 272,
+    "thermal_mean_u8": 73.96466471354167,
+    "infineon": {
+      "presence_raw": 0.029981210827827454,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9254662990570068,
+        "motion_energy": 0.029981210827827454
+      }
+    }
+  },
+  {
+    "index": 273,
+    "thermal_mean_u8": 73.81676106770833,
+    "infineon": {
+      "presence_raw": 0.026039287447929382,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9255320429801941,
+        "motion_energy": 0.026039287447929382
+      }
+    }
+  },
+  {
+    "index": 274,
+    "thermal_mean_u8": 74.05514322916666,
+    "infineon": {
+      "presence_raw": 0.027159472927451134,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.924009382724762,
+        "motion_energy": 0.027159472927451134
+      }
+    }
+  },
+  {
+    "index": 275,
+    "thermal_mean_u8": 74.40802083333334,
+    "infineon": {
+      "presence_raw": 0.027675464749336243,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9251675009727478,
+        "motion_energy": 0.027675464749336243
+      }
+    }
+  },
+  {
+    "index": 276,
+    "thermal_mean_u8": 74.20390299479166,
+    "infineon": {
+      "presence_raw": 0.026073869317770004,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9275310039520264,
+        "motion_energy": 0.026073869317770004
+      }
+    }
+  },
+  {
+    "index": 277,
+    "thermal_mean_u8": 74.353994140625,
+    "infineon": {
+      "presence_raw": 0.037439074367284775,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.927584707736969,
+        "motion_energy": 0.037439074367284775
+      }
+    }
+  },
+  {
+    "index": 278,
+    "thermal_mean_u8": 74.19977864583333,
+    "infineon": {
+      "presence_raw": 0.05064937472343445,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9223498106002808,
+        "motion_energy": 0.05064937472343445
+      }
+    }
+  },
+  {
+    "index": 279,
+    "thermal_mean_u8": 74.09878255208334,
+    "infineon": {
+      "presence_raw": 0.04630861058831215,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9355735182762146,
+        "motion_energy": 0.04630861058831215
+      }
+    }
+  },
+  {
+    "index": 280,
+    "thermal_mean_u8": 74.21047200520833,
+    "infineon": {
+      "presence_raw": 0.05399337410926819,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9252949953079224,
+        "motion_energy": 0.05399337410926819
+      }
+    }
+  },
+  {
+    "index": 281,
+    "thermal_mean_u8": 74.44153971354167,
+    "infineon": {
+      "presence_raw": 0.06258548051118851,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.930876612663269,
+        "motion_energy": 0.06258548051118851
+      }
+    }
+  },
+  {
+    "index": 282,
+    "thermal_mean_u8": 74.43188151041667,
+    "infineon": {
+      "presence_raw": 0.04512932896614075,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9253852367401123,
+        "motion_energy": 0.04512932896614075
+      }
+    }
+  },
+  {
+    "index": 283,
+    "thermal_mean_u8": 74.32205078125,
+    "infineon": {
+      "presence_raw": 0.04880959540605545,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9217462539672852,
+        "motion_energy": 0.04880959540605545
+      }
+    }
+  },
+  {
+    "index": 284,
+    "thermal_mean_u8": 74.11110026041666,
+    "infineon": {
+      "presence_raw": 0.05314616113901138,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9292013049125671,
+        "motion_energy": 0.05314616113901138
+      }
+    }
+  },
+  {
+    "index": 285,
+    "thermal_mean_u8": 73.90348307291667,
+    "infineon": {
+      "presence_raw": 0.07198208570480347,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9191240668296814,
+        "motion_energy": 0.07198208570480347
+      }
+    }
+  },
+  {
+    "index": 286,
+    "thermal_mean_u8": 73.6349609375,
+    "infineon": {
+      "presence_raw": 0.06612697243690491,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9341562986373901,
+        "motion_energy": 0.06612697243690491
+      }
+    }
+  },
+  {
+    "index": 287,
+    "thermal_mean_u8": 73.53063802083334,
+    "infineon": {
+      "presence_raw": 0.05611032247543335,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9270702004432678,
+        "motion_energy": 0.05611032247543335
+      }
+    }
+  },
+  {
+    "index": 288,
+    "thermal_mean_u8": 73.53489908854166,
+    "infineon": {
+      "presence_raw": 0.06101168692111969,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9308411478996277,
+        "motion_energy": 0.06101168692111969
+      }
+    }
+  },
+  {
+    "index": 289,
+    "thermal_mean_u8": 74.34053385416667,
+    "infineon": {
+      "presence_raw": 0.07294785976409912,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.930997908115387,
+        "motion_energy": 0.07294785976409912
+      }
+    }
+  },
+  {
+    "index": 290,
+    "thermal_mean_u8": 75.2476953125,
+    "infineon": {
+      "presence_raw": 0.06591405719518661,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.912583589553833,
+        "motion_energy": 0.06591405719518661
+      }
+    }
+  },
+  {
+    "index": 291,
+    "thermal_mean_u8": 74.61311197916666,
+    "infineon": {
+      "presence_raw": 0.06688571721315384,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9407657384872437,
+        "motion_energy": 0.06688571721315384
+      }
+    }
+  },
+  {
+    "index": 292,
+    "thermal_mean_u8": 77.98342122395833,
+    "infineon": {
+      "presence_raw": 0.061326444149017334,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": true,
+        "num_samples": 256,
+        "signal_rms": 0.9365656971931458,
+        "motion_energy": 0.061326444149017334
+      }
+    }
+  },
+  {
+    "index": 293,
+    "thermal_mean_u8": 76.06753255208334,
+    "infineon": {
+      "presence_raw": 0.08480250090360641,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9201096892356873,
+        "motion_energy": 0.08480250090360641
+      }
+    }
+  },
+  {
+    "index": 294,
+    "thermal_mean_u8": 76.11330078125,
+    "infineon": {
+      "presence_raw": 0.07803206890821457,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9367395639419556,
+        "motion_energy": 0.07803206890821457
+      }
+    }
+  },
+  {
+    "index": 295,
+    "thermal_mean_u8": 74.60828776041667,
+    "infineon": {
+      "presence_raw": 0.06130832061171532,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9194527268409729,
+        "motion_energy": 0.06130832061171532
+      }
+    }
+  },
+  {
+    "index": 296,
+    "thermal_mean_u8": 74.230732421875,
+    "infineon": {
+      "presence_raw": 0.06669548898935318,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9234336018562317,
+        "motion_energy": 0.06669548898935318
+      }
+    }
+  },
+  {
+    "index": 297,
+    "thermal_mean_u8": 77.05018229166667,
+    "infineon": {
+      "presence_raw": 0.06765416264533997,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9164596796035767,
+        "motion_energy": 0.06765416264533997
+      }
+    }
+  },
+  {
+    "index": 298,
+    "thermal_mean_u8": 78.227939453125,
+    "infineon": {
+      "presence_raw": 0.07558045536279678,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9294123649597168,
+        "motion_energy": 0.07558045536279678
+      }
+    }
+  },
+  {
+    "index": 299,
+    "thermal_mean_u8": 79.3987109375,
+    "infineon": {
+      "presence_raw": 0.06617646664381027,
+      "motion_raw": 0.0,
+      "meta": {
+        "avg_power": 0.005663999821990728,
+        "active": true,
+        "motion": false,
+        "direction": false,
+        "num_samples": 256,
+        "signal_rms": 0.9274457693099976,
+        "motion_energy": 0.06617646664381027
+      }
+    }
+  }
+]
