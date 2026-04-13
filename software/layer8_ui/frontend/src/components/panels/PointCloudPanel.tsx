@@ -1,5 +1,6 @@
 import { Radar } from 'lucide-react';
 import { PanelCard } from '@/components/shared/PanelCard';
+import { StatusChip } from '@/components/shared/StatusChip';
 import { pointCloudPoints } from '@/data/mock/pointCloud';
 import { useDashboardStore } from '@/store/dashboardStore';
 
@@ -8,6 +9,10 @@ export function PointCloudPanel() {
 
   return (
     <PanelCard title="Point Cloud" icon={<Radar className="h-4 w-4" />}>
+      <div className="mb-3 flex flex-wrap gap-2">
+        <StatusChip label={pointCloud.source === 'live' ? 'Live Feed' : 'Fallback'} tone={pointCloud.source === 'live' ? 'cyan' : 'amber'} />
+        {pointCloud.stale ? <StatusChip label="Stale" tone="red" /> : null}
+      </div>
       <div className="relative overflow-hidden rounded-[1.2rem] border border-cyan-400/10 bg-[linear-gradient(180deg,#08111f,#05070e)]">
         <div className="aspect-[16/7]">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(29,211,242,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(29,211,242,0.06)_1px,transparent_1px)] bg-[size:40px_40px]" />

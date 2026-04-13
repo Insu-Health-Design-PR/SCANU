@@ -16,6 +16,7 @@ from software.layer6_state_machine.models import ControlResult, SensorStatus
 from .backend_state_store import BackendStateStore
 from .publisher import BackendPublisher
 from .status_models import to_utc_iso
+from .ui_prefs_store import UiPrefsStore
 from .visual_state_store import VisualStateStore
 from .websocket_stream import WebSocketStream
 
@@ -41,17 +42,27 @@ class UsbResetRequest(BaseModel):
     manual_confirm: bool = False
 
 
+class UiPreferencesPayload(BaseModel):
+    appliedLayout: str = Field(default="Triple View")
+    previewLayout: str = Field(default="Triple View")
+    focusView: str = Field(default="rgb")
+    layoutStyle: str = Field(default="grid")
+    customModules: dict[str, bool] = Field(default_factory=dict)
+
+
 def create_app(
     *,
     store: BackendStateStore | None = None,
     publisher: BackendPublisher | None = None,
     orchestrator: Layer6Orchestrator | None = None,
     visual_store: VisualStateStore | None = None,
+    ui_prefs_store: UiPrefsStore | None = None,
 ) -> FastAPI:
     state_store = store if store is not None else BackendStateStore()
     stream_publisher = publisher if publisher is not None else BackendPublisher()
     layer6 = orchestrator if orchestrator is not None else Layer6Orchestrator()
     visual = visual_store if visual_store is not None else VisualStateStore()
+    ui_prefs = ui_prefs_store if ui_prefs_store is not None else UiPrefsStore()
 
     app = FastAPI(title="SCAN-U Layer 8 API", version="0.2.0")
     app.add_middleware(
@@ -65,6 +76,7 @@ def create_app(
     app.state.layer8_publisher = stream_publisher
     app.state.layer6_orchestrator = layer6
     app.state.layer8_visual_store = visual
+    app.state.layer8_ui_prefs_store = ui_prefs
 
     def _publish_control_result(result: ControlResult) -> None:
         stream_publisher.publish(WebSocketStream.encode_control_result(result))
@@ -130,6 +142,14 @@ def create_app(
             "presence": latest.get("presence"),
             "meta": latest.get("meta", {}),
         }
+
+    @app.get("/api/ui/preferences")
+    def get_ui_preferences() -> dict:
+        return ui_prefs.load()
+
+    @app.post("/api/ui/preferences")
+    def set_ui_preferences(payload: UiPreferencesPayload) -> dict:
+        return ui_prefs.save(payload.model_dump())
 
     @app.get("/api/sensors/status")
     def get_sensors_status() -> dict:

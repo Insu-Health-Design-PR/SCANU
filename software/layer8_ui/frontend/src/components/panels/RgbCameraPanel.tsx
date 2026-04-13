@@ -1,5 +1,6 @@
 import { Camera, Maximize2 } from 'lucide-react';
 import { PanelCard } from '@/components/shared/PanelCard';
+import { StatusChip } from '@/components/shared/StatusChip';
 import { useDashboardStore } from '@/store/dashboardStore';
 
 export function RgbCameraPanel() {
@@ -8,6 +9,10 @@ export function RgbCameraPanel() {
 
   return (
     <PanelCard title="RGB Camera" icon={<Camera className="h-4 w-4" />} action={<Maximize2 className="h-4 w-4 text-slate-500" />}>
+      <div className="mb-3 flex flex-wrap gap-2">
+        <StatusChip label={rgb.source === 'live' ? 'Live Feed' : 'Fallback'} tone={rgb.source === 'live' ? 'cyan' : 'amber'} />
+        {rgb.stale ? <StatusChip label="Stale" tone="red" /> : null}
+      </div>
       <div className="overflow-hidden rounded-[1.2rem] border border-white/10 bg-slate-950">
         {imageSrc ? (
           <img src={imageSrc} alt="RGB stream" className="aspect-[16/9] w-full object-cover" />

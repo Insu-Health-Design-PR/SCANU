@@ -15,6 +15,7 @@ export function LayoutPopover({ selected, onSelect, onOpenPreview }: LayoutPopov
       <div className="space-y-0 px-2 py-2">
         {layoutPresets.map((layout) => (
           <button
+            data-testid={`layout-option-${layout.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
             key={layout}
             type="button"
             onClick={() => onSelect(layout)}
@@ -30,6 +31,7 @@ export function LayoutPopover({ selected, onSelect, onOpenPreview }: LayoutPopov
 
       <div className="border-t border-white/10 p-3">
         <button
+          data-testid="open-layout-preview"
           type="button"
           onClick={onOpenPreview}
           className="w-full rounded-xl border border-cyan-400/25 bg-cyan-400/12 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
