@@ -36,7 +36,7 @@ import torch
 from torchvision import transforms
 from ultralytics import YOLO
 
-from weapon_ai.modeling import build_model
+from .modeling import build_model
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_FIREARM_YOLO = _REPO_ROOT / "trained_models" / "gun_detection" / "firearm_yolov8n_best.pt"

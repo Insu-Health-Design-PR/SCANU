@@ -1,32 +1,27 @@
 # Layer 5: Sensor Fusion
 
 ## Objective
-Fuse the model's anomaly signal with lightweight external triggers to strengthen the final score.
+Combine **mmWave / capture JSON** signals with **Layer 4 thermal inference** (person-crop scores and discrete labels) into a single, auditable result for downstream state and alerts.
 
 ## Inputs
-- `AnomalyDecision` from Layer 4.
-- `TriggerSignals(pir_motion, thermal_presence)` from auxiliary sensors.
+- Raw **capture JSON** (`frames[].mmwave`, optional `thermal` / `presence`), including `risk_score_mmwave` when present.
+- **Layer 4** (`ThermalThreatDetector` + `InferenceEngine` + `AnomalyScorer`): per-frame labels `unarmed` | `suspicious` | `armed` (exported to fusion as `no_threat` | `suspicious` | `threat`).
 
 ## Outputs
-- `FusionResult(frame_number, timestamp_ms, fused_score, evidence)`.
+- **Fused report JSON** with `status` (`ALERT` / `NO_ALERT`), `segments`, and `fusion_verdict.overall` in **`threat` | `suspicious` | `no_threat`** aligned with alert segments and peak-frame Layer 4 labels.
 
 ## `.py` Files
-- `sensor_fusion.py`: trigger/result classes and weighted fusion.
-
-- `__init__.py`: public exports.
+- `capture_fusion.py`: scoring, temporal rules, optional video-aligned Layer 4 pass, `fusion_verdict`.
+- `anomaly_report_from_capture.py`: CLI entry (`python -m layer5_fusion.anomaly_report_from_capture` from `software/`).
+- `__init__.py`: exports `main` / `build_parser` for tooling.
 
 ## Recommended Flow
-1. Receive anomaly decision and triggers.
-
-2. Calculate normalized `trigger_score`.
-
-3. Combine with weights (`model_weight`, `trigger_weight`).
-
-4. Deliver `FusionResult` to Layer 6.
+1. Ingest capture JSON (+ optional thermal video path from `capture_info.video` or `--video`).
+2. Sample thermal frames, run Layer 4, forward-fill scores/labels to every capture index.
+3. Fuse mmWave risk with presence / thermal delta / model score; require thermal support (mean delta or Layer 4 suspicious+).
+4. Emit segments, summary, and `fusion_verdict` for Layer 6.
 
 ## Exit Criteria (DoD)
-- Reproducible and typed merge.
-
-- Structured evidence (`dict[str, float]`) for traceability.
-
-- Direct integration with `StateMachine`.
+- Typed Layer 4 boundary (`layer4_inference.threat_engine`).
+- Structured JSON with traceable thresholds and preview rows.
+- **Public verdict vocabulary**: `threat` / `suspicious` / `no_threat` on the fusion output (Layer 4 still uses `armed` internally).
