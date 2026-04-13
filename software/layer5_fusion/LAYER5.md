@@ -5,7 +5,7 @@ Combine **mmWave / capture JSON** signals with **Layer 4 thermal inference** (pe
 
 ## Inputs
 - Raw **capture JSON** (`frames[].mmwave`, optional `thermal` / `presence`), including `risk_score_mmwave` when present.
-- **Layer 4** (`ThermalThreatDetector` + `InferenceEngine` + `AnomalyScorer`): per-frame labels `unarmed` | `suspicious` | `armed` (exported to fusion as `no_threat` | `suspicious` | `threat`).
+- **Layer 4 / weapon_ai** (`ThermalThreatDetector` + `InferenceEngine` + `AnomalyScorer` from `layer4_inference.weapon_ai.threat_engine`, same stack as `infer_thermal_objects`): per-frame labels `unarmed` | `suspicious` | `armed` (exported to fusion as `no_threat` | `suspicious` | `threat`).
 
 ## Outputs
 - **Fused report JSON** with `status` (`ALERT` / `NO_ALERT`), `segments`, and `fusion_verdict.overall` in **`threat` | `suspicious` | `no_threat`** aligned with alert segments and peak-frame Layer 4 labels.
@@ -22,6 +22,6 @@ Combine **mmWave / capture JSON** signals with **Layer 4 thermal inference** (pe
 4. Emit segments, summary, and `fusion_verdict` for Layer 6.
 
 ## Exit Criteria (DoD)
-- Typed Layer 4 boundary (`layer4_inference.threat_engine`).
+- Typed inference boundary (`layer4_inference.weapon_ai.threat_engine`).
 - Structured JSON with traceable thresholds and preview rows.
 - **Public verdict vocabulary**: `threat` / `suspicious` / `no_threat` on the fusion output (Layer 4 still uses `armed` internally).

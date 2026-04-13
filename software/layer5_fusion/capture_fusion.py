@@ -15,7 +15,7 @@ _SOFTWARE_ROOT = Path(__file__).resolve().parents[1]
 if str(_SOFTWARE_ROOT) not in sys.path:
     sys.path.insert(0, str(_SOFTWARE_ROOT))
 
-from layer4_inference import AnomalyScorer, InferenceEngine, ThermalThreatDetector
+from layer4_inference.weapon_ai.threat_engine import AnomalyScorer, InferenceEngine, ThermalThreatDetector
 
 
 def _clamp01(v: float) -> float:

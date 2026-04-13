@@ -1,0 +1,12 @@
+{
+  "best_val_acc": 0.8611111111111112,
+  "checkpoint": "trained_models/gun_detection/gun_prob_best.pt",
+  "arch": "mobilenet_v3_small",
+  "video_mode": "gun_prob",
+  "objective": "gun_prob_bce",
+  "init_checkpoint": null,
+  "cpd_root": "data/datasets/gun/cpd_split",
+  "uclm_root": "data/datasets/uclm/UCLM/UCLM_Thermal_Imaging_Dataset",
+  "train_samples": 826,
+  "val_samples": 252
+}

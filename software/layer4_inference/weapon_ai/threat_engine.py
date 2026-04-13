@@ -1,4 +1,7 @@
-"""Single-frame thermal threat inference API for Layer 4 (used by Layer 5 fusion and Layer 8 UI)."""
+"""Single-frame thermal threat inference (same stack as ``infer_thermal_objects``).
+
+Used by Layer 5 fusion; Layer 8 demo uses ``weapon_ai.webcam_layer8_runner`` + subprocess.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +15,7 @@ import torch
 from torchvision import transforms
 from ultralytics import YOLO
 
-from layer4_inference.weapon_ai.infer_thermal_objects import (
+from .infer_thermal_objects import (
     _DEFAULT_FIREARM_YOLO,
     _clamp_box,
     _ensure_firearm_yolo_weights,
@@ -20,10 +23,10 @@ from layer4_inference.weapon_ai.infer_thermal_objects import (
     _gun_detection_valid,
     _parse_yolo_classes,
 )
-from layer4_inference.weapon_ai.modeling import build_model
+from .modeling import build_model
 
 
-_L4_ROOT = Path(__file__).resolve().parent
+_L4_ROOT = Path(__file__).resolve().parent.parent
 
 _MODEL_FILES: dict[str, Path] = {
     "gun_prob_default": _L4_ROOT / "trained_models" / "gun_detection" / "gun_prob_best.pt",

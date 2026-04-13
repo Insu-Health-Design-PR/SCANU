@@ -4,7 +4,8 @@ __pycache__/
 *$py.class
 
 # Radar example captures — keep JSON; omit large video binaries
-software/layer1_radar/examples/data/*.mp4
-
+software/layer1_radar/examples/data/
+software/layer4_inference/trained_models/outputs/thermal_previews/
+software/layer4_inference/data/
 # Local/vendor SDK copies (testing only; not part of product tree)
 software/vendor/
