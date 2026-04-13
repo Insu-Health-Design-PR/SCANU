@@ -1,4 +1,4 @@
-export type SystemState = 'IDLE' | 'TRIGGERED' | 'SCANNING' | 'ALERT' | 'FAULT';
+export type SystemState = 'UNKNOWN' | 'IDLE' | 'TRIGGERED' | 'SCANNING' | 'ALERT' | 'FAULT';
 export type DashboardMode = 'live' | 'simulated';
 
 export interface CameraStream {
@@ -7,6 +7,7 @@ export interface CameraStream {
   fps: number;
   status: 'streaming' | 'paused' | 'fault';
   latencyMs: number;
+  frameBase64?: string | null;
 }
 
 export interface PointCloudSnapshot {

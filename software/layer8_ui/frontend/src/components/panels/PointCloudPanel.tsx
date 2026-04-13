@@ -1,8 +1,11 @@
 import { Radar } from 'lucide-react';
 import { PanelCard } from '@/components/shared/PanelCard';
 import { pointCloudPoints } from '@/data/mock/pointCloud';
+import { useDashboardStore } from '@/store/dashboardStore';
 
 export function PointCloudPanel() {
+  const pointCloud = useDashboardStore((state) => state.snapshot.pointCloud);
+
   return (
     <PanelCard title="Point Cloud" icon={<Radar className="h-4 w-4" />}>
       <div className="relative overflow-hidden rounded-[1.2rem] border border-cyan-400/10 bg-[linear-gradient(180deg,#08111f,#05070e)]">
@@ -19,10 +22,10 @@ export function PointCloudPanel() {
         </div>
       </div>
       <div className="mt-3 grid gap-2 text-xs text-slate-400 md:grid-cols-4">
-        <span>Tracked points 159</span>
-        <span>Confidence 89%</span>
-        <span>Update 0.8s</span>
-        <span>Rate 14 Hz</span>
+        <span>Tracked points {pointCloud.trackedPoints}</span>
+        <span>Confidence {Math.round(pointCloud.confidence * 100)}%</span>
+        <span>Update {(pointCloud.lastUpdateMs / 1000).toFixed(1)}s</span>
+        <span>Rate {pointCloud.updateRateHz.toFixed(1)} Hz</span>
       </div>
     </PanelCard>
   );

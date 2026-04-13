@@ -1,12 +1,309 @@
 import type { DashboardSnapshot } from '@/types/domain';
 import { dashboardSnapshot } from '@/data/mock/dashboardSnapshot';
 
-/**
- * Future backend adapter.
- * Replace the mock return values with FastAPI HTTP or WebSocket integration.
- */
+type AlertLevel = 'info' | 'warning' | 'fault';
+
+interface BackendStatusResponse {
+  state: string;
+  fused_score: number;
+  confidence: number;
+  health: {
+    has_fault?: boolean;
+    sensor_online_count?: number;
+  };
+  active_radars?: string[];
+}
+
+interface BackendHealthResponse {
+  healthy: boolean;
+  has_fault: boolean;
+  sensor_online_count: number;
+}
+
+interface BackendAlert {
+  event_id?: string;
+  level?: string;
+  timestamp_utc?: string;
+  message?: string;
+}
+
+interface BackendVisualLatest {
+  timestamp_ms?: number | null;
+  source_mode?: string;
+  rgb_jpeg_b64?: string | null;
+  thermal_jpeg_b64?: string | null;
+  point_cloud?: unknown[];
+  presence?: boolean | { detected?: boolean; confidence?: number } | null;
+  meta?: Record<string, unknown>;
+}
+
+interface BackendWsEvent {
+  event_type: string;
+  payload: unknown;
+}
+
+interface ControlResult {
+  radar_id?: string;
+  action?: string;
+  success?: boolean;
+  reason?: string | null;
+  details?: string | null;
+}
+
+const API_BASE = import.meta.env.VITE_LAYER8_API_BASE ?? 'http://127.0.0.1:8080';
+const WS_EVENTS_URL =
+  import.meta.env.VITE_LAYER8_WS_URL ?? `${API_BASE.replace(/^http/i, 'ws')}/ws/events`;
+
+async function fetchJson<T>(url: string): Promise<T> {
+  const response = await fetch(url, { headers: { Accept: 'application/json' } });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${url}`);
+  }
+  return (await response.json()) as T;
+}
+
+async function postJson<T>(url: string, body: Record<string, unknown>): Promise<T> {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${url}`);
+  }
+  return (await response.json()) as T;
+}
+
+function toAlertLevel(level: string | undefined): AlertLevel {
+  if (level === 'fault') return 'fault';
+  if (level === 'warning') return 'warning';
+  return 'info';
+}
+
+function toDashboardSnapshot(
+  status: BackendStatusResponse,
+  health: BackendHealthResponse,
+  alerts: BackendAlert[],
+  visual: BackendVisualLatest,
+): DashboardSnapshot {
+  const sensorCount = Math.max(health.sensor_online_count || 0, status.active_radars?.length || 0, 1);
+  const onlineCount = health.sensor_online_count || 0;
+  const nowMs = Date.now();
+  const timestampMs = visual.timestamp_ms ?? nowMs;
+  const pointCloud = Array.isArray(visual.point_cloud) ? visual.point_cloud : [];
+  const detected =
+    typeof visual.presence === 'boolean'
+      ? visual.presence
+      : typeof visual.presence === 'object' && visual.presence !== null
+        ? Boolean(visual.presence.detected)
+        : false;
+  const presenceConfidence =
+    typeof visual.presence === 'object' && visual.presence !== null && typeof visual.presence.confidence === 'number'
+      ? visual.presence.confidence
+      : detected
+        ? 0.8
+        : 0.0;
+
+  return {
+    mode: visual.source_mode === 'simulate' ? 'simulated' : 'live',
+    state: (status.state ?? 'UNKNOWN') as DashboardSnapshot['state'],
+    health: {
+      connected: onlineCount > 0,
+      configured: onlineCount > 0,
+      streaming: onlineCount > 0,
+      healthy: health.healthy && !health.has_fault,
+      activeSensors: onlineCount,
+      sensorCount,
+      fusedScore: status.fused_score ?? 0,
+      confidence: status.confidence ?? 0,
+    },
+    rgb: {
+      label: 'RGB Camera',
+      resolution: '1080p',
+      fps: 30,
+      status: visual.rgb_jpeg_b64 ? 'streaming' : 'paused',
+      latencyMs: 0,
+      frameBase64: visual.rgb_jpeg_b64 ?? null,
+    },
+    thermal: {
+      label: 'Thermal Camera',
+      resolution: '640x480',
+      fps: 30,
+      status: visual.thermal_jpeg_b64 ? 'streaming' : 'paused',
+      latencyMs: 0,
+      frameBase64: visual.thermal_jpeg_b64 ?? null,
+    },
+    pointCloud: {
+      trackedPoints: pointCloud.length,
+      confidence: status.confidence ?? 0,
+      lastUpdateMs: Math.max(0, nowMs - timestampMs),
+      updateRateHz: 0,
+    },
+    presence: {
+      detected,
+      confidence: presenceConfidence,
+      lastTriggerIso: detected ? new Date(timestampMs).toISOString() : '',
+      timeline: dashboardSnapshot.presence.timeline,
+    },
+    alerts: alerts.map((alert, index) => ({
+      id: alert.event_id ?? `alert-${index}`,
+      level: toAlertLevel(alert.level),
+      timestamp: alert.timestamp_utc ? new Date(alert.timestamp_utc).toLocaleTimeString() : '--:--:--',
+      message: alert.message ?? 'No message',
+    })),
+  };
+}
+
+function parseWsEvent(input: string): BackendWsEvent | null {
+  try {
+    const parsed = JSON.parse(input) as BackendWsEvent;
+    if (!parsed || typeof parsed.event_type !== 'string') return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function updateFromWs(current: DashboardSnapshot, event: BackendWsEvent): DashboardSnapshot {
+  const next = { ...current };
+  if (event.event_type === 'status_update' && event.payload && typeof event.payload === 'object') {
+    const payload = event.payload as BackendStatusResponse;
+    next.state = (payload.state ?? current.state) as DashboardSnapshot['state'];
+    next.health = {
+      ...next.health,
+      fusedScore: payload.fused_score ?? next.health.fusedScore,
+      confidence: payload.confidence ?? next.health.confidence,
+      activeSensors: payload.health?.sensor_online_count ?? next.health.activeSensors,
+      connected: (payload.health?.sensor_online_count ?? 0) > 0,
+      configured: (payload.health?.sensor_online_count ?? 0) > 0,
+      streaming: (payload.health?.sensor_online_count ?? 0) > 0,
+      healthy: !Boolean(payload.health?.has_fault),
+    };
+    return next;
+  }
+
+  if (event.event_type === 'alert_event' && event.payload && typeof event.payload === 'object') {
+    const payload = event.payload as BackendAlert;
+    const record = {
+      id: payload.event_id ?? `alert-${Date.now()}`,
+      level: toAlertLevel(payload.level),
+      timestamp: payload.timestamp_utc ? new Date(payload.timestamp_utc).toLocaleTimeString() : '--:--:--',
+      message: payload.message ?? 'No message',
+    };
+    next.alerts = [record, ...next.alerts].slice(0, 100);
+    return next;
+  }
+
+  if (event.event_type === 'visual_update' && event.payload && typeof event.payload === 'object') {
+    const payload = event.payload as BackendVisualLatest;
+    const pointCloud = Array.isArray(payload.point_cloud) ? payload.point_cloud : [];
+    const detected =
+      typeof payload.presence === 'boolean'
+        ? payload.presence
+        : typeof payload.presence === 'object' && payload.presence !== null
+          ? Boolean(payload.presence.detected)
+          : current.presence.detected;
+    const confidence =
+      typeof payload.presence === 'object' && payload.presence !== null && typeof payload.presence.confidence === 'number'
+        ? payload.presence.confidence
+        : current.presence.confidence;
+    next.rgb = { ...next.rgb, frameBase64: payload.rgb_jpeg_b64 ?? next.rgb.frameBase64, status: payload.rgb_jpeg_b64 ? 'streaming' : next.rgb.status };
+    next.thermal = {
+      ...next.thermal,
+      frameBase64: payload.thermal_jpeg_b64 ?? next.thermal.frameBase64,
+      status: payload.thermal_jpeg_b64 ? 'streaming' : next.thermal.status,
+    };
+    next.pointCloud = { ...next.pointCloud, trackedPoints: pointCloud.length };
+    next.presence = {
+      ...next.presence,
+      detected,
+      confidence,
+      timeline: [...next.presence.timeline.slice(-29), Math.round(confidence * 100)],
+      lastTriggerIso: detected ? new Date().toISOString() : next.presence.lastTriggerIso,
+    };
+    return next;
+  }
+
+  if (event.event_type === 'sensor_fault') {
+    next.health = { ...next.health, healthy: false };
+    next.alerts = [
+      {
+        id: `fault-${Date.now()}`,
+        level: 'fault' as const,
+        timestamp: new Date().toLocaleTimeString(),
+        message: 'Sensor fault event detected.',
+      },
+      ...next.alerts,
+    ].slice(0, 100);
+    return next;
+  }
+
+  if (event.event_type === 'control_result' && event.payload && typeof event.payload === 'object') {
+    const payload = event.payload as ControlResult;
+    const level: AlertLevel = payload.success ? 'info' : 'warning';
+    next.alerts = [
+      {
+        id: `ctrl-${Date.now()}`,
+        level,
+        timestamp: new Date().toLocaleTimeString(),
+        message: `${payload.action ?? 'control'} ${payload.success ? 'ok' : 'failed'}${payload.reason ? ` (${payload.reason})` : ''}`,
+      },
+      ...next.alerts,
+    ].slice(0, 100);
+    return next;
+  }
+  return next;
+}
+
 export const dashboardApi = {
   async fetchSnapshot(): Promise<DashboardSnapshot> {
-    return Promise.resolve(dashboardSnapshot);
+    try {
+      const [status, health, alertsResponse, visual] = await Promise.all([
+        fetchJson<BackendStatusResponse>(`${API_BASE}/api/status`),
+        fetchJson<BackendHealthResponse>(`${API_BASE}/api/health`),
+        fetchJson<{ alerts: BackendAlert[] }>(`${API_BASE}/api/alerts/recent?limit=50`),
+        fetchJson<BackendVisualLatest>(`${API_BASE}/api/visual/latest`),
+      ]);
+      return toDashboardSnapshot(status, health, alertsResponse.alerts ?? [], visual);
+    } catch {
+      return dashboardSnapshot;
+    }
   },
+
+  createEventsSocket(): WebSocket {
+    return new WebSocket(WS_EVENTS_URL);
+  },
+
+  async start(radarId = 'radar_main'): Promise<ControlResult> {
+    return postJson<ControlResult>(`${API_BASE}/api/control/reconfig`, {
+      radar_id: radarId,
+      config_text: 'sensorStart',
+    });
+  },
+
+  async stop(radarId = 'radar_main'): Promise<ControlResult> {
+    return postJson<ControlResult>(`${API_BASE}/api/control/reconfig`, {
+      radar_id: radarId,
+      config_text: 'sensorStop',
+    });
+  },
+
+  async reconfigure(radarId = 'radar_main'): Promise<ControlResult> {
+    return postJson<ControlResult>(`${API_BASE}/api/control/reconfig`, {
+      radar_id: radarId,
+      config_text: 'sensorStop\nsensorStart',
+    });
+  },
+
+  async reset(radarId = 'radar_main'): Promise<ControlResult> {
+    return postJson<ControlResult>(`${API_BASE}/api/control/reset-soft`, {
+      radar_id: radarId,
+    });
+  },
+
+  parseWsEvent,
+  updateFromWs,
 };
