@@ -1,4 +1,5 @@
 import type { DashboardSnapshot } from '@/types/domain';
+import type { UiPreferences } from '@/types/layout';
 import { dashboardSnapshot } from '@/data/mock/dashboardSnapshot';
 
 type AlertLevel = 'info' | 'warning' | 'fault';
@@ -53,6 +54,7 @@ interface ControlResult {
 const API_BASE = import.meta.env.VITE_LAYER8_API_BASE ?? 'http://127.0.0.1:8080';
 const WS_EVENTS_URL =
   import.meta.env.VITE_LAYER8_WS_URL ?? `${API_BASE.replace(/^http/i, 'ws')}/ws/events`;
+const PREFS_ENDPOINT = `${API_BASE}/api/ui/preferences`;
 
 async function fetchJson<T>(url: string): Promise<T> {
   const response = await fetch(url, { headers: { Accept: 'application/json' } });
@@ -107,6 +109,9 @@ function toDashboardSnapshot(
         ? 0.8
         : 0.0;
 
+  const rgbHasFrame = Boolean(visual.rgb_jpeg_b64);
+  const thermalHasFrame = Boolean(visual.thermal_jpeg_b64);
+
   return {
     mode: visual.source_mode === 'simulate' ? 'simulated' : 'live',
     state: (status.state ?? 'UNKNOWN') as DashboardSnapshot['state'],
@@ -124,23 +129,32 @@ function toDashboardSnapshot(
       label: 'RGB Camera',
       resolution: '1080p',
       fps: 30,
-      status: visual.rgb_jpeg_b64 ? 'streaming' : 'paused',
-      latencyMs: 0,
+      status: rgbHasFrame ? 'streaming' : 'paused',
+      latencyMs: Math.max(0, nowMs - timestampMs),
       frameBase64: visual.rgb_jpeg_b64 ?? null,
+      source: 'live',
+      stale: !rgbHasFrame,
+      lastFrameAtMs: timestampMs,
     },
     thermal: {
       label: 'Thermal Camera',
       resolution: '640x480',
       fps: 30,
-      status: visual.thermal_jpeg_b64 ? 'streaming' : 'paused',
-      latencyMs: 0,
+      status: thermalHasFrame ? 'streaming' : 'paused',
+      latencyMs: Math.max(0, nowMs - timestampMs),
       frameBase64: visual.thermal_jpeg_b64 ?? null,
+      source: 'live',
+      stale: !thermalHasFrame,
+      lastFrameAtMs: timestampMs,
     },
     pointCloud: {
       trackedPoints: pointCloud.length,
       confidence: status.confidence ?? 0,
       lastUpdateMs: Math.max(0, nowMs - timestampMs),
       updateRateHz: 0,
+      source: 'live',
+      stale: pointCloud.length === 0,
+      lastFrameAtMs: timestampMs,
     },
     presence: {
       detected,
@@ -210,13 +224,35 @@ function updateFromWs(current: DashboardSnapshot, event: BackendWsEvent): Dashbo
       typeof payload.presence === 'object' && payload.presence !== null && typeof payload.presence.confidence === 'number'
         ? payload.presence.confidence
         : current.presence.confidence;
-    next.rgb = { ...next.rgb, frameBase64: payload.rgb_jpeg_b64 ?? next.rgb.frameBase64, status: payload.rgb_jpeg_b64 ? 'streaming' : next.rgb.status };
+    const nowMs = Date.now();
+    const eventTs = payload.timestamp_ms ?? nowMs;
+
+    next.rgb = {
+      ...next.rgb,
+      frameBase64: payload.rgb_jpeg_b64 ?? next.rgb.frameBase64,
+      status: payload.rgb_jpeg_b64 ? 'streaming' : next.rgb.status,
+      source: 'live',
+      stale: !payload.rgb_jpeg_b64,
+      lastFrameAtMs: eventTs,
+      latencyMs: Math.max(0, nowMs - eventTs),
+    };
     next.thermal = {
       ...next.thermal,
       frameBase64: payload.thermal_jpeg_b64 ?? next.thermal.frameBase64,
       status: payload.thermal_jpeg_b64 ? 'streaming' : next.thermal.status,
+      source: 'live',
+      stale: !payload.thermal_jpeg_b64,
+      lastFrameAtMs: eventTs,
+      latencyMs: Math.max(0, nowMs - eventTs),
     };
-    next.pointCloud = { ...next.pointCloud, trackedPoints: pointCloud.length };
+    next.pointCloud = {
+      ...next.pointCloud,
+      trackedPoints: pointCloud.length,
+      source: 'live',
+      stale: pointCloud.length === 0,
+      lastFrameAtMs: eventTs,
+      lastUpdateMs: Math.max(0, nowMs - eventTs),
+    };
     next.presence = {
       ...next.presence,
       detected,
@@ -258,6 +294,53 @@ function updateFromWs(current: DashboardSnapshot, event: BackendWsEvent): Dashbo
   return next;
 }
 
+function applyFreshness(snapshot: DashboardSnapshot, staleThresholdMs = 7000): DashboardSnapshot {
+  const now = Date.now();
+  const rgbStale = now - snapshot.rgb.lastFrameAtMs > staleThresholdMs;
+  const thermalStale = now - snapshot.thermal.lastFrameAtMs > staleThresholdMs;
+  const pcStale = now - snapshot.pointCloud.lastFrameAtMs > staleThresholdMs;
+
+  return {
+    ...snapshot,
+    rgb: {
+      ...snapshot.rgb,
+      stale: snapshot.rgb.source === 'live' ? rgbStale : snapshot.rgb.stale,
+      status: snapshot.rgb.source === 'live' && rgbStale ? 'fault' : snapshot.rgb.status,
+      latencyMs: Math.max(0, now - snapshot.rgb.lastFrameAtMs),
+    },
+    thermal: {
+      ...snapshot.thermal,
+      stale: snapshot.thermal.source === 'live' ? thermalStale : snapshot.thermal.stale,
+      status: snapshot.thermal.source === 'live' && thermalStale ? 'fault' : snapshot.thermal.status,
+      latencyMs: Math.max(0, now - snapshot.thermal.lastFrameAtMs),
+    },
+    pointCloud: {
+      ...snapshot.pointCloud,
+      stale: snapshot.pointCloud.source === 'live' ? pcStale : snapshot.pointCloud.stale,
+      lastUpdateMs: Math.max(0, now - snapshot.pointCloud.lastFrameAtMs),
+    },
+  };
+}
+
+function toFallbackSnapshot(reason: string): DashboardSnapshot {
+  const now = Date.now();
+  return {
+    ...dashboardSnapshot,
+    rgb: { ...dashboardSnapshot.rgb, source: 'fallback', stale: false, lastFrameAtMs: now },
+    thermal: { ...dashboardSnapshot.thermal, source: 'fallback', stale: false, lastFrameAtMs: now },
+    pointCloud: { ...dashboardSnapshot.pointCloud, source: 'fallback', stale: false, lastFrameAtMs: now },
+    alerts: [
+      {
+        id: `fallback-${now}`,
+        level: 'warning',
+        timestamp: new Date(now).toLocaleTimeString(),
+        message: `Using fallback data (${reason}).`,
+      },
+      ...dashboardSnapshot.alerts,
+    ],
+  };
+}
+
 export const dashboardApi = {
   async fetchSnapshot(): Promise<DashboardSnapshot> {
     try {
@@ -267,14 +350,30 @@ export const dashboardApi = {
         fetchJson<{ alerts: BackendAlert[] }>(`${API_BASE}/api/alerts/recent?limit=50`),
         fetchJson<BackendVisualLatest>(`${API_BASE}/api/visual/latest`),
       ]);
-      return toDashboardSnapshot(status, health, alertsResponse.alerts ?? [], visual);
+      return applyFreshness(toDashboardSnapshot(status, health, alertsResponse.alerts ?? [], visual));
     } catch {
-      return dashboardSnapshot;
+      return toFallbackSnapshot('backend unreachable');
     }
   },
 
   createEventsSocket(): WebSocket {
     return new WebSocket(WS_EVENTS_URL);
+  },
+
+  async fetchUiPrefs(): Promise<Partial<UiPreferences> | null> {
+    try {
+      return await fetchJson<Partial<UiPreferences>>(PREFS_ENDPOINT);
+    } catch {
+      return null;
+    }
+  },
+
+  async saveUiPrefs(prefs: UiPreferences): Promise<void> {
+    try {
+      await postJson(PREFS_ENDPOINT, prefs as unknown as Record<string, unknown>);
+    } catch {
+      // Best effort only.
+    }
   },
 
   async start(radarId = 'radar_main'): Promise<ControlResult> {
@@ -306,4 +405,5 @@ export const dashboardApi = {
 
   parseWsEvent,
   updateFromWs,
+  applyFreshness,
 };

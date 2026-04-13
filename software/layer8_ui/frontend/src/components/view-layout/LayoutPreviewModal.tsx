@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { CustomLayoutBuilder } from '@/components/view-layout/CustomLayoutBuilder';
-import type { CustomLayoutModules, LayoutPreset, LayoutStyle } from '@/types/layout';
+import type { CustomLayoutModules, FocusView, LayoutPreset, LayoutStyle } from '@/types/layout';
 
 interface LayoutPreviewModalProps {
   open: boolean;
@@ -12,8 +12,10 @@ interface LayoutPreviewModalProps {
   onApply: () => void;
   customModules: CustomLayoutModules;
   layoutStyle: LayoutStyle;
+  focusView: FocusView;
   onToggleModule: (key: keyof CustomLayoutModules) => void;
   onSelectStyle: (style: LayoutStyle) => void;
+  onSelectFocusView: (focusView: FocusView) => void;
 }
 
 function Frame({ title, subtitle, className = '' }: { title: string; subtitle?: string; className?: string }) {
@@ -32,16 +34,21 @@ function OptionalInfo({ text }: { text: string }) {
 function CustomPreview({
   modules,
   layoutStyle,
+  focusView,
 }: {
   modules: CustomLayoutModules;
   layoutStyle: LayoutStyle;
+  focusView: FocusView;
 }) {
-  const primaryModules = [
-    modules.rgb ? 'RGB Camera' : null,
-    modules.thermal ? 'Thermal Camera' : null,
-    modules.pointCloud ? 'Point Cloud / Spatial View' : null,
-    modules.presence ? 'Presence Sensor' : null,
-  ].filter(Boolean) as string[];
+  const orderedModules = [
+    modules.rgb ? { id: 'rgb', label: 'RGB Camera' } : null,
+    modules.thermal ? { id: 'thermal', label: 'Thermal Camera' } : null,
+    modules.pointCloud ? { id: 'pointCloud', label: 'Point Cloud / Spatial View' } : null,
+    modules.presence ? { id: 'presence', label: 'Presence Sensor' } : null,
+  ].filter(Boolean) as Array<{ id: FocusView; label: string }>;
+
+  const focused = orderedModules.find((module) => module.id === focusView) ?? orderedModules[0];
+  const others = orderedModules.filter((module) => module.id !== focused?.id);
 
   const utilityModules = [
     modules.systemStatus ? 'System Status' : null,
@@ -50,34 +57,34 @@ function CustomPreview({
 
   return (
     <div className="space-y-4">
-      {primaryModules.length === 0 ? (
+      {orderedModules.length === 0 ? (
         <Frame title="No primary modules selected" subtitle="Enable at least one camera, point cloud, or presence module." />
       ) : layoutStyle === 'fullscreen' ? (
         <>
-          <Frame title={primaryModules[0]} subtitle="fullscreen main panel" className="aspect-[16/6]" />
-          {primaryModules.length > 1 ? (
+          <Frame title={focused.label} subtitle="fullscreen main panel" className="aspect-[16/6]" />
+          {others.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
-              {primaryModules.slice(1).map((name) => (
-                <Frame key={name} title={name} className="aspect-video" />
+              {others.map((module) => (
+                <Frame key={module.id} title={module.label} className="aspect-video" />
               ))}
             </div>
           ) : null}
         </>
       ) : layoutStyle === 'focus' ? (
         <>
-          <Frame title={primaryModules[0]} subtitle="focused main panel" className="aspect-[16/6]" />
-          {primaryModules.length > 1 ? (
+          <Frame title={focused.label} subtitle="focused main panel" className="aspect-[16/6]" />
+          {others.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
-              {primaryModules.slice(1).map((name) => (
-                <Frame key={name} title={name} className="aspect-video" />
+              {others.map((module) => (
+                <Frame key={module.id} title={module.label} className="aspect-video" />
               ))}
             </div>
           ) : null}
         </>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {primaryModules.map((name) => (
-            <Frame key={name} title={name} className="aspect-video" />
+          {orderedModules.map((module) => (
+            <Frame key={module.id} title={module.label} className="aspect-video" />
           ))}
         </div>
       )}
@@ -99,10 +106,12 @@ function PresetPreview({
   layout,
   customModules,
   layoutStyle,
+  focusView,
 }: {
   layout: LayoutPreset;
   customModules: CustomLayoutModules;
   layoutStyle: LayoutStyle;
+  focusView: FocusView;
 }) {
   if (layout === '1 Camera') {
     return (
@@ -153,7 +162,7 @@ function PresetPreview({
   }
 
   if (layout === 'Custom Combination') {
-    return <CustomPreview modules={customModules} layoutStyle={layoutStyle} />;
+    return <CustomPreview modules={customModules} layoutStyle={layoutStyle} focusView={focusView} />;
   }
 
   return (
@@ -176,8 +185,10 @@ export function LayoutPreviewModal({
   onApply,
   customModules,
   layoutStyle,
+  focusView,
   onToggleModule,
   onSelectStyle,
+  onSelectFocusView,
 }: LayoutPreviewModalProps) {
   const [flashPreview, setFlashPreview] = useState(false);
 
@@ -222,6 +233,7 @@ export function LayoutPreviewModal({
               <h3 className="text-2xl font-medium text-white">Layout Preview: {layout}</h3>
               <div className="flex items-center gap-3">
                 <button
+                  data-testid="apply-layout"
                   onClick={onApply}
                   className="rounded-xl border border-cyan-400/25 bg-cyan-400/12 px-4 py-2 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/20"
                 >
@@ -234,6 +246,7 @@ export function LayoutPreviewModal({
                   Back
                 </button>
                 <button
+                  data-testid="close-layout-preview"
                   onClick={onClose}
                   className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 transition hover:bg-white/10"
                 >
@@ -255,7 +268,7 @@ export function LayoutPreviewModal({
                   flashPreview ? 'border-cyan-300/55 shadow-[0_0_0_1px_rgba(103,232,249,0.45),0_0_34px_rgba(34,211,238,0.18)]' : 'border-white/10'
                 }`}
               >
-                <PresetPreview layout={layout} customModules={customModules} layoutStyle={layoutStyle} />
+                <PresetPreview layout={layout} customModules={customModules} layoutStyle={layoutStyle} focusView={focusView} />
               </div>
 
               {layout === 'Custom Combination' ? (
@@ -263,8 +276,10 @@ export function LayoutPreviewModal({
                   <CustomLayoutBuilder
                     modules={customModules}
                     layoutStyle={layoutStyle}
+                    focusView={focusView}
                     onToggleModule={onToggleModule}
                     onSelectStyle={onSelectStyle}
+                    onSelectFocusView={onSelectFocusView}
                     onPreviewLayout={handlePreviewLayout}
                   />
                 </div>

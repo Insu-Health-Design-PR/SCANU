@@ -44,6 +44,8 @@ function LayoutSidebarPanel() {
     toggleCustomModule,
     layoutStyle,
     setLayoutStyle,
+    focusView,
+    setFocusView,
   } = useDashboardStore();
 
   return (
@@ -78,6 +80,7 @@ function LayoutSidebarPanel() {
         </div>
 
         <button
+          data-testid="open-layout-preview"
           type="button"
           onClick={() => setOpenPreview(true)}
           className="mt-4 w-full rounded-full border border-cyan-400/30 bg-cyan-400/15 px-4 py-2.5 text-sm font-medium text-cyan-100 transition hover:bg-cyan-400/22"
@@ -97,8 +100,10 @@ function LayoutSidebarPanel() {
         }}
         customModules={customModules}
         layoutStyle={layoutStyle}
+        focusView={focusView}
         onToggleModule={toggleCustomModule}
         onSelectStyle={setLayoutStyle}
+        onSelectFocusView={setFocusView}
       />
     </>
   );
@@ -112,8 +117,7 @@ function CustomCombinationView() {
   }));
 
   const enabledMain = MAIN_MODULE_ORDER.filter((id) => customModules[id]);
-  const focusCandidate = focusView === 'thermal' ? 'thermal' : 'rgb';
-  const focusModule = enabledMain.includes(focusCandidate) ? focusCandidate : enabledMain[0];
+  const focusModule = enabledMain.includes(focusView as MainModuleId) ? (focusView as MainModuleId) : enabledMain[0];
   const otherModules = enabledMain.filter((id) => id !== focusModule);
   const hasOps = customModules.systemStatus || customModules.execution;
 
@@ -202,7 +206,7 @@ function OneCameraView() {
   const focusView = useDashboardStore((state) => state.focusView);
   return (
     <div className="space-y-5">
-      {focusView === 'rgb' ? <RgbCameraPanel /> : <ThermalCameraPanel />}
+      {focusView === 'thermal' ? <ThermalCameraPanel /> : <RgbCameraPanel />}
       <PresenceAndOpsRow />
       <ConsoleLogPanel />
     </div>
