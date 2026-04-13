@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Compatibility shim: use ``python -m layer5_fusion.anomaly_report_from_capture`` from ``software/``."""
+"""CLI: fused anomaly report from a raw capture JSON (mmWave + Layer 4 thermal)."""
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
 
-_ROOT = Path(__file__).resolve().parents[2]
+_ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 

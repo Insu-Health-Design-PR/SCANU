@@ -121,5 +121,6 @@ for f in "/home/insu/Desktop/weapon_test_data/2_person"/*.mp4; do ffmpeg -i "$f"
 
 
 
-python3 /home/insu/Desktop/SCANU/software/layer1_radar/examples/anomaly_report_from_capture.py \
+python3 -m layer5_fusion.anomaly_report_from_capture \
   --capture-json "/home/insu/Desktop/weapon_test_data/2_person/two_people_one_threat_sens_report_person_concealed_object_capture.json"
+# (Run from ``software/``; legacy path ``layer1_radar/examples/anomaly_report_from_capture.py`` is a shim.)
