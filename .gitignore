@@ -10,8 +10,13 @@ __pycache__/
 .pytest_cache/
 .venv/
 
-# Layer 8 frontend caches
+# Layer 8 frontend caches and build artifacts
 software/layer8_ui/frontend/.vite/
+software/layer8_ui/frontend/node_modules/
+software/layer8_ui/frontend/dist/
+software/layer8_ui/frontend/*.tsbuildinfo
+software/layer8_ui/frontend/vite.config.js
+software/layer8_ui/frontend/vite.config.d.ts
 
 # Layer 8 legacy runtime outputs
 software/layer8_ui/legacy/logs/*
