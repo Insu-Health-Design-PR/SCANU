@@ -53,6 +53,15 @@ def main():
                         help='Enable verbose logging')
     parser.add_argument('--list-ports', action='store_true',
                         help='List available serial ports and exit')
+    parser.add_argument(
+        '--no-frame-timeout-s',
+        type=float,
+        default=0.0,
+        help=(
+            'Abort capture if no mmWave frame arrives for this many seconds '
+            '(after config). 0 disables (default).'
+        ),
+    )
     args = parser.parse_args()
     
     setup_logging(args.verbose)
@@ -135,17 +144,39 @@ def main():
         
         frames_data = []
         start_time = time.time()
-        
+        last_frame_time = time.time()
+        no_frame_to = float(args.no_frame_timeout_s)
+
         try:
-            for i, raw_frame in enumerate(uart_source.stream_frames(max_frames=args.frames)):
+            i = 0
+            while i < args.frames:
+                raw_frame = uart_source.read_frame(timeout_ms=300)
+                if not raw_frame:
+                    now = time.time()
+                    if no_frame_to > 0 and (now - last_frame_time) >= no_frame_to:
+                        print(
+                            f"\n\n      ABORT: no mmWave frame for {no_frame_to:.1f}s "
+                            "(check data UART / port swap / sensorStart)."
+                        )
+                        break
+                    dt = now - last_frame_time
+                    if dt >= 1.0:
+                        print(f"\r      Waiting for frames... ({dt:.1f}s)", end="", flush=True)
+                    continue
+
+                last_frame_time = time.time()
                 parsed = tlv_parser.parse(raw_frame)
                 elapsed = time.time() - start_time
                 fps = (i + 1) / elapsed if elapsed > 0 else 0
-                
-                print(f"\r      Frame {i+1:4d}/{args.frames}: "
-                      f"{len(parsed.points):2d} objects, "
-                      f"{len(raw_frame):5d} bytes, "
-                      f"{fps:.1f} FPS", end='')
+
+                print(
+                    f"\r      Frame {i + 1:4d}/{args.frames}: "
+                    f"{len(parsed.points):2d} objects, "
+                    f"{len(raw_frame):5d} bytes, "
+                    f"{fps:.1f} FPS",
+                    end="",
+                    flush=True,
+                )
 
                 if args.output:
                     frame_dict = {
@@ -158,7 +189,9 @@ def main():
                     if parsed.range_profile is not None:
                         frame_dict['range_profile'] = parsed.range_profile.tolist()
                     frames_data.append(frame_dict)
-        
+
+                i += 1
+
         except KeyboardInterrupt:
             print("\n\n      Capture interrupted by user")
         
@@ -169,7 +202,8 @@ def main():
         print(f"      Total frames: {source_stats['frames_read']}")
         print(f"      Total bytes: {source_stats['bytes_read']:,}")
         print(f"      Duration: {elapsed:.1f}s")
-        print(f"      Average FPS: {source_stats['frames_read']/elapsed:.1f}")
+        avg_fps = source_stats["frames_read"] / elapsed if elapsed > 0 else 0.0
+        print(f"      Average FPS: {avg_fps:.1f}")
         
         # 5. Save output
         if args.output and frames_data:
