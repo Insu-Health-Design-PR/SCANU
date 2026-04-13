@@ -1,5 +1,6 @@
 export type SystemState = 'UNKNOWN' | 'IDLE' | 'TRIGGERED' | 'SCANNING' | 'ALERT' | 'FAULT';
 export type DashboardMode = 'live' | 'simulated';
+export type FeedSource = 'live' | 'fallback';
 
 export interface CameraStream {
   label: string;
@@ -8,6 +9,9 @@ export interface CameraStream {
   status: 'streaming' | 'paused' | 'fault';
   latencyMs: number;
   frameBase64?: string | null;
+  source: FeedSource;
+  stale: boolean;
+  lastFrameAtMs: number;
 }
 
 export interface PointCloudSnapshot {
@@ -15,6 +19,9 @@ export interface PointCloudSnapshot {
   confidence: number;
   lastUpdateMs: number;
   updateRateHz: number;
+  source: FeedSource;
+  stale: boolean;
+  lastFrameAtMs: number;
 }
 
 export interface PresenceSnapshot {

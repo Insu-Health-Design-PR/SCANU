@@ -1,5 +1,7 @@
 import type { DashboardSnapshot } from '@/types/domain';
 
+const now = Date.now();
+
 export const dashboardSnapshot: DashboardSnapshot = {
   mode: 'live',
   state: 'SCANNING',
@@ -19,6 +21,9 @@ export const dashboardSnapshot: DashboardSnapshot = {
     fps: 30,
     status: 'streaming',
     latencyMs: 24,
+    source: 'fallback',
+    stale: false,
+    lastFrameAtMs: now,
   },
   thermal: {
     label: 'Thermal Camera',
@@ -26,12 +31,18 @@ export const dashboardSnapshot: DashboardSnapshot = {
     fps: 30,
     status: 'streaming',
     latencyMs: 18,
+    source: 'fallback',
+    stale: false,
+    lastFrameAtMs: now,
   },
   pointCloud: {
     trackedPoints: 159,
     confidence: 0.89,
     lastUpdateMs: 800,
     updateRateHz: 14,
+    source: 'fallback',
+    stale: false,
+    lastFrameAtMs: now,
   },
   presence: {
     detected: true,

@@ -17,6 +17,8 @@ export function ViewLayoutButton() {
     toggleCustomModule,
     layoutStyle,
     setLayoutStyle,
+    focusView,
+    setFocusView,
   } = useDashboardStore();
 
   useEffect(() => {
@@ -34,6 +36,7 @@ export function ViewLayoutButton() {
     <>
       <div ref={wrapperRef} className="relative">
         <button
+          data-testid="view-layout-button"
           type="button"
           aria-expanded={openPopover}
           onClick={() => setOpenPopover((value) => !value)}
@@ -80,8 +83,10 @@ export function ViewLayoutButton() {
         }}
         customModules={customModules}
         layoutStyle={layoutStyle}
+        focusView={focusView}
         onToggleModule={toggleCustomModule}
         onSelectStyle={setLayoutStyle}
+        onSelectFocusView={setFocusView}
       />
     </>
   );
