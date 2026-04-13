@@ -1,5 +1,27 @@
 # Layer 8 Commands (Jetson / Dev)
 
+
+## 0) Quick local stack (recommended)
+Run backend + frontend together:
+```bash
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+./scripts/run_local_stack.sh
+```
+
+Modes:
+```bash
+# default: simulate
+BACKEND_MODE=simulate ./scripts/run_local_stack.sh
+
+# API only backend (no simulated producer)
+BACKEND_MODE=api ./scripts/run_local_stack.sh
+```
+
+Default URLs:
+- Frontend: `http://127.0.0.1:4173`
+- Backend: `http://127.0.0.1:8080`
+- Health: `http://127.0.0.1:8080/api/health`
+
 This command guide runs the new Layer 8 backend and validates L6->L7->L8 flow.
 
 ## 1) Environment

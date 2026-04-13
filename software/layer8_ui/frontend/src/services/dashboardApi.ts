@@ -1,7 +1,6 @@
 import type { DashboardSnapshot, RenderPoint } from '@/types/domain';
 import type { UiPreferences } from '@/types/layout';
-import { dashboardSnapshot } from '@/data/mock/dashboardSnapshot';
-import { pointCloudPoints } from '@/data/mock/pointCloud';
+import { emptyDashboardSnapshot } from '@/data/initial/emptyDashboardSnapshot';
 
 type AlertLevel = 'info' | 'warning' | 'fault';
 
@@ -52,9 +51,53 @@ interface ControlResult {
   details?: string | null;
 }
 
-const API_BASE = import.meta.env.VITE_LAYER8_API_BASE ?? 'http://127.0.0.1:8080';
-const WS_EVENTS_URL =
-  import.meta.env.VITE_LAYER8_WS_URL ?? `${API_BASE.replace(/^http/i, 'ws')}/ws/events`;
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+}
+
+function toUrlOrNull(input: string | undefined): URL | null {
+  if (!input) return null;
+  try {
+    return new URL(input);
+  } catch {
+    return null;
+  }
+}
+
+function resolveApiBase(): string {
+  const envApiBase = import.meta.env.VITE_LAYER8_API_BASE as string | undefined;
+  if (typeof window === 'undefined') return envApiBase ?? 'http://127.0.0.1:8080';
+
+  const browserHost = window.location.hostname;
+  const browserIsLocal = isLoopbackHost(browserHost);
+  const localDefault = 'http://127.0.0.1:8080';
+  const sameHostDefault = `${window.location.protocol}//${browserHost}:8080`;
+  const envUrl = toUrlOrNull(envApiBase);
+
+  if (browserIsLocal && envUrl && !isLoopbackHost(envUrl.hostname)) {
+    return localDefault;
+  }
+
+  return envApiBase ?? (browserIsLocal ? localDefault : sameHostDefault);
+}
+
+function resolveWsEventsUrl(apiBase: string): string {
+  const envWs = import.meta.env.VITE_LAYER8_WS_URL as string | undefined;
+  if (typeof window === 'undefined') return envWs ?? `${apiBase.replace(/^http/i, 'ws')}/ws/events`;
+
+  const browserHost = window.location.hostname;
+  const browserIsLocal = isLoopbackHost(browserHost);
+  const envWsUrl = toUrlOrNull(envWs);
+
+  if (browserIsLocal && envWsUrl && !isLoopbackHost(envWsUrl.hostname)) {
+    return `${apiBase.replace(/^http/i, 'ws')}/ws/events`;
+  }
+
+  return envWs ?? `${apiBase.replace(/^http/i, 'ws')}/ws/events`;
+}
+
+const API_BASE = resolveApiBase();
+const WS_EVENTS_URL = resolveWsEventsUrl(API_BASE);
 const PREFS_ENDPOINT = `${API_BASE}/api/ui/preferences`;
 
 async function fetchJson<T>(url: string): Promise<T> {
@@ -87,7 +130,7 @@ function toAlertLevel(level: string | undefined): AlertLevel {
 }
 
 function toRenderPoints(raw: unknown[]): RenderPoint[] {
-  if (!Array.isArray(raw) || raw.length === 0) return pointCloudPoints;
+  if (!Array.isArray(raw) || raw.length === 0) return [];
 
   const parsed = raw
     .map((item, idx) => {
@@ -122,7 +165,7 @@ function toRenderPoints(raw: unknown[]): RenderPoint[] {
     })
     .filter(Boolean) as Array<{ idx: number; x: number; y: number; z: number }>;
 
-  if (parsed.length === 0) return pointCloudPoints;
+  if (parsed.length === 0) return [];
 
   const xs = parsed.map((p) => p.x);
   const ys = parsed.map((p) => p.y);
@@ -223,7 +266,7 @@ function toDashboardSnapshot(
       detected,
       confidence: presenceConfidence,
       lastTriggerIso: detected ? new Date(timestampMs).toISOString() : '',
-      timeline: dashboardSnapshot.presence.timeline,
+      timeline: Array.from({ length: 30 }, () => Math.round(presenceConfidence * 100)),
     },
     alerts: alerts.map((alert, index) => ({
       id: alert.event_id ?? `alert-${index}`,
@@ -368,39 +411,38 @@ function applyFreshness(snapshot: DashboardSnapshot, staleThresholdMs = 7000): D
     ...snapshot,
     rgb: {
       ...snapshot.rgb,
-      stale: snapshot.rgb.source === 'live' ? rgbStale : snapshot.rgb.stale,
-      status: snapshot.rgb.source === 'live' && rgbStale ? 'fault' : snapshot.rgb.status,
+      stale: rgbStale,
+      status: rgbStale ? 'fault' : snapshot.rgb.status,
       latencyMs: Math.max(0, now - snapshot.rgb.lastFrameAtMs),
     },
     thermal: {
       ...snapshot.thermal,
-      stale: snapshot.thermal.source === 'live' ? thermalStale : snapshot.thermal.stale,
-      status: snapshot.thermal.source === 'live' && thermalStale ? 'fault' : snapshot.thermal.status,
+      stale: thermalStale,
+      status: thermalStale ? 'fault' : snapshot.thermal.status,
       latencyMs: Math.max(0, now - snapshot.thermal.lastFrameAtMs),
     },
     pointCloud: {
       ...snapshot.pointCloud,
-      stale: snapshot.pointCloud.source === 'live' ? pcStale : snapshot.pointCloud.stale,
+      stale: pcStale,
       lastUpdateMs: Math.max(0, now - snapshot.pointCloud.lastFrameAtMs),
     },
   };
 }
 
-function toFallbackSnapshot(reason: string): DashboardSnapshot {
+function toUnavailableSnapshot(reason: string): DashboardSnapshot {
   const now = Date.now();
   return {
-    ...dashboardSnapshot,
-    rgb: { ...dashboardSnapshot.rgb, source: 'fallback', stale: false, lastFrameAtMs: now },
-    thermal: { ...dashboardSnapshot.thermal, source: 'fallback', stale: false, lastFrameAtMs: now },
-    pointCloud: { ...dashboardSnapshot.pointCloud, source: 'fallback', stale: false, lastFrameAtMs: now, renderPoints: pointCloudPoints },
+    ...emptyDashboardSnapshot,
+    rgb: { ...emptyDashboardSnapshot.rgb, lastFrameAtMs: now, latencyMs: 0 },
+    thermal: { ...emptyDashboardSnapshot.thermal, lastFrameAtMs: now, latencyMs: 0 },
+    pointCloud: { ...emptyDashboardSnapshot.pointCloud, lastFrameAtMs: now, lastUpdateMs: 0 },
     alerts: [
       {
-        id: `fallback-${now}`,
-        level: 'warning',
+        id: `backend-unreachable-${now}`,
+        level: 'fault',
         timestamp: new Date(now).toLocaleTimeString(),
-        message: `Using fallback data (${reason}).`,
+        message: `Backend unavailable: ${reason}`,
       },
-      ...dashboardSnapshot.alerts,
     ],
   };
 }
@@ -416,7 +458,7 @@ export const dashboardApi = {
       ]);
       return applyFreshness(toDashboardSnapshot(status, health, alertsResponse.alerts ?? [], visual));
     } catch {
-      return toFallbackSnapshot('backend unreachable');
+      return toUnavailableSnapshot('backend unreachable');
     }
   },
 

@@ -23,3 +23,6 @@ software/layer8_ui/legacy/logs/*
 !software/layer8_ui/legacy/logs/.gitkeep
 software/layer8_ui/legacy/artifacts/*
 !software/layer8_ui/legacy/artifacts/.gitkeep
+
+# Playwright artifacts
+software/layer8_ui/frontend/test-results/

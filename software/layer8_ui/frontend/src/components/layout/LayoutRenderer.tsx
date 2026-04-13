@@ -109,6 +109,18 @@ function LayoutSidebarPanel() {
   );
 }
 
+
+function WithLayoutSidebar({ children }: { children: JSX.Element }) {
+  return (
+    <div className="grid gap-5 xl:grid-cols-[1.65fr_0.72fr]">
+      <div>{children}</div>
+      <div className="space-y-5">
+        <LayoutSidebarPanel />
+      </div>
+    </div>
+  );
+}
+
 function CustomCombinationView() {
   const { customModules, layoutStyle, focusView } = useDashboardStore((state) => ({
     customModules: state.customModules,
@@ -205,45 +217,53 @@ function MainTripleView() {
 function OneCameraView() {
   const focusView = useDashboardStore((state) => state.focusView);
   return (
-    <div className="space-y-5">
-      {focusView === 'thermal' ? <ThermalCameraPanel /> : <RgbCameraPanel />}
-      <PresenceAndOpsRow />
-      <ConsoleLogPanel />
-    </div>
+    <WithLayoutSidebar>
+      <div className="space-y-5">
+        {focusView === 'thermal' ? <ThermalCameraPanel /> : <RgbCameraPanel />}
+        <PresenceAndOpsRow />
+        <ConsoleLogPanel />
+      </div>
+    </WithLayoutSidebar>
   );
 }
 
 function TwoCameraView() {
   return (
-    <div className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-2">
-        <RgbCameraPanel />
-        <ThermalCameraPanel />
+    <WithLayoutSidebar>
+      <div className="space-y-5">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <RgbCameraPanel />
+          <ThermalCameraPanel />
+        </div>
+        <PresenceAndOpsRow />
+        <ConsoleLogPanel />
       </div>
-      <PresenceAndOpsRow />
-      <ConsoleLogPanel />
-    </div>
+    </WithLayoutSidebar>
   );
 }
 
 function DualView({ mode }: { mode: 'rgb+pc' | 'thermal+pc' }) {
   return (
-    <div className="space-y-5">
-      {mode === 'rgb+pc' ? <RgbCameraPanel /> : <ThermalCameraPanel />}
-      <PointCloudPanel />
-      <PresenceAndOpsRow />
-      <ConsoleLogPanel />
-    </div>
+    <WithLayoutSidebar>
+      <div className="space-y-5">
+        {mode === 'rgb+pc' ? <RgbCameraPanel /> : <ThermalCameraPanel />}
+        <PointCloudPanel />
+        <PresenceAndOpsRow />
+        <ConsoleLogPanel />
+      </div>
+    </WithLayoutSidebar>
   );
 }
 
 function PointCloudOnlyView() {
   return (
-    <div className="space-y-5">
-      <PointCloudPanel />
-      <PresenceAndOpsRow />
-      <ConsoleLogPanel />
-    </div>
+    <WithLayoutSidebar>
+      <div className="space-y-5">
+        <PointCloudPanel />
+        <PresenceAndOpsRow />
+        <ConsoleLogPanel />
+      </div>
+    </WithLayoutSidebar>
   );
 }
 

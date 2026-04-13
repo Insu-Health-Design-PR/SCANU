@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, LayoutGrid } from 'lucide-react';
 import { LayoutPopover } from '@/components/view-layout/LayoutPopover';
@@ -8,7 +9,10 @@ import { useDashboardStore } from '@/store/dashboardStore';
 export function ViewLayoutButton() {
   const [openPopover, setOpenPopover] = useState(false);
   const [openPreview, setOpenPreview] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+
   const {
     previewLayout,
     setPreviewLayout,
@@ -23,19 +27,46 @@ export function ViewLayoutButton() {
 
   useEffect(() => {
     if (!openPopover) return;
-    const onPointerDown = (event: MouseEvent) => {
-      const node = wrapperRef.current;
-      if (!node || !(event.target instanceof Node)) return;
-      if (!node.contains(event.target)) setOpenPopover(false);
+
+    const updateRect = () => {
+      if (!buttonRef.current) return;
+      setAnchorRect(buttonRef.current.getBoundingClientRect());
     };
+
+    updateRect();
+    window.addEventListener('resize', updateRect);
+    window.addEventListener('scroll', updateRect, true);
+
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (buttonRef.current?.contains(target)) return;
+      if (popoverRef.current?.contains(target)) return;
+      setOpenPopover(false);
+    };
+
     window.addEventListener('mousedown', onPointerDown);
-    return () => window.removeEventListener('mousedown', onPointerDown);
+
+    return () => {
+      window.removeEventListener('resize', updateRect);
+      window.removeEventListener('scroll', updateRect, true);
+      window.removeEventListener('mousedown', onPointerDown);
+    };
   }, [openPopover]);
+
+  const popoverStyle = useMemo(() => {
+    const width = 330;
+    if (!anchorRect) return { top: 0, left: 0 };
+    const left = Math.max(12, Math.min(window.innerWidth - width - 12, anchorRect.right - width));
+    const top = anchorRect.bottom + 10;
+    return { top, left };
+  }, [anchorRect]);
 
   return (
     <>
-      <div ref={wrapperRef} className="relative">
+      <div className="relative">
         <button
+          ref={buttonRef}
           data-testid="view-layout-button"
           type="button"
           aria-expanded={openPopover}
@@ -46,28 +77,35 @@ export function ViewLayoutButton() {
           View Layout
           <ChevronDown className={`h-4 w-4 transition ${openPopover ? 'rotate-180 text-cyan-300' : 'text-slate-400'}`} />
         </button>
-
-        <AnimatePresence>
-          {openPopover ? (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.98 }}
-              transition={{ duration: 0.16, ease: 'easeOut' }}
-              className="absolute right-0 top-[calc(100%+12px)] z-40"
-            >
-              <LayoutPopover
-                selected={previewLayout}
-                onSelect={setPreviewLayout}
-                onOpenPreview={() => {
-                  setOpenPreview(true);
-                  setOpenPopover(false);
-                }}
-              />
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
       </div>
+
+      {typeof document !== 'undefined'
+        ? createPortal(
+            <AnimatePresence>
+              {openPopover ? (
+                <motion.div
+                  ref={popoverRef}
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                  transition={{ duration: 0.16, ease: 'easeOut' }}
+                  style={{ position: 'fixed', ...popoverStyle }}
+                  className="z-[100]"
+                >
+                  <LayoutPopover
+                    selected={previewLayout}
+                    onSelect={setPreviewLayout}
+                    onOpenPreview={() => {
+                      setOpenPreview(true);
+                      setOpenPopover(false);
+                    }}
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>,
+            document.body,
+          )
+        : null}
 
       <LayoutPreviewModal
         open={openPreview}
