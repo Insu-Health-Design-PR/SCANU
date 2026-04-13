@@ -1,5 +1,5 @@
 """
-Layer 8 sensor dashboard: run thermal, Infineon, and mmWave captures separately.
+Layer 8 sensor dashboard: run thermal, webcam (live weapon infer), and mmWave captures separately.
 
   uvicorn layer8_ui.app:app --reload --host 0.0.0.0 --port 8088
 
@@ -185,7 +185,7 @@ class SettingsBody(BaseModel):
     settings: dict[str, Any]
 
 
-SensorName = Literal["thermal", "infineon", "mmwave"]
+SensorName = Literal["thermal", "webcam", "mmwave"]
 
 
 class _ThermalSharedStream:
@@ -382,8 +382,23 @@ class _ThermalSharedStream:
                         gray = ((f32 - mn) / (mx - mn) * 255.0).astype("uint8")
                     else:
                         gray = cv2.convertScaleAbs(frame)
+                elif len(frame.shape) == 2:
+                    gray = frame
+                elif len(frame.shape) == 3:
+                    ch = int(frame.shape[2])
+                    if ch == 1:
+                        gray = frame[:, :, 0]
+                    elif ch == 2:
+                        # Some V4L modes deliver 2-channel packed data; BGR2GRAY is invalid.
+                        gray = np.mean(frame, axis=2).astype(np.uint8)
+                    elif ch == 3:
+                        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    elif ch == 4:
+                        gray = cv2.cvtColor(frame, cv2.COLOR_BGRA2GRAY)
+                    else:
+                        gray = np.mean(frame, axis=2).astype(np.uint8)
                 else:
-                    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
+                    gray = frame
 
                 heat = cv2.applyColorMap(gray, cv2.COLORMAP_INFERNO)
                 heat = cv2.resize(heat, (panel_w, panel_h), interpolation=cv2.INTER_LINEAR)
@@ -577,7 +592,7 @@ def reset_sensor_config(sensor: SensorName) -> dict[str, Any]:
 
 @app.get("/api/command/{sensor}")
 def preview_command(sensor: SensorName) -> dict[str, Any]:
-    if sensor not in ("thermal", "infineon", "mmwave"):
+    if sensor not in ("thermal", "webcam", "mmwave"):
         raise HTTPException(400, "invalid sensor")
     s = load(LAYER8_DIR)
     cmd = sensor_runner.build_command(sensor, s, LAYER8_DIR)
@@ -585,7 +600,7 @@ def preview_command(sensor: SensorName) -> dict[str, Any]:
 
 
 @app.get("/api/preview/video/{sensor}")
-def preview_video(sensor: Literal["thermal", "infineon", "mmwave"]) -> FileResponse:
+def preview_video(sensor: Literal["thermal", "webcam", "mmwave"]) -> FileResponse:
     s = load(LAYER8_DIR)
     key = "video"
     sub = (s.get(sensor) or {}).get(key) or ""
@@ -684,10 +699,26 @@ def preview_mmwave_output() -> FileResponse:
     return FileResponse(path, media_type="application/json", filename=path.name)
 
 
+@app.get("/api/dashboard/metrics")
+def dashboard_metrics() -> dict[str, Any]:
+    """
+    Fusion / threat summary for the left rail. Placeholder until L5 writes a state file
+    or log parsing is added; UI polls this for live updates.
+    """
+    return {
+        "unsafe_pct": None,
+        "gun_detected": None,
+        "persons_with_gun": None,
+        "prediction": None,
+        "mmwave_torso_score": None,
+        "note": "Wire Layer 5 fusion or weapon-infer sidecar JSON to populate these fields.",
+    }
+
+
 @app.get("/api/status")
 def all_status() -> dict[str, Any]:
     out = {}
-    for name in ("thermal", "infineon", "mmwave"):
+    for name in ("thermal", "webcam", "mmwave"):
         out[name] = sensor_runner.status(name, LAYER8_DIR)
     return out
 
@@ -698,7 +729,7 @@ async def stream_status() -> StreamingResponse:
         while True:
             payload = {
                 name: sensor_runner.status(name, LAYER8_DIR)
-                for name in ("thermal", "infineon", "mmwave")
+                for name in ("thermal", "webcam", "mmwave")
             }
             yield f"event: status\ndata: {json.dumps(payload)}\n\n"
             await asyncio.sleep(1.0)
@@ -739,7 +770,7 @@ def run_all_sensors() -> dict[str, Any]:
     s = load(LAYER8_DIR)
     results: dict[str, Any] = {}
     started: list[SensorName] = []
-    for sensor in ("thermal", "infineon", "mmwave"):
+    for sensor in ("thermal", "webcam", "mmwave"):
         res = sensor_runner.start(sensor, s, LAYER8_DIR)
         results[sensor] = res
         if res.get("ok"):
@@ -764,7 +795,7 @@ def stop_all_sensors() -> dict[str, Any]:
         "ok": True,
         "results": {
             sensor: sensor_runner.stop(sensor, LAYER8_DIR)
-            for sensor in ("thermal", "infineon", "mmwave")
+            for sensor in ("thermal", "webcam", "mmwave")
         },
     }
 
@@ -772,7 +803,7 @@ def stop_all_sensors() -> dict[str, Any]:
 @app.post("/api/restart_all")
 def restart_all_sensors() -> dict[str, Any]:
     sensor_runner.stop("thermal", LAYER8_DIR)
-    sensor_runner.stop("infineon", LAYER8_DIR)
+    sensor_runner.stop("webcam", LAYER8_DIR)
     sensor_runner.stop("mmwave", LAYER8_DIR)
     return run_all_sensors()
 

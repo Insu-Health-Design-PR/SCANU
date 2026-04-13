@@ -1,0 +1,3 @@
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation

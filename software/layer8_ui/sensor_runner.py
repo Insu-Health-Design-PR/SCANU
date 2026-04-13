@@ -1,9 +1,10 @@
-"""Start/stop capture subprocesses for thermal, Infineon, and mmWave."""
+"""Start/stop capture subprocesses for thermal, webcam (weapon infer), and mmWave."""
 
 from __future__ import annotations
 
 import json
 import os
+import shlex
 import signal
 import subprocess
 import sys
@@ -13,7 +14,7 @@ from typing import Any, Literal
 
 from layer8_ui.thermal_device import detect_working_thermal_device
 
-SensorId = Literal["thermal", "infineon", "mmwave"]
+SensorId = Literal["thermal", "webcam", "mmwave"]
 
 _lock = threading.Lock()
 _STATE_PATH: Path | None = None
@@ -66,7 +67,71 @@ def resolved_software_root(settings: dict[str, Any]) -> Path:
     return _software_root(settings)
 
 
-def _logs_dir(layer8_dir: Path) -> Path:
+def command_cwd(sensor: SensorId, settings: dict[str, Any]) -> Path:
+    """Working directory for the sensor subprocess."""
+    sw = _software_root(settings)
+    if sensor == "webcam":
+        return sw / "layer4_inference"
+    return sw
+
+
+def _abs_software_path(sw: Path, rel: str) -> str:
+    rel = rel.strip()
+    if not rel:
+        return ""
+    p = Path(rel).expanduser()
+    if p.is_absolute():
+        return str(p.resolve())
+    return str((sw / p).resolve())
+
+
+def _webcam_structured_weapon_args(w: dict, sw: Path) -> str:
+    """Build extra CLI for infer_thermal_objects from settings (merged with weapon_extra_args)."""
+    parts: list[str] = []
+
+    def _f(flag: str, key: str, caster) -> None:
+        raw = w.get(key)
+        if raw is None or str(raw).strip() == "":
+            return
+        try:
+            parts.extend([flag, str(caster(raw))])
+        except (TypeError, ValueError):
+            return
+
+    _f("--unsafe_threshold", "weapon_unsafe_threshold", float)
+    gt_raw = w.get("weapon_gun_threshold")
+    if gt_raw is not None and str(gt_raw).strip() != "":
+        try:
+            if float(gt_raw) > 0:
+                parts.extend(["--gun_threshold", str(float(gt_raw))])
+        except (TypeError, ValueError):
+            pass
+    ym = str(w.get("weapon_yolo_model") or "").strip()
+    if ym:
+        parts.extend(["--yolo_model", ym])
+    _f("--conf", "weapon_conf", float)
+    _f("--image_size", "weapon_image_size", int)
+    _f("--gun_conf", "weapon_gun_conf", float)
+    _f("--gun_imgsz", "weapon_gun_imgsz", int)
+    _f("--min_box_px", "weapon_min_box_px", int)
+    _f("--gun_min_box_px", "weapon_gun_min_box_px", int)
+    if int(w.get("weapon_gun_thermal", 0)):
+        parts.append("--gun_thermal")
+    if int(w.get("weapon_no_gun_yolo", 0)):
+        parts.append("--no_gun_yolo")
+    if int(w.get("weapon_show_yolo_name", 0)):
+        parts.append("--show_yolo_name")
+    gpath = str(w.get("weapon_gun_yolo_model") or "").strip()
+    if gpath:
+        gp = Path(gpath).expanduser()
+        abs_g = str(gp.resolve()) if gp.is_absolute() else str((sw / gpath).resolve())
+        parts.extend(["--gun_yolo_model", abs_g])
+
+    built = shlex.join(parts) if parts else ""
+    manual = (w.get("weapon_extra_args") or "").strip()
+    if manual:
+        return f"{built} {manual}".strip() if built else manual
+    return built
     d = layer8_dir / "logs"
     d.mkdir(parents=True, exist_ok=True)
     return d
@@ -124,35 +189,36 @@ def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) 
             cmd.extend(["--live-frame", live])
         return cmd
 
-    if sensor == "infineon":
-        i = settings.get("infineon") or {}
-        script = ex / "infineon_only_capture.py"
-        video = (i.get("video") or "infineon_only.mp4").strip()
-        live = (i.get("live_frame") or "").strip()
-        out = (i.get("output") or "").strip()
+    if sensor == "webcam":
+        w = settings.get("webcam") or {}
+        sw = _software_root(settings)
+        live = _abs_software_path(sw, str(w.get("live_frame") or ""))
+        if not live:
+            raise ValueError("webcam.live_frame must be set (JPEG path under software/).")
+        video = _abs_software_path(sw, str(w.get("video") or w.get("output") or ""))
+        ck = str(w.get("weapon_checkpoint") or "").strip() or (
+            "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
+        )
+        ck_abs = _abs_software_path(sw, ck)
         cmd = [
             py,
-            str(script),
-            "--frames",
-            str(int(i.get("frames", 300))),
-            "--fps",
-            str(float(i.get("fps", 10))),
-            "--video",
-            video,
-            "--panel-w",
-            str(int(i.get("panel_w", 640))),
-            "--panel-h",
-            str(int(i.get("panel_h", 480))),
+            "-m",
+            "weapon_ai.webcam_layer8_runner",
+            "--webcam-device",
+            str(int(w.get("webcam_device", 0))),
+            "--checkpoint",
+            ck_abs,
+            "--live-frame",
+            live,
         ]
-        uuid = (i.get("infineon_uuid") or "").strip()
-        if uuid:
-            cmd.extend(["--infineon-uuid", uuid])
-        if i.get("verbose"):
-            cmd.append("--verbose")
-        if out:
-            cmd.extend(["--output", out])
-        if live:
-            cmd.extend(["--live-frame", live])
+        if video:
+            cmd.extend(["--video", video])
+        frames = int(w.get("frames", 0))
+        if frames > 0:
+            cmd.extend(["--frames", str(frames)])
+        extra = _webcam_structured_weapon_args(w, sw).strip()
+        if extra:
+            cmd.extend(["--weapon-extra-args", extra])
         return cmd
 
     # mmwave
@@ -243,7 +309,11 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
         return {"ok": False, "error": f"{sensor} already running (pid {cur['pid']})"}
 
     sw = _software_root(settings)
-    cmd = build_command(sensor, settings, layer8_dir)
+    try:
+        cmd = build_command(sensor, settings, layer8_dir)
+    except ValueError as e:
+        return {"ok": False, "error": str(e)}
+    cwd = command_cwd(sensor, settings)
     log_path = _logs_dir(layer8_dir) / f"{sensor}.log"
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{sw.parent}:{sw}{os.pathsep}{env.get('PYTHONPATH', '')}"
@@ -252,7 +322,7 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
     try:
         proc = subprocess.Popen(
             cmd,
-            cwd=str(sw),
+            cwd=str(cwd),
             stdout=log_f,
             stderr=subprocess.STDOUT,
             env=env,

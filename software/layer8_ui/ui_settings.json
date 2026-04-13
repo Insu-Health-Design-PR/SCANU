@@ -25,15 +25,15 @@
     "thermal_classifier_every_n": 5,
     "thermal_classifier_device": -1
   },
-  "infineon": {
-    "frames": 300,
+  "webcam": {
+    "frames": 0,
     "fps": 10,
-    "video": "layer8_ui/artifacts/infineon_only.mp4",
-    "live_frame": "layer8_ui/artifacts/live_infineon.jpg",
+    "video": "layer8_ui/artifacts/webcam_weapon.mp4",
+    "live_frame": "layer8_ui/artifacts/live_webcam.jpg",
     "output": "",
-    "panel_w": 640,
-    "panel_h": 480,
-    "infineon_uuid": "",
+    "webcam_device": 0,
+    "weapon_checkpoint": "layer4_inference/trained_models/gun_detection/gun_prob_best.pt",
+    "weapon_extra_args": "",
     "verbose": false
   },
   "mmwave": {
