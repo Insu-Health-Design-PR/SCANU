@@ -1,72 +1,43 @@
-# Layer 7: Alerting and Event Logging
+# Layer 7: Alerts
 
 ## Objective
-Build, serialize, route, and persist alert events derived from state transitions for operator visibility and external notification channels.
+Build, present, serialize, and log alerts from system state events.
 
 ## Inputs
-- StateEvent from Layer 6
-- Optional StateSnapshot for context
+- `StateEvent` from Layer 6.
 
 ## Outputs
-- AlertPayload(level, message, metadata)
-- E-Ink render payload (human-readable text)
-- LoRa transport payload (compact bytes)
-- EventRecord persisted in in-memory or durable log store
+- `AlertPayload(level, message, metadata)`.
 
-## Alert Levels
-- INFO
-- WARNING
-- ALERT
-- FAULT
+- Text render for E-Ink.
 
-## Responsibilities
-- Convert state transitions into normalized alert payloads
-- Render concise operator messages for E-Ink or local display
-- Serialize compact payloads for LoRaWAN transmission
-- Persist event records with UTC timestamps
-- Deduplicate or rate-limit repeated alerts
+- Serialized payload for LoRa (`bytes`).
 
-## Recommended Python Files
-- alert_manager.py: state to alert mapping
-- eink_driver.py: concise text rendering for display
-- lora_sender.py: compact JSON or msgpack serialization
-- event_logger.py: append-only event history and query API
-- __init__.py: exports
+- `EventRecord` persisted in memory.
 
-## Payload Contract
-Minimum fields:
-- event_id
-- timestamp_utc
-- level
-- state
-- message
-- fused_score
-- confidence
-- source_summary
+## `.py` Files
+- `alert_manager.py`: builds normalized payload.
 
-## Delivery Rules
-- Always log every state transition event
-- Notify ALERT and FAULT immediately
-- Coalesce repeated INFO and WARNING within a short window
+- `eink_driver.py`: renders payload to string.
+
+- `lora_sender.py`: compact JSON serialization.
+
+- `event_logger.py`: in-memory logger with ISO UTC timestamp.
+
+- `__init__.py`: public exports.
 
 ## Recommended Flow
-1. Receive StateEvent.
-2. Build AlertPayload from transition and context.
-3. Render E-Ink text payload.
-4. Serialize LoRa payload and enqueue for transport.
-5. Persist EventRecord with canonical UTC timestamp.
-6. Publish latest alert to Layer 8 backend stream.
+1. `AlertManager` transforms `StateEvent` into `AlertPayload`.
 
-## Observability
-Track channel-level metrics:
-- alerts_total by level
-- dropped_or_coalesced_count
-- lora_send_attempts and failures
-- end-to-end alert latency
+2. `EInkDriver` generates a visual message.
 
-## Definition of Done (DoD)
-- Normalized alert contract implemented
-- E-Ink and LoRa serializers implemented and tested
-- Event logger supports retrieval for audit and UI
-- Deduplication and rate-limit policy verified
-- Integration validated with Layer 6 input and Layer 8 publishing
+3. `LoRaSender` serializes the event for transport.
+
+4. `EventLogger` logs the event history.
+
+## Exit Criteria (DoD)
+- Consistent payload across multiple channels.
+
+- Compact and stable serialization.
+
+- Logging available for auditing and smoke testing.

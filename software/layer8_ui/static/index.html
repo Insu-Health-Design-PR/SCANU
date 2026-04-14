@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SCANU — operations dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #12151c;
+      --surface2: #1a1e28;
+      --border: #2a3142;
+      --text: #eef1f7;
+      --muted: #8b95a8;
+      --accent: #5b9cf5;
+      --accent-dim: rgba(91, 156, 245, 0.15);
+      --ok: #34c759;
+      --warn: #ff9f0a;
+      --danger: #ff453a;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --font: "DM Sans", system-ui, sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding: 0.75rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .topbar-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+    .topbar-actions label { font-size: 0.65rem; color: var(--muted); display: block; margin-bottom: 0.15rem; }
+    .topbar-actions input[type="text"] {
+      width: min(280px, 42vw);
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.72rem;
+    }
+
+    button.btn, a.btn {
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.75rem;
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    button.btn:hover, a.btn:hover { border-color: #3d465c; }
+    button.btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #061018;
+      font-weight: 600;
+    }
+    button.btn.ghost { background: transparent; }
+
+    .dash {
+      display: grid;
+      grid-template-columns: minmax(300px, 1fr) minmax(0, 2fr);
+      gap: 1rem;
+      padding: 1rem 1.25rem 1.5rem;
+      max-width: 1680px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .dash { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-h {
+      padding: 0.65rem 1rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.2);
+    }
+    .panel-b { padding: 0.85rem 1rem; }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    @media (max-width: 400px) { .metrics-grid { grid-template-columns: 1fr; } }
+
+    .metric {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.55rem 0.65rem;
+    }
+    .metric .k {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.2rem;
+    }
+    .metric .v {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .pred-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+    .pred-pill.safe { background: rgba(52, 199, 89, 0.15); color: var(--ok); }
+    .pred-pill.unsafe { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
+    .pred-pill.suspicious { background: rgba(255, 159, 10, 0.15); color: var(--warn); }
+
+    .mmwave-slot {
+      margin-top: 0.75rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #000;
+      aspect-ratio: 4 / 3;
+      max-height: 200px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .mmwave-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .chrome-tabs {
+      display: flex;
+      gap: 0;
+      margin-top: 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+    .chrome-tabs button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 0.55rem 0.65rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .chrome-tabs button:hover { color: var(--text); }
+    .chrome-tabs button.active {
+      color: var(--text);
+      background: var(--surface);
+      border-bottom-color: var(--accent);
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    }
+
+    .tab-panel { display: none; padding: 0.75rem 0 0; }
+    .tab-panel.active { display: block; }
+
+    .config-section {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0.85rem 0 0.4rem;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--border);
+    }
+    .config-section:first-child { margin-top: 0; padding-top: 0; border-top: none; }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem 0.6rem;
+    }
+    @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+
+    .fields label {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+    .fields input, .fields textarea {
+      width: 100%;
+      padding: 0.32rem 0.45rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+    }
+    .fields textarea { min-height: 48px; resize: vertical; }
+
+    .row-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.65rem;
+    }
+
+    .status-line {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+    .status-line .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 0.35rem; vertical-align: middle; }
+    .status-line .dot.on { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+    .status-line .dot.off { background: #555; }
+
+    .log-mini {
+      margin-top: 0.5rem;
+      max-height: 72px;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .err {
+      color: var(--danger);
+      font-size: 0.72rem;
+      margin-top: 0.35rem;
+      min-height: 1em;
+    }
+
+    /* Right preview */
+    .preview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0,0,0,0.15);
+    }
+    .preview-head .label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .seg {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+    }
+    .seg button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .seg button.active {
+      background: var(--surface2);
+      color: var(--text);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    }
+
+    .preview-frame {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: min(62vh, 720px);
+      padding: 0.5rem;
+    }
+    .preview-frame img {
+      max-width: 100%;
+      max-height: min(62vh, 720px);
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+    }
+
+    .preview-foot {
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      align-items: center;
+    }
+    .preview-foot .hint {
+      flex: 1 1 100%;
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .metrics-footnote {
+      font-size: 0.62rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <h1>SCANU</h1>
+      <span>Layer 8 · operations</span>
+    </div>
+    <div class="topbar-actions">
+      <div>
+        <label for="software_root">software_root</label>
+        <input type="text" id="software_root" placeholder="default: repo software/" />
+      </div>
+      <button type="button" class="btn primary" id="run-all">Run all</button>
+      <button type="button" class="btn" id="stop-all">Stop all</button>
+      <button type="button" class="btn" id="restart-all">Restart</button>
+      <button type="button" class="btn ghost" id="save-global">Save root</button>
+      <button type="button" class="btn ghost" id="reset-all">Reset defaults</button>
+    </div>
+  </header>
+
+  <main class="dash">
+    <aside class="left-col">
+      <div class="panel">
+        <div class="panel-h">Threat summary</div>
+        <div class="panel-b">
+          <div class="metrics-grid">
+            <div class="metric">
+              <div class="k">Unsafe %</div>
+              <div class="v" id="metric-unsafe">—</div>
+            </div>
+            <div class="metric">
+              <div class="k">Gun detected</div>
+              <div class="v" id="metric-gun">—</div>
+            </div>
+            <div class="metric">
+              <div class="k">Persons w/ gun</div>
+              <div class="v" id="metric-persons-gun">—</div>
+            </div>
+            <div class="metric">
+              <div class="k">mmWave torso</div>
+              <div class="v" id="metric-mmwave-score">—</div>
+            </div>
+          </div>
+          <div class="metric" style="margin-top:0.5rem;">
+            <div class="k">Prediction</div>
+            <div class="v" style="margin-top:0.25rem;"><span class="pred-pill" id="metric-pred">—</span></div>
+          </div>
+          <p class="metrics-footnote" id="metrics-note"></p>
+
+          <div class="panel-h" style="margin: 0.85rem -1rem 0.5rem; border-top: 1px solid var(--border);">mmWave plot</div>
+          <div class="mmwave-slot">
+            <img id="vid-mmwave" alt="mmWave" src="/api/preview/live/mmwave" />
+          </div>
+
+          <div class="chrome-tabs" role="tablist">
+            <button type="button" class="active" data-tab="camera" id="tabbtn-camera">Camera &amp; model</button>
+            <button type="button" data-tab="radar" id="tabbtn-radar">mmWave</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-camera" role="tabpanel">
+            <div class="config-section">Thermal camera</div>
+            <div class="fields" id="fields-thermal"></div>
+            <div class="row-actions">
+              <button type="button" class="btn primary" id="run-thermal">Run</button>
+              <button type="button" class="btn" id="stop-thermal">Stop</button>
+              <button type="button" class="btn" id="restart-thermal">Restart</button>
+              <button type="button" class="btn ghost" id="save-thermal">Save</button>
+              <button type="button" class="btn ghost" id="reset-thermal">Defaults</button>
+              <button type="button" class="btn ghost" id="cmd-thermal">Cmd</button>
+            </div>
+            <div class="err" id="err-thermal"></div>
+            <div class="status-line" id="st-thermal"><span class="dot off"></span><span class="txt">Thermal idle</span></div>
+            <pre class="log-mini" id="log-thermal"></pre>
+
+            <div class="config-section">Webcam · weapon AI (<code>infer_thermal_objects</code>)</div>
+            <div class="fields" id="fields-webcam"></div>
+            <div class="row-actions">
+              <button type="button" class="btn primary" id="run-webcam">Run</button>
+              <button type="button" class="btn" id="stop-webcam">Stop</button>
+              <button type="button" class="btn" id="restart-webcam">Restart</button>
+              <button type="button" class="btn ghost" id="save-webcam">Save</button>
+              <button type="button" class="btn ghost" id="reset-webcam">Defaults</button>
+              <button type="button" class="btn ghost" id="cmd-webcam">Cmd</button>
+            </div>
+            <div class="err" id="err-webcam"></div>
+            <div class="status-line" id="st-webcam"><span class="dot off"></span><span class="txt">Webcam idle</span></div>
+            <pre class="log-mini" id="log-webcam"></pre>
+            <pre class="log-mini" id="cmd-out-thermal" style="display:none;max-height:100px;"></pre>
+            <pre class="log-mini" id="cmd-out-webcam" style="display:none;max-height:100px;"></pre>
+          </div>
+
+          <div class="tab-panel" id="tab-radar" role="tabpanel">
+            <div class="fields" id="fields-mmwave"></div>
+            <div class="row-actions">
+              <button type="button" class="btn primary" id="run-mmwave">Run</button>
+              <button type="button" class="btn" id="stop-mmwave">Stop</button>
+              <button type="button" class="btn" id="restart-mmwave">Restart</button>
+              <button type="button" class="btn ghost" id="save-mmwave">Save</button>
+              <button type="button" class="btn ghost" id="reset-mmwave">Defaults</button>
+              <button type="button" class="btn ghost" id="cmd-mmwave">Cmd</button>
+              <a class="btn" href="/api/preview/output/mmwave" target="_blank" rel="noopener">JSON</a>
+            </div>
+            <div class="err" id="err-mmwave"></div>
+            <div class="status-line" id="st-mmwave"><span class="dot off"></span><span class="txt">mmWave idle</span></div>
+            <pre class="log-mini" id="log-mmwave"></pre>
+            <pre class="log-mini" id="cmd-out-mmwave" style="display:none;max-height:100px;"></pre>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="right-col panel">
+      <div class="preview-head">
+        <span class="label">Live view</span>
+        <div class="seg" role="group" aria-label="Video source">
+          <button type="button" class="active" id="src-thermal" data-src="thermal">Thermal</button>
+          <button type="button" id="src-webcam" data-src="webcam">Webcam</button>
+        </div>
+      </div>
+      <div class="preview-frame">
+        <img id="vid-main" alt="Main preview" />
+      </div>
+      <div class="preview-foot">
+        <a class="btn" id="link-mp4-thermal" href="/api/preview/video/thermal" target="_blank" rel="noopener">Thermal MP4</a>
+        <a class="btn" id="link-mp4-webcam" href="/api/preview/video/webcam" target="_blank" rel="noopener">Webcam MP4</a>
+        <button type="button" class="btn ghost" id="refresh-main">Reconnect stream</button>
+        <p class="hint">Segment shows which feed fills this panel. Weapon inference runs in the <strong>webcam</strong> runner; thermal uses the thermal capture path and optional DETR / CNN overlays on direct preview.</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const SENSORS = ["thermal", "webcam", "mmwave"];
+    const PREVIEW_KEY = "scanu_main_preview";
+    let settings = {};
+    let lastStatus = {};
+    let eventSource = null;
+
+    const FIELD_DEFS = {
+      thermal: [
+        ["frames", "number"], ["fps", "number"], ["video", "text"], ["live_frame", "text"], ["output", "text"],
+        ["thermal_device", "number"], ["thermal_auto_detect", "number"], ["thermal_detect_max_index", "number"], ["thermal_detect_retry_s", "number"],
+        ["thermal_width", "number"], ["thermal_height", "number"],
+        ["thermal_fps", "number"], ["panel_w", "number"], ["panel_h", "number"],
+        ["thermal_inference_enabled", "number"], ["thermal_inference_every_n", "number"],
+        ["thermal_inference_threshold", "number"], ["thermal_inference_device", "number"],
+        ["thermal_inference_model_id", "text"],
+        ["thermal_classifier_enabled", "number"],
+        ["thermal_classifier_weights", "text"],
+        ["thermal_classifier_every_n", "number"],
+        ["thermal_classifier_device", "number"]
+      ],
+      webcam: [
+        ["frames", "number"],
+        ["fps", "number"],
+        ["video", "text"],
+        ["live_frame", "text"],
+        ["webcam_device", "number"],
+        ["weapon_checkpoint", "text"],
+        ["weapon_unsafe_threshold", "number"],
+        ["weapon_gun_threshold", "number"],
+        ["weapon_yolo_model", "text"],
+        ["weapon_conf", "number"],
+        ["weapon_image_size", "number"],
+        ["weapon_gun_conf", "number"],
+        ["weapon_gun_imgsz", "number"],
+        ["weapon_min_box_px", "number"],
+        ["weapon_gun_min_box_px", "number"],
+        ["weapon_gun_thermal", "number"],
+        ["weapon_no_gun_yolo", "number"],
+        ["weapon_show_yolo_name", "number"],
+        ["weapon_gun_yolo_model", "text"],
+        ["weapon_extra_args", "textarea"],
+      ],
+      mmwave: [
+        ["frames", "number"], ["mmwave_only", "number"], ["config", "text"], ["cli_port", "text"], ["data_port", "text"],
+        ["video", "text"], ["live_frame", "text"], ["output", "text"], ["no_frame_timeout_s", "number"], ["extra_args", "textarea"]
+      ]
+    };
+
+    function el(id) { return document.getElementById(id); }
+
+    function mainPreviewMode() {
+      return localStorage.getItem(PREVIEW_KEY) || "thermal";
+    }
+
+    function setMainPreviewMode(mode) {
+      localStorage.setItem(PREVIEW_KEY, mode);
+      el("src-thermal").classList.toggle("active", mode === "thermal");
+      el("src-webcam").classList.toggle("active", mode === "webcam");
+      refreshMainPreview();
+    }
+
+    function refreshMainPreview() {
+      const img = el("vid-main");
+      const mode = mainPreviewMode();
+      const t = Date.now();
+      if (mode === "thermal") {
+        const running = !!((lastStatus.thermal || {}).running);
+        img.src = running
+          ? `/api/preview/live/thermal?t=${t}`
+          : `/api/preview/live_direct/thermal?t=${t}`;
+      } else {
+        img.src = `/api/preview/live/webcam?t=${t}`;
+      }
+    }
+
+    function refreshMmwaveThumb() {
+      el("vid-mmwave").src = `/api/preview/live/mmwave?t=${Date.now()}`;
+    }
+
+    function setError(sensor, msg) {
+      const n = el("err-" + sensor);
+      if (n) n.textContent = msg || "";
+    }
+    function clearErrors() { SENSORS.forEach((s) => setError(s, "")); }
+
+    function renderFields(sensor) {
+      const root = el("fields-" + sensor);
+      if (!root) return;
+      root.innerHTML = "";
+      const sec = settings[sensor] || {};
+      FIELD_DEFS[sensor].forEach(([key, type]) => {
+        if (sensor === "thermal" && key === "thermal_inference_enabled") {
+          const h = document.createElement("div");
+          h.className = "config-section";
+          h.textContent = "Layer 4 · DETR (direct thermal preview)";
+          root.appendChild(h);
+        }
+        if (sensor === "thermal" && key === "thermal_classifier_enabled") {
+          const h = document.createElement("div");
+          h.className = "config-section";
+          h.textContent = "Safe / unsafe CNN overlay";
+          root.appendChild(h);
+        }
+        if (sensor === "webcam" && key === "frames") {
+          const h = document.createElement("div");
+          h.className = "config-section";
+          h.textContent = "Webcam runner (frames 0 = until Stop)";
+          root.appendChild(h);
+        }
+        if (sensor === "webcam" && key === "weapon_unsafe_threshold") {
+          const h = document.createElement("div");
+          h.className = "config-section";
+          h.textContent = "Weapon model (maps to infer_thermal_objects flags)";
+          root.appendChild(h);
+        }
+        const wrap = document.createElement("div");
+        const label = document.createElement("label");
+        label.textContent = key;
+        label.htmlFor = `${sensor}-${key}`;
+        let input;
+        if (type === "textarea") {
+          input = document.createElement("textarea");
+          input.rows = 2;
+        } else {
+          input = document.createElement("input");
+          input.type = type === "number" ? "number" : "text";
+          if (type === "number") input.step = "any";
+        }
+        input.id = `${sensor}-${key}`;
+        input.dataset.sensor = sensor;
+        input.dataset.key = key;
+        const value = sec[key];
+        input.value = value === undefined || value === null ? "" : String(value);
+        wrap.appendChild(label);
+        wrap.appendChild(input);
+        root.appendChild(wrap);
+      });
+    }
+
+    function readSection(sensor) {
+      const root = el("fields-" + sensor);
+      const out = { ...(settings[sensor] || {}) };
+      if (!root) return out;
+      root.querySelectorAll("[data-key]").forEach((inp) => {
+        const k = inp.dataset.key;
+        const raw = inp.value.trim();
+        if (inp.type === "number") out[k] = raw === "" ? 0 : Number(raw);
+        else out[k] = raw;
+      });
+      return out;
+    }
+
+    async function loadConfig() {
+      const r = await fetch("/api/config");
+      settings = await r.json();
+      el("software_root").value = settings.software_root || "";
+      SENSORS.forEach(renderFields);
+      refreshMmwaveThumb();
+      refreshMainPreview();
+    }
+
+    async function saveAllSettings() {
+      const r = await fetch("/api/config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings })
+      });
+      if (!r.ok) throw new Error("Failed to save settings");
+      settings = await r.json();
+    }
+
+    async function saveSensor(sensor) {
+      settings[sensor] = readSection(sensor);
+      await saveAllSettings();
+      renderFields(sensor);
+      setError(sensor, "");
+    }
+
+    async function resetSensor(sensor) {
+      const r = await fetch(`/api/config/reset/${sensor}`, { method: "POST" });
+      if (!r.ok) throw new Error("Failed to reset defaults");
+      settings = await r.json();
+      renderFields(sensor);
+      setError(sensor, "");
+    }
+
+    async function saveGlobal() {
+      settings.software_root = el("software_root").value.trim();
+      await saveAllSettings();
+    }
+
+    async function resetAll() {
+      const r = await fetch("/api/config/reset", { method: "POST" });
+      if (!r.ok) throw new Error("Failed to reset defaults");
+      settings = await r.json();
+      el("software_root").value = settings.software_root || "";
+      SENSORS.forEach(renderFields);
+    }
+
+    function applyStatus(st) {
+      lastStatus = st || {};
+      SENSORS.forEach((sensor) => {
+        const info = st[sensor] || {};
+        const running = !!info.running;
+        const line = el("st-" + sensor);
+        if (line) {
+          const dot = line.querySelector(".dot");
+          if (dot) {
+            dot.classList.toggle("on", running);
+            dot.classList.toggle("off", !running);
+          }
+          const txt = line.querySelector(".txt");
+          const name = sensor === "mmwave" ? "mmWave" : sensor.charAt(0).toUpperCase() + sensor.slice(1);
+          if (txt) {
+            txt.textContent = running ? `${name} · pid ${info.pid}` : `${name} · idle`;
+          }
+        }
+        const log = el("log-" + sensor);
+        if (log) log.textContent = info.log_tail || "(no log)";
+      });
+      refreshMainPreview();
+      refreshMmwaveThumb();
+    }
+
+    async function pollMetrics() {
+      try {
+        const r = await fetch("/api/dashboard/metrics");
+        const m = await r.json();
+        el("metric-unsafe").textContent = m.unsafe_pct != null ? `${m.unsafe_pct}%` : "—";
+        el("metric-gun").textContent = m.gun_detected != null ? (m.gun_detected ? "Yes" : "No") : "—";
+        el("metric-persons-gun").textContent = m.persons_with_gun != null ? String(m.persons_with_gun) : "—";
+        el("metric-mmwave-score").textContent = m.mmwave_torso_score != null ? String(m.mmwave_torso_score) : "—";
+        const pred = el("metric-pred");
+        pred.className = "pred-pill";
+        if (m.prediction) {
+          const p = String(m.prediction).toLowerCase();
+          pred.textContent = m.prediction;
+          if (p.includes("unsafe")) pred.classList.add("unsafe");
+          else if (p.includes("suspicious")) pred.classList.add("suspicious");
+          else if (p.includes("safe")) pred.classList.add("safe");
+        } else {
+          pred.textContent = "—";
+        }
+        el("metrics-note").textContent = m.note || "";
+      } catch (_) { /* ignore */ }
+    }
+
+    async function oneShotStatus() {
+      const r = await fetch("/api/status");
+      if (!r.ok) return;
+      applyStatus(await r.json());
+    }
+
+    function startLiveStatus() {
+      if (eventSource) eventSource.close();
+      eventSource = new EventSource("/api/status/stream");
+      eventSource.addEventListener("status", (ev) => {
+        try {
+          applyStatus(JSON.parse(ev.data));
+        } catch (_) {}
+      });
+      eventSource.onerror = async () => {
+        eventSource.close();
+        setTimeout(startLiveStatus, 1500);
+        await oneShotStatus();
+      };
+    }
+
+    async function runAction(sensor, action) {
+      clearErrors();
+      const r = await fetch(`/api/${action}/${sensor}`, { method: "POST" });
+      const payload = await r.json();
+      if (!r.ok && payload.error) setError(sensor, payload.error);
+      await oneShotStatus();
+    }
+
+    async function runGroup(action) {
+      clearErrors();
+      const r = await fetch(`/api/${action}`, { method: "POST" });
+      const payload = await r.json();
+      if (!r.ok && payload.error) SENSORS.forEach((s) => setError(s, payload.error));
+      await oneShotStatus();
+    }
+
+    async function showCommand(sensor) {
+      const r = await fetch(`/api/command/${sensor}`);
+      const payload = await r.json();
+      const pre = el(`cmd-out-${sensor}`);
+      if (!pre) return;
+      pre.textContent = JSON.stringify(payload, null, 2);
+      pre.style.display = pre.style.display === "none" ? "block" : "none";
+    }
+
+    /* Tabs */
+    document.querySelectorAll(".chrome-tabs button").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const id = btn.dataset.tab;
+        document.querySelectorAll(".chrome-tabs button").forEach((b) => b.classList.toggle("active", b === btn));
+        el("tab-camera").classList.toggle("active", id === "camera");
+        el("tab-radar").classList.toggle("active", id === "radar");
+      });
+    });
+
+    el("src-thermal").addEventListener("click", () => setMainPreviewMode("thermal"));
+    el("src-webcam").addEventListener("click", () => setMainPreviewMode("webcam"));
+    el("refresh-main").addEventListener("click", () => { refreshMainPreview(); refreshMmwaveThumb(); });
+
+    el("run-all").addEventListener("click", () => runGroup("run_all"));
+    el("stop-all").addEventListener("click", () => runGroup("stop_all"));
+    el("restart-all").addEventListener("click", () => runGroup("restart_all"));
+    el("save-global").addEventListener("click", () => saveGlobal().catch((e) => alert(e)));
+    el("reset-all").addEventListener("click", () => resetAll().catch((e) => alert(e)));
+
+    ["thermal", "webcam", "mmwave"].forEach((sensor) => {
+      el(`run-${sensor}`).addEventListener("click", () => runAction(sensor, "run"));
+      el(`stop-${sensor}`).addEventListener("click", () => runAction(sensor, "stop"));
+      el(`restart-${sensor}`).addEventListener("click", () => runAction(sensor, "restart"));
+      el(`save-${sensor}`).addEventListener("click", () => saveSensor(sensor).catch((e) => setError(sensor, String(e))));
+      el(`reset-${sensor}`).addEventListener("click", () => resetSensor(sensor).catch((e) => setError(sensor, String(e))));
+      el(`cmd-${sensor}`).addEventListener("click", () => showCommand(sensor).catch((e) => setError(sensor, String(e))));
+    });
+
+    if (mainPreviewMode() === "webcam") {
+      el("src-thermal").classList.remove("active");
+      el("src-webcam").classList.add("active");
+    }
+
+    loadConfig().then(() => {
+      oneShotStatus();
+      startLiveStatus();
+      pollMetrics();
+      setInterval(pollMetrics, 2500);
+    });
+  </script>
+</body>
+</html>

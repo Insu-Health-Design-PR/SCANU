@@ -1,7 +1,0 @@
-python3 ~/Desktop/SCANU-dev_adrian/software/layer2_signal_processing/testing/sensor_60g/examples/ifx_ltr11_stream.py --seconds 10 --hz 10
-
-
-
-
-python3 ~/Desktop/SCANU-dev_adrian/software/layer2_signal_processing/testing/sensor_60g/examples/ifx_ltr11_stream.py --seconds 15 --hz 10 --out ~/Desktop/SCANU-dev_adrian/software/layer2_signal_processing/testing/sensor_60g/ltr11_test.jsonl
-

@@ -16,7 +16,7 @@ Transform Layer 1 radar outputs into calibrated spectral outputs and heatmap-rea
 - `calibration.py`: exponential moving background subtraction.
 - `signal_processor.py`: input normalization plus FFT + CFAR processing and sparse detection point cloud extraction.
 - `feature_extractor.py`: range and doppler heatmap projections plus summary vector.
-- `testing/`: tests, runners, and sample Layer 1 captures used during development.
+- `test_parser.py`: parser unit tests (Layer 1 parser coverage driven by Layer 2 task scope).
 - `__init__.py`: public API exports.
 
 ## Recommended Flow
@@ -70,3 +70,4 @@ print("feature vector:", features.vector)
 
 configurator.stop()
 serial_mgr.disconnect()
+
