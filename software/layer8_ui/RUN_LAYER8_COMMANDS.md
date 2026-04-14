@@ -1,5 +1,43 @@
 # Layer 8 Commands (Jetson / Dev)
 
+## Jetson Path + Dependencies
+If your Jetson workspace path is different from this Mac, use your local path:
+
+```bash
+cd /home/Desktop/SCANU-dev_adrian/software/layer8_ui
+```
+
+If your folder names are lowercase:
+
+```bash
+cd /home/desktop/scanu-dev_adrian/software/layer8_ui
+```
+
+Backend dependencies (Python):
+
+```bash
+cd /home/Desktop/SCANU-dev_adrian/software
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -U pip
+pip install -r layer8_ui/requirements.txt
+pip install fastapi uvicorn websockets pyserial numpy
+```
+
+Frontend dependencies (Node):
+
+```bash
+cd /home/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+npm ci
+```
+
+Then run full live stack:
+
+```bash
+cd /home/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/run_jetson_full_stack.sh
+```
+
 
 ## 0) Quick local stack (recommended)
 Run backend + frontend together:
@@ -128,3 +166,30 @@ Expected final line:
 
 ## 8) Operational note
 This runner keeps Layer 8 API contracts stable; when Layer 5 real output arrives, you only replace input source logic and keep API/WS unchanged.
+
+## 9) Run stable test suite (timeouts)
+```bash
+./scripts/run_tests_layer8.sh
+```
+Optional:
+```bash
+RUN_E2E=1 ./scripts/run_tests_layer8.sh
+```
+
+## 10) Jetson Full Live Stack (frontend + backend + sensors)
+Run everything in one command:
+```bash
+./scripts/run_jetson_full_stack.sh
+```
+Optional IFX UUID:
+```bash
+IFX_UUID=<YOUR_UUID> ./scripts/run_jetson_full_stack.sh
+```
+If thermal camera index differs:
+```bash
+THERMAL_DEVICE=1 RGB_DEVICE=0 ./scripts/run_jetson_full_stack.sh
+```
+If you need to skip radar config (already configured):
+```bash
+MMWAVE=on PRESENCE=ifx THERMAL=on RGB=on ./scripts/run_jetson_full_stack.sh --skip-mmwave-config
+```

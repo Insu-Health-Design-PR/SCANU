@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import time
 from dataclasses import asdict
 
@@ -222,4 +223,8 @@ def create_app(
     return app
 
 
-app = create_app()
+if os.getenv("LAYER8_APP_SKIP_GLOBAL_BOOT", "0") == "1":
+    # Test mode: avoid import-time boot side effects from dependencies.
+    app = FastAPI(title="SCAN-U Layer 8 API (test bootstrap)", version="0.2.0")
+else:
+    app = create_app()
