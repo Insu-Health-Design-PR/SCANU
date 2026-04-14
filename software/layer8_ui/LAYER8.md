@@ -5,9 +5,9 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 
 ## Folder Layout
 - `backend/`: official Layer 8 backend (FastAPI + WS + L6/L7 bridge).
-- `frontend/`: new React/TS/Vite workspace (scaffold, implementation pending).
-- `legacy/`: previous sensor-runner UI and capture tooling kept for operational diagnostics.
-- root wrappers (`app.py`, `run_layer8.py`, etc.): compatibility shims that forward to `backend/`.
+- `frontend/`: React/TS/Vite operator UI.
+- `scripts/`: local stack runners and smoke checks.
+- docs in root (`RUN_LAYER8_COMMANDS.md`, `TEST_COMMANDS.md`): runtime and validation guides.
 
 ## Backend Inputs
 - `StateSnapshot` from Layer 6.
@@ -25,6 +25,8 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 - `GET /api/visual/thermal`
 - `GET /api/visual/point-cloud`
 - `GET /api/visual/presence`
+- `GET /api/ui/preferences`
+- `POST /api/ui/preferences`
 - `POST /api/control/reconfig`
 - `POST /api/control/reset-soft`
 - `POST /api/control/kill-holders`
@@ -56,6 +58,6 @@ Expose real-time system status, anomaly trends, sensor health, and alert history
 4. Layer 8 backend pushes WS updates to UI clients.
 
 ## Current Status
-- Backend implemented and tested.
-- Legacy tooling preserved under `legacy/`.
-- Frontend directory scaffold exists; operator UI implementation is still pending.
+- Backend implemented with test coverage for API/state bridge/websocket contract.
+- Frontend connected to backend contracts and layout workflows.
+- Local stack scripts available for simulate/api modes.
