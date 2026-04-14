@@ -1,0 +1,15 @@
+{
+  "appliedLayout": "Triple View",
+  "previewLayout": "Triple View",
+  "focusView": "rgb",
+  "layoutStyle": "grid",
+  "customModules": {
+    "rgb": true,
+    "thermal": true,
+    "pointCloud": true,
+    "presence": true,
+    "systemStatus": true,
+    "execution": true,
+    "consoleLog": true
+  }
+}
