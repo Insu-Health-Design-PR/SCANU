@@ -32,3 +32,7 @@ software/layer8_ui/legacy/artifacts/*
 
 # Playwright artifacts
 software/layer8_ui/frontend/test-results/
+
+# Personal local git helpers (do not version)
+scripts/git-whoami.sh
+scripts/githooks/pre-commit
