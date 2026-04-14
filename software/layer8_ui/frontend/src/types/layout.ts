@@ -7,7 +7,7 @@ export type LayoutPreset =
   | 'Triple View'
   | 'Custom Combination';
 
-export type FocusView = 'rgb' | 'thermal';
+export type FocusView = 'rgb' | 'thermal' | 'pointCloud' | 'presence';
 export type LayoutStyle = 'grid' | 'focus' | 'fullscreen';
 
 export interface CustomLayoutModules {
@@ -18,4 +18,12 @@ export interface CustomLayoutModules {
   systemStatus: boolean;
   execution: boolean;
   consoleLog: boolean;
+}
+
+export interface UiPreferences {
+  appliedLayout: LayoutPreset;
+  previewLayout: LayoutPreset;
+  focusView: FocusView;
+  layoutStyle: LayoutStyle;
+  customModules: CustomLayoutModules;
 }

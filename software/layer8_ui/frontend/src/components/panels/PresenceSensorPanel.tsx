@@ -5,7 +5,7 @@ import { useDashboardStore } from '@/store/dashboardStore';
 
 export function PresenceSensorPanel() {
   const presence = useDashboardStore((state) => state.snapshot.presence);
-  const max = Math.max(...presence.timeline);
+  const max = Math.max(1, ...presence.timeline);
 
   return (
     <PanelCard title="Presence Sensor" icon={<Activity className="h-4 w-4" />}>
