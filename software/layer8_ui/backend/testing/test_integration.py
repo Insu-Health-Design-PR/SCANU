@@ -1,6 +1,6 @@
 from software.layer6_state_machine.models import ActionRequest, StateEvent, StateSnapshot, SystemState
 from software.layer7_alerts import AlertManager
-from software.layer8_ui.integration import L6L7ToL8Bridge
+from software.layer8_ui.backend.integration import L6L7ToL8Bridge
 
 
 

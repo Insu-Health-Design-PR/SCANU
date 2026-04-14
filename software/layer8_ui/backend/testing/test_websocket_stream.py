@@ -1,6 +1,6 @@
 from software.layer6_state_machine.models import ControlResult, StateEvent, StateSnapshot, SystemState
 from software.layer7_alerts import AlertManager
-from software.layer8_ui.websocket_stream import WebSocketStream
+from software.layer8_ui.backend.websocket_stream import WebSocketStream
 
 
 

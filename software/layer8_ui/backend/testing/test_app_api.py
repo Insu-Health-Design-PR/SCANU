@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from software.layer8_ui.app import create_app
+from software.layer8_ui.backend.app import create_app
 
 
 
