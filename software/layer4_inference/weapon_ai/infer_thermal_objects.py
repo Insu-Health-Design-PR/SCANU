@@ -302,22 +302,44 @@ def _filter_infer_config(cfg: dict, path: Path) -> dict:
     return {k: v for k, v in cfg.items() if k in _INFER_CONFIG_KEYS}
 
 
+def _pop_infer_config_file(argv: list[str]) -> tuple[Path | None, list[str]]:
+    """
+    Strip only exact ``--config`` / ``--config=`` from argv.
+
+    Argparse with default ``allow_abbrev=True`` can treat ``--conf`` as ``--config``; even
+    ``allow_abbrev=False`` on a pre-parser is easy to get wrong across versions. Exact-token
+    handling keeps ``--conf 0.25`` (YOLO confidence) safe.
+    """
+    cfg: Path | None = None
+    out: list[str] = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--config":
+            if i + 1 >= len(argv):
+                raise SystemExit("--config requires a path to a .json or .yaml file")
+            cfg = Path(argv[i + 1])
+            i += 2
+            continue
+        if a.startswith("--config="):
+            cfg = Path(a.split("=", 1)[1])
+            i += 1
+            continue
+        out.append(a)
+        i += 1
+    return cfg, out
+
+
 def main() -> None:
-    pre = argparse.ArgumentParser(add_help=False)
-    pre.add_argument(
-        "--config",
-        type=Path,
-        default=None,
-        help="JSON or YAML file with infer options; CLI overrides file.",
-    )
-    pre_args, argv_rest = pre.parse_known_args()
+    infer_config_path, argv_rest = _pop_infer_config_file(sys.argv[1:])
     file_defaults: dict = {}
-    if pre_args.config is not None:
-        loaded = _load_infer_config(pre_args.config)
-        file_defaults = _coerce_infer_config_values(_filter_infer_config(loaded, pre_args.config))
+    if infer_config_path is not None:
+        loaded = _load_infer_config(infer_config_path)
+        file_defaults = _coerce_infer_config_values(_filter_infer_config(loaded, infer_config_path))
 
     p = argparse.ArgumentParser(
         description=__doc__,
+        allow_abbrev=False,
         epilog=(
             "Use --config path.yaml or path.json (before other flags) to load options; "
             "CLI arguments override the file. See weapon_ai/infer_thermal.example.yaml."
@@ -496,8 +518,8 @@ def main() -> None:
         p.set_defaults(**file_defaults)
     args = p.parse_args(argv_rest)
 
-    if pre_args.config is not None:
-        print(f"Loaded infer config: {pre_args.config.resolve()}")
+    if infer_config_path is not None:
+        print(f"Loaded infer config: {infer_config_path.resolve()}")
 
     if args.checkpoint is None:
         raise SystemExit(
@@ -569,7 +591,13 @@ def main() -> None:
         gun_detector = YOLO(str(gpath))
 
     src = int(args.source) if args.source.isdigit() else args.source
-    cap = cv2.VideoCapture(src)
+    if isinstance(src, int) and sys.platform.startswith("linux"):
+        cap = cv2.VideoCapture(src, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            cap = cv2.VideoCapture(src)
+    else:
+        cap = cv2.VideoCapture(src)
     if not cap.isOpened():
         raise SystemExit(f"Cannot open {args.source}")
 

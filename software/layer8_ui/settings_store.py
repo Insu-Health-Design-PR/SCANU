@@ -92,6 +92,19 @@ def load(layer8_dir: Path) -> dict[str, Any]:
         return merged
 
 
+def reset_webcam_weapon_defaults(layer8_dir: Path) -> dict[str, Any]:
+    """Reset only ``weapon_*`` and ``verbose`` under ``webcam`` (Model tab); paths/frames unchanged."""
+    data = load(layer8_dir)
+    defs = deepcopy(DEFAULT_SETTINGS["webcam"])
+    w = {**(data.get("webcam") or {})}
+    for k, v in defs.items():
+        if k.startswith("weapon_") or k == "verbose":
+            w[k] = v
+    data["webcam"] = w
+    save(layer8_dir, data)
+    return load(layer8_dir)
+
+
 def save(layer8_dir: Path, data: dict[str, Any]) -> None:
     path = settings_path(layer8_dir)
     path.parent.mkdir(parents=True, exist_ok=True)

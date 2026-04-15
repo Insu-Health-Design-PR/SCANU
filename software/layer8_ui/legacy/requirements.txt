@@ -1,5 +1,0 @@
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-# Optional: Layer 4 thermal inference on live preview (thermal_inference_enabled=1)
-# See ../layer4_inference/requirements.txt — Jetson apt torch 1.8 + transformers 5.x fails;
-# pin transformers<5 or install NVIDIA PyTorch for your JetPack.

@@ -1,3 +1,174 @@
 WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
 Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
 For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Config file not found: /home/insu/Desktop/SCANU/software/layer4_inference/0.25
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 81, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 75, in main
+    from weapon_ai import infer_thermal_objects
+ImportError: cannot import name 'infer_thermal_objects' from 'weapon_ai' (unknown location)
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 81, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 75, in main
+    from weapon_ai import infer_thermal_objects
+ImportError: cannot import name 'infer_thermal_objects' from 'weapon_ai' (unknown location)
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@8.235] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.279] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 0
+Frames read: 0
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaae3aee6f0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.392] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaaeef8be00] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.100] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation

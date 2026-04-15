@@ -189,6 +189,7 @@
 
     .chrome-tabs {
       display: flex;
+      flex-wrap: wrap;
       gap: 0;
       margin-top: 1rem;
       border-bottom: 1px solid var(--border);
@@ -196,14 +197,15 @@
       border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     }
     .chrome-tabs button {
-      flex: 1;
+      flex: 1 1 auto;
+      min-width: 4.5rem;
       border: none;
       background: transparent;
       color: var(--muted);
       font: inherit;
-      font-size: 0.78rem;
+      font-size: 0.7rem;
       font-weight: 500;
-      padding: 0.55rem 0.65rem;
+      padding: 0.5rem 0.4rem;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
@@ -432,12 +434,15 @@
           </div>
 
           <div class="chrome-tabs" role="tablist">
-            <button type="button" class="active" data-tab="camera" id="tabbtn-camera">Camera &amp; model</button>
-            <button type="button" data-tab="radar" id="tabbtn-radar">mmWave</button>
+            <button type="button" class="active" data-tab="thermal" id="tabbtn-thermal">Thermal</button>
+            <button type="button" data-tab="webcam" id="tabbtn-webcam">Webcam</button>
+            <button type="button" data-tab="model" id="tabbtn-model">Model</button>
+            <button type="button" data-tab="mmwave" id="tabbtn-mmwave">mmWave</button>
           </div>
 
-          <div class="tab-panel active" id="tab-camera" role="tabpanel">
-            <div class="config-section">Thermal camera</div>
+          <div class="tab-panel active" id="tab-thermal" role="tabpanel">
+            <p class="metrics-footnote" style="margin-top:0;">Subprocess + live stream: <code>layer8_ui.thermal_runner</code> → <code>layer1_radar/examples/thermal_only_capture.py</code></p>
+            <div class="config-section">Thermal</div>
             <div class="fields" id="fields-thermal"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-thermal">Run</button>
@@ -450,8 +455,12 @@
             <div class="err" id="err-thermal"></div>
             <div class="status-line" id="st-thermal"><span class="dot off"></span><span class="txt">Thermal idle</span></div>
             <pre class="log-mini" id="log-thermal"></pre>
+            <pre class="log-mini" id="cmd-out-thermal" style="display:none;max-height:100px;"></pre>
+          </div>
 
-            <div class="config-section">Webcam · weapon AI (<code>infer_thermal_objects</code>)</div>
+          <div class="tab-panel" id="tab-webcam" role="tabpanel">
+            <p class="metrics-footnote" style="margin-top:0;">Capture + live stream: <code>layer8_ui.webcam_runner</code> · weapon runner cwd <code>layer4_inference/</code></p>
+            <div class="config-section">Webcam device &amp; files</div>
             <div class="fields" id="fields-webcam"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-webcam">Run</button>
@@ -464,11 +473,33 @@
             <div class="err" id="err-webcam"></div>
             <div class="status-line" id="st-webcam"><span class="dot off"></span><span class="txt">Webcam idle</span></div>
             <pre class="log-mini" id="log-webcam"></pre>
-            <pre class="log-mini" id="cmd-out-thermal" style="display:none;max-height:100px;"></pre>
             <pre class="log-mini" id="cmd-out-webcam" style="display:none;max-height:100px;"></pre>
           </div>
 
-          <div class="tab-panel" id="tab-radar" role="tabpanel">
+          <div class="tab-panel" id="tab-model" role="tabpanel">
+            <p class="metrics-footnote" style="margin-top:0;">
+              When you <strong>Run Webcam</strong>, <code>sensor_runner</code> starts <code>python -m weapon_ai.webcam_layer8_runner</code>
+              (cwd <code>layer4_inference/</code>), which loads and runs <code>weapon_ai/infer_thermal_objects.py</code> (same logic as
+              <code>python -m weapon_ai.infer_thermal_objects</code>). <code>weapon_yolo_model</code> (e.g. <code>yolov8n.pt</code>) is the
+              <strong>person / object</strong> detector (<code>--conf</code> = <code>weapon_conf</code>, min box = <code>weapon_min_box_px</code>).
+              <code>weapon_checkpoint</code> (e.g. <code>gun_prob_best.pt</code>) scores each <strong>person crop</strong> for p(gun) / safe vs unsafe
+              (<code>weapon_unsafe_threshold</code> / <code>weapon_gun_threshold</code>). Optional orange boxes: separate firearm YOLO via <code>weapon_gun_*</code>.
+              Keys live under <code>webcam</code> in JSON; most flags are forwarded as <code>--weapon-extra-args</code> on that subprocess.
+              <code>layer8_ui.inference_overlay</code> is only a server-side stub today (not the live subprocess).
+            </p>
+            <div class="config-section">Person YOLO → crop classifier → optional firearm YOLO</div>
+            <div class="fields" id="fields-model"></div>
+            <div class="row-actions">
+              <button type="button" class="btn primary" id="save-model">Save</button>
+              <button type="button" class="btn ghost" id="reset-model">Reset weapon defaults</button>
+              <button type="button" class="btn ghost" id="cmd-model">Cmd (webcam pipeline)</button>
+            </div>
+            <div class="err" id="err-model"></div>
+            <pre class="log-mini" id="cmd-out-model" style="display:none;max-height:100px;"></pre>
+          </div>
+
+          <div class="tab-panel" id="tab-mmwave" role="tabpanel">
+            <p class="metrics-footnote" style="margin-top:0;"><code>layer8_ui.sensor_runner</code> → <code>layer1_radar/examples/live_capture.py</code> (UART / TLV stack)</p>
             <div class="fields" id="fields-mmwave"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-mmwave">Run</button>
@@ -503,17 +534,26 @@
         <a class="btn" id="link-mp4-thermal" href="/api/preview/video/thermal" target="_blank" rel="noopener">Thermal MP4</a>
         <a class="btn" id="link-mp4-webcam" href="/api/preview/video/webcam" target="_blank" rel="noopener">Webcam MP4</a>
         <button type="button" class="btn ghost" id="refresh-main">Reconnect stream</button>
-        <p class="hint">Segment shows which feed fills this panel. Weapon inference runs in the <strong>webcam</strong> runner (<code>weapon_ai.infer_thermal_objects</code> via <code>webcam_layer8_runner</code>). Thermal shows the capture / direct colormap stream only.</p>
+        <a class="btn" href="/embed/thermal" target="_blank" rel="noopener">Thermal only (new tab)</a>
+        <a class="btn" href="/embed/webcam" target="_blank" rel="noopener">Webcam only (new tab)</a>
+        <p class="hint">Thermal and webcam each use a dedicated <strong>WebSocket</strong> (<code>/ws/thermal</code>, <code>/ws/webcam</code>) so many viewers can subscribe in parallel. Open the links above on two devices for side‑by‑side operators. Use different <code>thermal_device</code> and <code>webcam_device</code> if both are USB cameras.</p>
       </div>
     </section>
   </main>
 
   <script>
     const SENSORS = ["thermal", "webcam", "mmwave"];
+    const TAB_IDS = ["thermal", "webcam", "model", "mmwave"];
     const PREVIEW_KEY = "scanu_main_preview";
     let settings = {};
     let lastStatus = {};
     let eventSource = null;
+    let thermalWs = null;
+    let thermalObjectUrl = null;
+    let _thermalWsReconnect = null;
+    let webcamWs = null;
+    let webcamObjectUrl = null;
+    let _webcamWsReconnect = null;
 
     const FIELD_DEFS = {
       thermal: [
@@ -528,19 +568,21 @@
         ["video", "text"],
         ["live_frame", "text"],
         ["webcam_device", "number"],
+      ],
+      model: [
+        ["weapon_yolo_model", "text"],
+        ["weapon_conf", "number"],
+        ["weapon_min_box_px", "number"],
+        ["weapon_show_yolo_name", "number"],
         ["weapon_checkpoint", "text"],
         ["weapon_unsafe_threshold", "number"],
         ["weapon_gun_threshold", "number"],
-        ["weapon_yolo_model", "text"],
-        ["weapon_conf", "number"],
         ["weapon_image_size", "number"],
         ["weapon_gun_conf", "number"],
         ["weapon_gun_imgsz", "number"],
-        ["weapon_min_box_px", "number"],
         ["weapon_gun_min_box_px", "number"],
         ["weapon_gun_thermal", "number"],
         ["weapon_no_gun_yolo", "number"],
-        ["weapon_show_yolo_name", "number"],
         ["weapon_gun_yolo_model", "text"],
         ["weapon_extra_args", "textarea"],
       ],
@@ -563,18 +605,96 @@
       refreshMainPreview();
     }
 
-    function refreshMainPreview() {
-      const img = el("vid-main");
-      const mode = mainPreviewMode();
-      const t = Date.now();
-      if (mode === "thermal") {
-        const running = !!((lastStatus.thermal || {}).running);
-        img.src = running
-          ? `/api/preview/live/thermal?t=${t}`
-          : `/api/preview/live_direct/thermal?t=${t}`;
-      } else {
-        img.src = `/api/preview/live/webcam?t=${t}`;
+    function stopWebcamWs() {
+      if (_webcamWsReconnect) {
+        clearTimeout(_webcamWsReconnect);
+        _webcamWsReconnect = null;
       }
+      if (webcamWs) {
+        try { webcamWs.close(); } catch (_) {}
+        webcamWs = null;
+      }
+      if (webcamObjectUrl) {
+        URL.revokeObjectURL(webcamObjectUrl);
+        webcamObjectUrl = null;
+      }
+    }
+
+    function stopThermalWs() {
+      if (_thermalWsReconnect) {
+        clearTimeout(_thermalWsReconnect);
+        _thermalWsReconnect = null;
+      }
+      if (thermalWs) {
+        try { thermalWs.close(); } catch (_) {}
+        thermalWs = null;
+      }
+      if (thermalObjectUrl) {
+        URL.revokeObjectURL(thermalObjectUrl);
+        thermalObjectUrl = null;
+      }
+    }
+
+    function startThermalWs() {
+      stopThermalWs();
+      const proto = location.protocol === "https:" ? "wss:" : "ws:";
+      const url = `${proto}//${location.host}/ws/thermal`;
+      thermalWs = new WebSocket(url);
+      thermalWs.binaryType = "arraybuffer";
+      thermalWs.onmessage = (ev) => {
+        if (mainPreviewMode() !== "thermal") return;
+        const img = el("vid-main");
+        const buf = ev.data;
+        if (!(buf instanceof ArrayBuffer) || buf.byteLength === 0) return;
+        if (thermalObjectUrl) URL.revokeObjectURL(thermalObjectUrl);
+        thermalObjectUrl = URL.createObjectURL(new Blob([buf], { type: "image/jpeg" }));
+        img.src = thermalObjectUrl;
+      };
+      thermalWs.onerror = () => { try { thermalWs.close(); } catch (_) {} };
+      thermalWs.onclose = () => {
+        thermalWs = null;
+        if (mainPreviewMode() !== "thermal") return;
+        _thermalWsReconnect = window.setTimeout(() => {
+          _thermalWsReconnect = null;
+          if (mainPreviewMode() === "thermal") startThermalWs();
+        }, 1600);
+      };
+    }
+
+    function startWebcamWs() {
+      stopWebcamWs();
+      const proto = location.protocol === "https:" ? "wss:" : "ws:";
+      const url = `${proto}//${location.host}/ws/webcam`;
+      webcamWs = new WebSocket(url);
+      webcamWs.binaryType = "arraybuffer";
+      webcamWs.onmessage = (ev) => {
+        if (mainPreviewMode() !== "webcam") return;
+        const img = el("vid-main");
+        const buf = ev.data;
+        if (!(buf instanceof ArrayBuffer) || buf.byteLength === 0) return;
+        if (webcamObjectUrl) URL.revokeObjectURL(webcamObjectUrl);
+        webcamObjectUrl = URL.createObjectURL(new Blob([buf], { type: "image/jpeg" }));
+        img.src = webcamObjectUrl;
+      };
+      webcamWs.onerror = () => { try { webcamWs.close(); } catch (_) {} };
+      webcamWs.onclose = () => {
+        webcamWs = null;
+        if (mainPreviewMode() !== "webcam") return;
+        _webcamWsReconnect = window.setTimeout(() => {
+          _webcamWsReconnect = null;
+          if (mainPreviewMode() === "webcam") startWebcamWs();
+        }, 1600);
+      };
+    }
+
+    function refreshMainPreview() {
+      const mode = mainPreviewMode();
+      stopThermalWs();
+      stopWebcamWs();
+      const img = el("vid-main");
+      if (!img) return;
+      // Main preview is served via API streaming (multipart MJPEG).
+      img.src = `/api/preview/live_direct/${mode}?t=${Date.now()}`;
     }
 
     function refreshMmwaveThumb() {
@@ -585,7 +705,11 @@
       const n = el("err-" + sensor);
       if (n) n.textContent = msg || "";
     }
-    function clearErrors() { SENSORS.forEach((s) => setError(s, "")); }
+
+    function clearErrors() {
+      SENSORS.forEach((s) => setError(s, ""));
+      setError("model", "");
+    }
 
     function renderFields(sensor) {
       const root = el("fields-" + sensor);
@@ -596,13 +720,7 @@
         if (sensor === "webcam" && key === "frames") {
           const h = document.createElement("div");
           h.className = "config-section";
-          h.textContent = "Webcam runner (frames 0 = until Stop)";
-          root.appendChild(h);
-        }
-        if (sensor === "webcam" && key === "weapon_unsafe_threshold") {
-          const h = document.createElement("div");
-          h.className = "config-section";
-          h.textContent = "Weapon model (maps to infer_thermal_objects flags)";
+          h.textContent = "Runner (frames 0 = until Stop)";
           root.appendChild(h);
         }
         const wrap = document.createElement("div");
@@ -629,9 +747,52 @@
       });
     }
 
+    function renderModelFields() {
+      const root = el("fields-model");
+      if (!root) return;
+      root.innerHTML = "";
+      const sec = settings.webcam || {};
+      FIELD_DEFS.model.forEach(([key, type]) => {
+        const wrap = document.createElement("div");
+        const label = document.createElement("label");
+        label.textContent = key;
+        label.htmlFor = `model-${key}`;
+        let input;
+        if (type === "textarea") {
+          input = document.createElement("textarea");
+          input.rows = 2;
+        } else {
+          input = document.createElement("input");
+          input.type = type === "number" ? "number" : "text";
+          if (type === "number") input.step = "any";
+        }
+        input.id = `model-${key}`;
+        input.dataset.sensor = "webcam";
+        input.dataset.key = key;
+        const value = sec[key];
+        input.value = value === undefined || value === null ? "" : String(value);
+        wrap.appendChild(label);
+        wrap.appendChild(input);
+        root.appendChild(wrap);
+      });
+    }
+
     function readSection(sensor) {
       const root = el("fields-" + sensor);
-      const out = { ...(settings[sensor] || {}) };
+      const out = {};
+      if (!root) return out;
+      root.querySelectorAll("[data-key]").forEach((inp) => {
+        const k = inp.dataset.key;
+        const raw = inp.value.trim();
+        if (inp.type === "number") out[k] = raw === "" ? 0 : Number(raw);
+        else out[k] = raw;
+      });
+      return out;
+    }
+
+    function readModelSection() {
+      const root = el("fields-model");
+      const out = {};
       if (!root) return out;
       root.querySelectorAll("[data-key]").forEach((inp) => {
         const k = inp.dataset.key;
@@ -647,6 +808,7 @@
       settings = await r.json();
       el("software_root").value = settings.software_root || "";
       SENSORS.forEach(renderFields);
+      renderModelFields();
       refreshMmwaveThumb();
       refreshMainPreview();
     }
@@ -662,10 +824,28 @@
     }
 
     async function saveSensor(sensor) {
-      settings[sensor] = readSection(sensor);
+      settings[sensor] = { ...(settings[sensor] || {}), ...readSection(sensor) };
       await saveAllSettings();
       renderFields(sensor);
+      if (sensor === "webcam") renderModelFields();
       setError(sensor, "");
+    }
+
+    async function saveModel() {
+      settings.webcam = { ...(settings.webcam || {}), ...readModelSection() };
+      await saveAllSettings();
+      renderModelFields();
+      renderFields("webcam");
+      setError("model", "");
+    }
+
+    async function resetModel() {
+      const r = await fetch("/api/config/reset/model", { method: "POST" });
+      if (!r.ok) throw new Error("Failed to reset weapon defaults");
+      settings = await r.json();
+      renderModelFields();
+      renderFields("webcam");
+      setError("model", "");
     }
 
     async function resetSensor(sensor) {
@@ -673,6 +853,7 @@
       if (!r.ok) throw new Error("Failed to reset defaults");
       settings = await r.json();
       renderFields(sensor);
+      if (sensor === "webcam") renderModelFields();
       setError(sensor, "");
     }
 
@@ -687,6 +868,7 @@
       settings = await r.json();
       el("software_root").value = settings.software_root || "";
       SENSORS.forEach(renderFields);
+      renderModelFields();
     }
 
     function applyStatus(st) {
@@ -774,28 +956,35 @@
       await oneShotStatus();
     }
 
-    async function showCommand(sensor) {
+    async function showCommand(sensor, outputId = null) {
       const r = await fetch(`/api/command/${sensor}`);
       const payload = await r.json();
-      const pre = el(`cmd-out-${sensor}`);
+      const pre = el(outputId || `cmd-out-${sensor}`);
       if (!pre) return;
       pre.textContent = JSON.stringify(payload, null, 2);
       pre.style.display = pre.style.display === "none" ? "block" : "none";
     }
 
-    /* Tabs */
+    /* Tabs: thermal | webcam | model | mmwave */
     document.querySelectorAll(".chrome-tabs button").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.dataset.tab;
         document.querySelectorAll(".chrome-tabs button").forEach((b) => b.classList.toggle("active", b === btn));
-        el("tab-camera").classList.toggle("active", id === "camera");
-        el("tab-radar").classList.toggle("active", id === "radar");
+        TAB_IDS.forEach((t) => {
+          const panel = el("tab-" + t);
+          if (panel) panel.classList.toggle("active", t === id);
+        });
       });
     });
 
     el("src-thermal").addEventListener("click", () => setMainPreviewMode("thermal"));
     el("src-webcam").addEventListener("click", () => setMainPreviewMode("webcam"));
-    el("refresh-main").addEventListener("click", () => { refreshMainPreview(); refreshMmwaveThumb(); });
+    el("refresh-main").addEventListener("click", () => {
+      stopThermalWs();
+      stopWebcamWs();
+      refreshMainPreview();
+      refreshMmwaveThumb();
+    });
 
     el("run-all").addEventListener("click", () => runGroup("run_all"));
     el("stop-all").addEventListener("click", () => runGroup("stop_all"));
@@ -811,6 +1000,12 @@
       el(`reset-${sensor}`).addEventListener("click", () => resetSensor(sensor).catch((e) => setError(sensor, String(e))));
       el(`cmd-${sensor}`).addEventListener("click", () => showCommand(sensor).catch((e) => setError(sensor, String(e))));
     });
+
+    el("save-model").addEventListener("click", () => saveModel().catch((e) => setError("model", String(e))));
+    el("reset-model").addEventListener("click", () => resetModel().catch((e) => setError("model", String(e))));
+    el("cmd-model").addEventListener("click", () =>
+      showCommand("webcam", "cmd-out-model").catch((e) => setError("model", String(e)))
+    );
 
     if (mainPreviewMode() === "webcam") {
       el("src-thermal").classList.remove("active");
