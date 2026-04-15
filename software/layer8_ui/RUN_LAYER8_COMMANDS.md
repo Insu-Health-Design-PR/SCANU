@@ -193,3 +193,30 @@ If you need to skip radar config (already configured):
 ```bash
 MMWAVE=on PRESENCE=ifx THERMAL=on RGB=on ./scripts/run_jetson_full_stack.sh --skip-mmwave-config
 ```
+
+## 11) Auto-start on Jetson (systemd)
+Install backend + frontend as services (boot persistence):
+
+```bash
+cd /home/Desktop/SCANU-dev_adrian/software/layer8_ui/scripts
+./install_layer8_systemd.sh /home/Desktop/SCANU-dev_adrian <your-linux-user>
+```
+
+Check status:
+
+```bash
+sudo systemctl status layer8-backend layer8-frontend
+```
+
+Edit runtime options (ports, devices, IFX, etc.):
+
+```bash
+sudo nano /etc/default/layer8
+sudo systemctl restart layer8-backend layer8-frontend
+```
+
+Disable auto-start if needed:
+
+```bash
+sudo systemctl disable --now layer8-backend layer8-frontend
+```
