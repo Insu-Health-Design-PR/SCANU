@@ -14,12 +14,37 @@ Run with cwd = layer4_inference/ (see layer8_ui.sensor_runner).
 from __future__ import annotations
 
 import argparse
+import importlib
+import importlib.util
 import shlex
 import sys
+from pathlib import Path
+
+
+def _infer_main_callable():
+    """
+    Load ``infer_thermal_objects.main`` from the sibling file.
+
+    Avoids ``from weapon_ai import infer_thermal_objects`` (not re-exported in ``weapon_ai``)
+    and avoids a wrong ``weapon_ai`` on ``PYTHONPATH`` shadowing this package.
+    """
+    importlib.import_module("weapon_ai")  # ensure package metadata / __path__
+
+    path = Path(__file__).resolve().parent / "infer_thermal_objects.py"
+    if not path.is_file():
+        raise FileNotFoundError(path)
+    name = "weapon_ai.infer_thermal_objects"
+    spec = importlib.util.spec_from_file_location(name, path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load spec for {name} from {path}")
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod.main
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Webcam live infer for Layer 8 UI.")
+    p = argparse.ArgumentParser(description="Webcam live infer for Layer 8 UI.", allow_abbrev=False)
     p.add_argument("--webcam-device", type=int, default=0)
     p.add_argument(
         "--checkpoint",
@@ -72,9 +97,8 @@ def main() -> None:
         forward.extend(shlex.split(extra))
 
     sys.argv = forward
-    from weapon_ai import infer_thermal_objects
-
-    infer_thermal_objects.main()
+    infer_main = _infer_main_callable()
+    infer_main()
 
 
 if __name__ == "__main__":

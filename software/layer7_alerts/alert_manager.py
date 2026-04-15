@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from uuid import uuid4
 
 from software.layer6_state_machine.models import StateEvent, StateSnapshot, SystemState
@@ -61,5 +61,5 @@ def _build_message(event: StateEvent) -> str:
 
 
 def _to_utc_iso(timestamp_ms: float) -> str:
-    dt = datetime.fromtimestamp(timestamp_ms / 1000.0, tz=UTC)
+    dt = datetime.fromtimestamp(timestamp_ms / 1000.0, tz=timezone.utc)
     return dt.isoformat().replace("+00:00", "Z")

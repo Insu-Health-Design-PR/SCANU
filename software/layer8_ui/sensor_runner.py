@@ -1,4 +1,9 @@
-"""Start/stop capture subprocesses for thermal, webcam (weapon infer), and mmWave."""
+"""
+mmWave capture via ``layer1_radar/examples/live_capture.py`` (UART/TLV stack under ``layer1_radar/mmwave``).
+
+Also owns shared PID/log state and ``start`` / ``stop`` / ``status`` for **thermal** and **webcam**,
+delegating command lines to ``thermal_runner`` and ``webcam_runner``.
+"""
 
 from __future__ import annotations
 
@@ -12,7 +17,8 @@ import threading
 from pathlib import Path
 from typing import Any, Literal
 
-from layer8_ui.thermal_device import detect_working_thermal_device
+from layer8_ui import thermal_runner, webcam_runner
+from layer8_ui.artifact_paths import software_root_from_settings
 
 SensorId = Literal["thermal", "webcam", "mmwave"]
 
@@ -25,6 +31,12 @@ def _state_path(layer8_dir: Path) -> Path:
     if _STATE_PATH is None:
         _STATE_PATH = layer8_dir / ".sensor_pids.json"
     return _STATE_PATH
+
+
+def _logs_dir(layer8_dir: Path) -> Path:
+    d = layer8_dir.resolve() / "logs"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
 
 
 def _read_state(path: Path) -> dict[str, Any]:
@@ -55,175 +67,24 @@ def _pid_alive(pid: int) -> bool:
     return True
 
 
-def _software_root(settings: dict[str, Any]) -> Path:
-    raw = (settings.get("software_root") or "").strip()
-    if raw:
-        return Path(raw).resolve()
-    return Path(__file__).resolve().parent.parent
-
-
 def resolved_software_root(settings: dict[str, Any]) -> Path:
-    """Absolute `software/` directory used for cwd and PYTHONPATH."""
-    return _software_root(settings)
+    """Absolute ``software/`` directory used for cwd and PYTHONPATH."""
+    return software_root_from_settings(settings)
 
 
-def command_cwd(sensor: SensorId, settings: dict[str, Any]) -> Path:
-    """Working directory for the sensor subprocess."""
-    sw = _software_root(settings)
-    if sensor == "webcam":
-        return sw / "layer4_inference"
-    return sw
+def mmwave_capture_script(software_root: Path) -> Path:
+    return thermal_runner.layer1_examples_dir(software_root) / "live_capture.py"
 
 
-def _abs_software_path(sw: Path, rel: str) -> str:
-    rel = rel.strip()
-    if not rel:
-        return ""
-    p = Path(rel).expanduser()
-    if p.is_absolute():
-        return str(p.resolve())
-    return str((sw / p).resolve())
-
-
-def _webcam_structured_weapon_args(w: dict, sw: Path) -> str:
-    """Build extra CLI for infer_thermal_objects from settings (merged with weapon_extra_args)."""
-    parts: list[str] = []
-
-    def _f(flag: str, key: str, caster) -> None:
-        raw = w.get(key)
-        if raw is None or str(raw).strip() == "":
-            return
-        try:
-            parts.extend([flag, str(caster(raw))])
-        except (TypeError, ValueError):
-            return
-
-    _f("--unsafe_threshold", "weapon_unsafe_threshold", float)
-    gt_raw = w.get("weapon_gun_threshold")
-    if gt_raw is not None and str(gt_raw).strip() != "":
-        try:
-            if float(gt_raw) > 0:
-                parts.extend(["--gun_threshold", str(float(gt_raw))])
-        except (TypeError, ValueError):
-            pass
-    ym = str(w.get("weapon_yolo_model") or "").strip()
-    if ym:
-        parts.extend(["--yolo_model", ym])
-    _f("--conf", "weapon_conf", float)
-    _f("--image_size", "weapon_image_size", int)
-    _f("--gun_conf", "weapon_gun_conf", float)
-    _f("--gun_imgsz", "weapon_gun_imgsz", int)
-    _f("--min_box_px", "weapon_min_box_px", int)
-    _f("--gun_min_box_px", "weapon_gun_min_box_px", int)
-    if int(w.get("weapon_gun_thermal", 0)):
-        parts.append("--gun_thermal")
-    if int(w.get("weapon_no_gun_yolo", 0)):
-        parts.append("--no_gun_yolo")
-    if int(w.get("weapon_show_yolo_name", 0)):
-        parts.append("--show_yolo_name")
-    gpath = str(w.get("weapon_gun_yolo_model") or "").strip()
-    if gpath:
-        gp = Path(gpath).expanduser()
-        abs_g = str(gp.resolve()) if gp.is_absolute() else str((sw / gpath).resolve())
-        parts.extend(["--gun_yolo_model", abs_g])
-
-    built = shlex.join(parts) if parts else ""
-    manual = (w.get("weapon_extra_args") or "").strip()
-    if manual:
-        return f"{built} {manual}".strip() if built else manual
-    return built
-
-
-def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> list[str]:
-    sw = _software_root(settings)
+def build_mmwave_command(settings: dict[str, Any], layer8_dir: Path) -> list[str]:
+    """CLI for ``live_capture.py`` (uses ``layer1_radar.mmwave`` UART/TLV stack)."""
+    del layer8_dir
+    sw = software_root_from_settings(settings)
     py = os.environ.get("PYTHON", sys.executable)
-    ex = sw / "layer1_radar" / "examples"
-
-    if sensor == "thermal":
-        t = settings.get("thermal") or {}
-        script = ex / "thermal_only_capture.py"
-        video = (t.get("video") or "thermal_only.mp4").strip()
-        live = (t.get("live_frame") or "").strip()
-        out = (t.get("output") or "").strip()
-        thermal_device = int(t.get("thermal_device", 0))
-        thermal_auto_detect = bool(int(t.get("thermal_auto_detect", 1)))
-        if thermal_auto_detect:
-            detected = detect_working_thermal_device(
-                preferred=thermal_device,
-                width=int(t.get("thermal_width", 640)),
-                height=int(t.get("thermal_height", 480)),
-                fps=int(t.get("thermal_fps", 30)),
-                search_max_index=int(t.get("thermal_detect_max_index", 6)),
-            )
-            if detected is not None:
-                thermal_device = detected
-
-        cmd = [
-            py,
-            str(script),
-            "--frames",
-            str(int(t.get("frames", 300))),
-            "--fps",
-            str(float(t.get("fps", 10))),
-            "--video",
-            video,
-            "--thermal-device",
-            str(int(thermal_device)),
-            "--thermal-width",
-            str(int(t.get("thermal_width", 640))),
-            "--thermal-height",
-            str(int(t.get("thermal_height", 480))),
-            "--thermal-fps",
-            str(int(t.get("thermal_fps", 30))),
-            "--panel-w",
-            str(int(t.get("panel_w", 640))),
-            "--panel-h",
-            str(int(t.get("panel_h", 480))),
-        ]
-        if out:
-            cmd.extend(["--output", out])
-        if live:
-            cmd.extend(["--live-frame", live])
-        return cmd
-
-    if sensor == "webcam":
-        w = settings.get("webcam") or {}
-        sw = _software_root(settings)
-        live = _abs_software_path(sw, str(w.get("live_frame") or ""))
-        if not live:
-            raise ValueError("webcam.live_frame must be set (JPEG path under software/).")
-        video = _abs_software_path(sw, str(w.get("video") or w.get("output") or ""))
-        ck = str(w.get("weapon_checkpoint") or "").strip() or (
-            "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
-        )
-        ck_abs = _abs_software_path(sw, ck)
-        cmd = [
-            py,
-            "-m",
-            "weapon_ai.webcam_layer8_runner",
-            "--webcam-device",
-            str(int(w.get("webcam_device", 0))),
-            "--checkpoint",
-            ck_abs,
-            "--live-frame",
-            live,
-        ]
-        if video:
-            cmd.extend(["--video", video])
-        frames = int(w.get("frames", 0))
-        if frames > 0:
-            cmd.extend(["--frames", str(frames)])
-        extra = _webcam_structured_weapon_args(w, sw).strip()
-        if extra:
-            cmd.extend(["--weapon-extra-args", extra])
-        return cmd
-
-    # mmwave
     m = settings.get("mmwave") or {}
-    script = ex / "live_capture.py"
+    script = mmwave_capture_script(sw)
     cmd = [py, str(script), "--frames", str(int(m.get("frames", 100)))]
-    mmwave_only = bool(int(m.get("mmwave_only", 1)))
-    if mmwave_only:
+    if bool(int(m.get("mmwave_only", 1))):
         cmd.append("--mmwave-only")
     cfg = (m.get("config") or "").strip()
     if cfg:
@@ -250,10 +111,24 @@ def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) 
         cmd.append("--verbose")
     extra = (m.get("extra_args") or "").strip()
     if extra:
-        import shlex
-
         cmd.extend(shlex.split(extra))
     return cmd
+
+
+def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> list[str]:
+    if sensor == "thermal":
+        return thermal_runner.build_thermal_command(settings, layer8_dir)
+    if sensor == "webcam":
+        return webcam_runner.build_webcam_command(settings, layer8_dir)
+    return build_mmwave_command(settings, layer8_dir)
+
+
+def command_cwd(sensor: SensorId, settings: dict[str, Any]) -> Path:
+    if sensor == "webcam":
+        return webcam_runner.webcam_command_cwd(settings)
+    if sensor == "thermal":
+        return thermal_runner.thermal_command_cwd(settings)
+    return software_root_from_settings(settings)
 
 
 def status(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
@@ -305,7 +180,7 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
     if cur["running"]:
         return {"ok": False, "error": f"{sensor} already running (pid {cur['pid']})"}
 
-    sw = _software_root(settings)
+    sw = software_root_from_settings(settings)
     try:
         cmd = build_command(sensor, settings, layer8_dir)
     except ValueError as e:
@@ -339,7 +214,8 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
         "ok": True,
         "pid": proc.pid,
         "command": cmd,
-        "cwd": str(sw),
+        "cwd": str(cwd),
+        "software_root": str(sw),
         "log_file": str(log_path),
     }
 
