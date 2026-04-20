@@ -220,3 +220,41 @@ Disable auto-start if needed:
 ```bash
 sudo systemctl disable --now layer8-backend layer8-frontend
 ```
+
+## 12) Ensure cameras + sensors start automatically on boot
+After installing systemd services, set `/etc/default/layer8` so Layer 8 boots in full live mode:
+
+```bash
+sudo nano /etc/default/layer8
+```
+
+Recommended values:
+
+```bash
+LAYER8_MMWAVE=on
+LAYER8_PRESENCE=ifx
+LAYER8_THERMAL=on
+LAYER8_RGB=on
+LAYER8_VISUAL=on
+LAYER8_CLI_PORT=/dev/ttyUSB0
+LAYER8_DATA_PORT=/dev/ttyUSB1
+LAYER8_THERMAL_DEVICE=0
+LAYER8_RGB_DEVICE=0
+# LAYER8_IFX_UUID=<YOUR_UUID_IF_NEEDED>
+```
+
+Apply changes:
+
+```bash
+sudo systemctl restart layer8-backend layer8-frontend
+sudo systemctl status layer8-backend layer8-frontend
+```
+
+Quick validation:
+
+```bash
+curl http://127.0.0.1:8080/api/health
+curl http://127.0.0.1:8080/api/visual/latest
+```
+
+After Jetson reboot, both services should start automatically with live cameras + sensors.
