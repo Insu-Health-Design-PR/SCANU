@@ -11,3 +11,6 @@ software/layer8_ui/logs/**
 !software/layer8_ui/logs/.gitkeep
 software/layer8_ui/.sensor_pids.json
 software/layer8_ui/profiles/*.bak
+
+# Local-only copy / workspace (keep out of remote)
+SCANU-dev_adrian/
