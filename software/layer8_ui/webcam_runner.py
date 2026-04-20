@@ -17,10 +17,49 @@ from typing import Any
 os.environ.setdefault("OPENCV_LOG_LEVEL", "ERROR")
 
 import cv2
+import numpy as np
 
 from layer8_ui.artifact_paths import abs_software_path, software_root_from_settings
 
 _WEBCAM_CAM_CFG_LEN = 3
+_DEFAULT_WEAPON_CHECKPOINT = "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
+
+
+def _frame_to_bgr_for_jpeg(frame: Any) -> np.ndarray | None:
+    """V4L2 can yield 2-channel or odd layouts; JPEG needs 1/3/4 ch — normalize to BGR."""
+    if frame is None or not hasattr(frame, "shape"):
+        return None
+    if frame.size == 0:
+        return None
+    if frame.ndim == 2:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if frame.ndim != 3:
+        return None
+    ch = int(frame.shape[2])
+    if ch == 3:
+        return frame
+    if ch == 1:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if ch == 4:
+        return cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    if ch == 2:
+        # Packed / planar oddities: duplicate into 3 channels for preview only.
+        a = np.ascontiguousarray(frame[:, :, 0])
+        b = np.ascontiguousarray(frame[:, :, 1])
+        return cv2.merge([a, b, a])
+    return None
+
+
+def _resolve_gun_model_path(sw: Path, raw: str) -> str:
+    val = str(raw or "").strip()
+    if not val:
+        return ""
+    p = Path(val).expanduser()
+    if p.is_absolute():
+        return str(p.resolve())
+    if "/" not in val and "\\" not in val:
+        return str((sw / "layer4_inference" / "trained_models" / "gun_detection" / val).resolve())
+    return str((sw / val).resolve())
 
 
 def _webcam_structured_weapon_args(w: dict[str, Any], sw: Path) -> str:
@@ -43,7 +82,7 @@ def _webcam_structured_weapon_args(w: dict[str, Any], sw: Path) -> str:
                 parts.extend(["--gun_threshold", str(float(gt_raw))])
         except (TypeError, ValueError):
             pass
-    ym = str(w.get("weapon_yolo_model") or "").strip()
+    ym = str(w.get("person_detection_model") or w.get("weapon_yolo_model") or "").strip()
     if ym:
         parts.extend(["--yolo_model", ym])
     _f("--conf", "weapon_conf", float)
@@ -60,8 +99,7 @@ def _webcam_structured_weapon_args(w: dict[str, Any], sw: Path) -> str:
         parts.append("--show_yolo_name")
     gpath = str(w.get("weapon_gun_yolo_model") or "").strip()
     if gpath:
-        gp = Path(gpath).expanduser()
-        abs_g = str(gp.resolve()) if gp.is_absolute() else str((sw / gpath).resolve())
+        abs_g = _resolve_gun_model_path(sw, gpath)
         parts.extend(["--gun_yolo_model", abs_g])
 
     built = shlex.join(parts) if parts else ""
@@ -84,21 +122,28 @@ def build_webcam_command(settings: dict[str, Any], layer8_dir: Path) -> list[str
     if not live:
         raise ValueError("webcam.live_frame must be set (JPEG path under software/).")
     video = abs_software_path(settings, str(w.get("video") or w.get("output") or ""))
-    ck = str(w.get("weapon_checkpoint") or "").strip() or (
-        "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
+    metrics_json = abs_software_path(
+        settings,
+        str(w.get("metrics_json") or "layer8_ui/artifacts/live_threat_metrics.json"),
     )
-    ck_abs = abs_software_path(settings, ck)
+    ck_abs = _resolve_gun_model_path(sw, _DEFAULT_WEAPON_CHECKPOINT)
     cmd = [
         py,
         "-m",
         "weapon_ai.webcam_layer8_runner",
         "--webcam-device",
         str(int(w.get("webcam_device", 0))),
+        "--capture-width",
+        str(int(w.get("webcam_width", 1920))),
+        "--capture-height",
+        str(int(w.get("webcam_height", 1080))),
         "--checkpoint",
         ck_abs,
         "--live-frame",
         live,
     ]
+    if metrics_json:
+        cmd.extend(["--metrics-json", metrics_json])
     if video:
         cmd.extend(["--video", video])
     frames = int(w.get("frames", 0))
@@ -134,11 +179,10 @@ class WebcamSharedStream:
     @staticmethod
     def _cfg_from_settings(settings: dict[str, Any]) -> tuple[Any, ...]:
         w = settings.get("webcam") or {}
-        t = settings.get("thermal") or {}
         return (
             int(w.get("webcam_device", 0)),
-            int(t.get("panel_w", 640)),
-            int(t.get("panel_h", 480)),
+            int(w.get("webcam_width", 1920)),
+            int(w.get("webcam_height", 1080)),
         )
 
     def sync_settings(self, settings: dict[str, Any]) -> None:
@@ -261,11 +305,10 @@ class WebcamSharedStream:
                     continue
 
                 _device, width, height = settings_cam_cfg
-                bgr = frame
-                if len(bgr.shape) == 2:
-                    bgr = cv2.cvtColor(bgr, cv2.COLOR_GRAY2BGR)
-                elif bgr.shape[2] == 4:
-                    bgr = cv2.cvtColor(bgr, cv2.COLOR_BGRA2BGR)
+                bgr = _frame_to_bgr_for_jpeg(frame)
+                if bgr is None:
+                    time.sleep(0.03)
+                    continue
                 preview = cv2.resize(bgr, (int(width), int(height)), interpolation=cv2.INTER_LINEAR)
                 ok_enc, jpg = cv2.imencode(".jpg", preview, [int(cv2.IMWRITE_JPEG_QUALITY), 82])
                 if ok_enc:

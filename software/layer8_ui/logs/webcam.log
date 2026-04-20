@@ -172,3 +172,832 @@ For a full compatibility table see https://github.com/pytorch/vision#installatio
 WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
 Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
 For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaaeb9a00c0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@15.809] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaad6dbebb0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@6.759] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaae3186cd0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.342] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaabb401da0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.222] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaafc97aa20] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.074] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaadef1d2a0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.096] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaae5cfecc0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.015] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.248] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.176] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.234] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@6.978] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.710] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.239] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@7.031] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 1
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+NvMapMemAllocInternalTagged: 1075072515 error 12
+NvMapMemHandleAlloc: error 0
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaae919d180] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@8.423] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaab06eb00d0] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.446] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaaaec245a00] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.878] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+NvMapMemAllocInternalTagged: 1075072515 error 12
+NvMapMemHandleAlloc: error 0
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[video4linux2,v4l2 @ 0xaaab1a5ef950] ioctl(VIDIOC_G_INPUT): Inappropriate ioctl for device
+[ERROR:0@7.119] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 2
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 113, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 109, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 581, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 593, in main
+    clf.load_state_dict(ck["model"])
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 2556, in load_state_dict
+    raise TypeError(
+TypeError: Expected state_dict to be dict-like, got <class 'ultralytics.nn.tasks.DetectionModel'>.
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+NvMapMemAllocInternalTagged: 1075072515 error 12
+NvMapMemHandleAlloc: error 0
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤22%, side≤65%.
+Firearm YOLO imgsz=640.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 4
+Frames read: 2179
+Person crops scored (total boxes): 2317
+p(gun) over all crops — min: 0.0000  mean: 0.3586  max: 0.9900
+Per-frame max p(gun) — mean: 0.3383  peak (worst frame): 0.9900
+FINAL (clip): UNSAFE  |  peak p(gun)=0.9900  (safe<0.2, suspicious<0.75, unsafe>=0.75; legacy border threshold=0.5)
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@25.551] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 4
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+[ERROR:0@11.766] global obsensor_uvc_stream_channel.cpp:163 getStreamChannelGroup Camera index out of range
+Cannot open 4
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+NvMapMemAllocInternalTagged: 1075072515 error 12
+NvMapMemHandleAlloc: error 0
+NvMapMemAllocInternalTagged: 1075072515 error 12
+NvMapMemHandleAlloc: error 0
+ioctl(VIDIOC_QBUF): Bad file descriptor
+Traceback (most recent call last):
+  File "/usr/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/usr/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 119, in <module>
+    main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/webcam_layer8_runner.py", line 115, in main
+    infer_main()
+  File "/home/insu/Desktop/SCANU/software/layer4_inference/weapon_ai/infer_thermal_objects.py", line 745, in main
+    logits = clf(x)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torchvision/models/mobilenetv3.py", line 221, in forward
+    return self._forward_impl(x)
+  File "/home/insu/.local/lib/python3.10/site-packages/torchvision/models/mobilenetv3.py", line 216, in _forward_impl
+    x = self.classifier(x)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/container.py", line 244, in forward
+    input = module(input)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/insu/.local/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 125, in forward
+    return F.linear(input, self.weight, self.bias)
+RuntimeError: CUDA error: CUBLAS_STATUS_ALLOC_FAILED when calling `cublasCreate(handle)`
+q=quit | YOLO (person only) on thermal | label = safe/UNSAFE + p(gun) | UNSAFE = colored border (not filled)
+Firearm YOLO: orange boxes (AGPL-3.0) — search: inside each person box only. Size filter vs ROI/frame: area≤50%, side≤88%.
+Firearm YOLO imgsz=800.
+Person ROI pad for firearm pass: 6% of box size.
+Person ROI extra pad for firearm pass: 8 px per side.
+Preset --gun_thermal: take-best firearm box, relaxed size limits, larger imgsz.
+Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person.
+Summary prints when the video ends or you press q.
+
+============================================================
+Run finished: 3
+Frames read: 1876
+No person crops scored — cannot summarize p(gun).
+============================================================
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation
+WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
+Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
+For a full compatibility table see https://github.com/pytorch/vision#installation

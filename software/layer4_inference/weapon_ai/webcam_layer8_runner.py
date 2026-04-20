@@ -46,6 +46,8 @@ def _infer_main_callable():
 def main() -> None:
     p = argparse.ArgumentParser(description="Webcam live infer for Layer 8 UI.", allow_abbrev=False)
     p.add_argument("--webcam-device", type=int, default=0)
+    p.add_argument("--capture-width", type=int, default=1920)
+    p.add_argument("--capture-height", type=int, default=1080)
     p.add_argument(
         "--checkpoint",
         type=str,
@@ -71,6 +73,12 @@ def main() -> None:
         help="Max frames (0 = until process stopped / stream ends).",
     )
     p.add_argument(
+        "--metrics-json",
+        type=str,
+        default="",
+        help="Optional JSON path for Layer 8 dashboard threat metrics.",
+    )
+    p.add_argument(
         "--weapon-extra-args",
         type=str,
         default="",
@@ -84,6 +92,10 @@ def main() -> None:
         args.checkpoint,
         "--source",
         str(int(args.webcam_device)),
+        "--capture_width",
+        str(int(args.capture_width)),
+        "--capture_height",
+        str(int(args.capture_height)),
         "--no_imshow",
         "--live_jpg",
         args.live_frame,
@@ -92,6 +104,8 @@ def main() -> None:
         forward.extend(["--output", args.video.strip()])
     if int(args.frames) > 0:
         forward.extend(["--max_frames", str(int(args.frames))])
+    if args.metrics_json.strip():
+        forward.extend(["--live_metrics_json", args.metrics_json.strip()])
     extra = args.weapon_extra_args.strip()
     if extra:
         forward.extend(shlex.split(extra))

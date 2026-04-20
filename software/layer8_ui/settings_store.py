@@ -32,7 +32,12 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "live_frame": "layer8_ui/artifacts/live_webcam.jpg",
         "output": "",
         "webcam_device": 0,
+        "webcam_width": 1920,
+        "webcam_height": 1080,
+        "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
+        "active_model_profile_id": "",
         "weapon_checkpoint": "layer4_inference/trained_models/gun_detection/gun_prob_best.pt",
+        "person_detection_model": "yolov8n.pt",
         "weapon_unsafe_threshold": 0.5,
         "weapon_gun_threshold": 0.0,
         "weapon_yolo_model": "yolov8n.pt",
@@ -98,7 +103,7 @@ def reset_webcam_weapon_defaults(layer8_dir: Path) -> dict[str, Any]:
     defs = deepcopy(DEFAULT_SETTINGS["webcam"])
     w = {**(data.get("webcam") or {})}
     for k, v in defs.items():
-        if k.startswith("weapon_") or k == "verbose":
+        if k.startswith("weapon_") or k in ("verbose", "person_detection_model"):
             w[k] = v
     data["webcam"] = w
     save(layer8_dir, data)

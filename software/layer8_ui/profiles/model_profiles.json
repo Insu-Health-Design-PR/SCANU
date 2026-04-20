@@ -1,0 +1,102 @@
+{
+  "profile_balanced": {
+    "label": "Balanced",
+    "description": "1080p capture; default threat thresholds and gun pipeline settings.",
+    "values": {
+      "webcam_device": 2,
+      "webcam_width": 1920,
+      "webcam_height": 1080,
+      "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
+      "person_detection_model": "yolov8n.pt",
+      "weapon_conf": 0.25,
+      "weapon_min_box_px": 24,
+      "weapon_show_yolo_name": 0,
+      "weapon_unsafe_threshold": 0.75,
+      "weapon_gun_threshold": 0,
+      "weapon_image_size": 224,
+      "weapon_gun_conf": 0.25,
+      "weapon_gun_imgsz": 768,
+      "weapon_gun_min_box_px": 8,
+      "weapon_gun_thermal": 1,
+      "weapon_no_gun_yolo": 0,
+      "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_yolo_model": "yolov8n.pt"
+    }
+  },
+  "profile_high_resolution": {
+    "label": "High resolution",
+    "description": "1440p-class capture; larger gun YOLO input — heavier on Jetson VRAM.",
+    "values": {
+      "webcam_device": 2,
+      "webcam_width": 2560,
+      "webcam_height": 1440,
+      "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
+      "person_detection_model": "yolov8n.pt",
+      "weapon_conf": 0.22,
+      "weapon_min_box_px": 28,
+      "weapon_show_yolo_name": 0,
+      "weapon_unsafe_threshold": 0.75,
+      "weapon_gun_threshold": 0,
+      "weapon_image_size": 256,
+      "weapon_gun_conf": 0.22,
+      "weapon_gun_imgsz": 960,
+      "weapon_gun_min_box_px": 10,
+      "weapon_gun_thermal": 1,
+      "weapon_no_gun_yolo": 0,
+      "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_yolo_model": "yolov8n.pt"
+    }
+  },
+  "profile_low_resolution": {
+    "label": "Low resolution",
+    "description": "720p capture; smaller gun YOLO imgsz for lighter GPU/CPU load.",
+    "values": {
+      "webcam_device": 2,
+      "webcam_width": 1280,
+      "webcam_height": 720,
+      "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
+      "person_detection_model": "yolov8n.pt",
+      "weapon_conf": 0.28,
+      "weapon_min_box_px": 20,
+      "weapon_show_yolo_name": 0,
+      "weapon_unsafe_threshold": 0.75,
+      "weapon_gun_threshold": 0,
+      "weapon_image_size": 192,
+      "weapon_gun_conf": 0.28,
+      "weapon_gun_imgsz": 512,
+      "weapon_gun_min_box_px": 6,
+      "weapon_gun_thermal": 1,
+      "weapon_no_gun_yolo": 0,
+      "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_yolo_model": "yolov8n.pt"
+    }
+  },
+  "camera_4k_gun_enhanced_apr20": {
+    "label": "Gun enhanced · 1080p Jetson test",
+    "description": "Gun-enhanced profile; values below set to 1080p + classifier on CPU for Jetson VRAM testing (raise res when stable).",
+    "values": {
+      "webcam_device": 2,
+      "webcam_width": 1920,
+      "webcam_height": 1080,
+      "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
+      "person_detection_model": "yolov8n.pt",
+      "weapon_conf": 0.25,
+      "weapon_min_box_px": 24,
+      "weapon_show_yolo_name": 0,
+      "weapon_unsafe_threshold": 0.75,
+      "weapon_gun_threshold": 0,
+      "weapon_image_size": 224,
+      "weapon_gun_conf": 0.25,
+      "weapon_gun_imgsz": 768,
+      "weapon_gun_min_box_px": 8,
+      "weapon_gun_thermal": 1,
+      "weapon_no_gun_yolo": 0,
+      "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_yolo_model": "yolov8n.pt"
+    }
+  }
+}

@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
+    html { color-scheme: dark; }
     :root {
       --bg: #0a0c10;
       --surface: #12151c;
@@ -62,6 +63,21 @@
       color: var(--muted);
       font-weight: 500;
     }
+    .sys-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+      flex: 1 1 auto;
+      min-width: 0;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .sys-metrics .sep { opacity: 0.45; user-select: none; }
+    .sys-metrics strong { color: var(--text); font-weight: 600; }
     .topbar-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
     .topbar-actions label { font-size: 0.65rem; color: var(--muted); display: block; margin-bottom: 0.15rem; }
     .topbar-actions input[type="text"] {
@@ -246,7 +262,7 @@
       color: var(--muted);
       margin-bottom: 0.15rem;
     }
-    .fields input, .fields textarea {
+    .fields input, .fields textarea, .fields select {
       width: 100%;
       padding: 0.32rem 0.45rem;
       border-radius: var(--radius-sm);
@@ -256,7 +272,33 @@
       font-family: var(--mono);
       font-size: 0.7rem;
     }
+    .fields select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      padding-right: 1.85rem;
+      background-color: var(--bg);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b95a8' d='M2.5 4.5 6 8l3.5-3.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+    }
+    .fields select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent-dim);
+    }
+    .fields select option {
+      background: var(--surface2);
+      color: var(--text);
+    }
     .fields textarea { min-height: 48px; resize: vertical; }
+    .profile-row > .row-actions {
+      grid-column: 1 / -1;
+    }
+    .profile-row .metrics-footnote {
+      grid-column: 1 / -1;
+    }
 
     .row-actions {
       display: flex;
@@ -386,6 +428,13 @@
       <h1>SCANU</h1>
       <span>Layer 8 · operations</span>
     </div>
+    <div class="sys-metrics" id="sys-metrics" aria-live="polite" title="Host load (updates every few seconds)">
+      <span>CPU <strong id="sys-cpu">—</strong></span>
+      <span class="sep">·</span>
+      <span>RAM <strong id="sys-ram">—</strong></span>
+      <span class="sep">·</span>
+      <span>GPU <strong id="sys-gpu">—</strong></span>
+    </div>
     <div class="topbar-actions">
       <div>
         <label for="software_root">software_root</label>
@@ -477,17 +526,33 @@
           </div>
 
           <div class="tab-panel" id="tab-model" role="tabpanel">
-            <p class="metrics-footnote" style="margin-top:0;">
-              When you <strong>Run Webcam</strong>, <code>sensor_runner</code> starts <code>python -m weapon_ai.webcam_layer8_runner</code>
-              (cwd <code>layer4_inference/</code>), which loads and runs <code>weapon_ai/infer_thermal_objects.py</code> (same logic as
-              <code>python -m weapon_ai.infer_thermal_objects</code>). <code>weapon_yolo_model</code> (e.g. <code>yolov8n.pt</code>) is the
-              <strong>person / object</strong> detector (<code>--conf</code> = <code>weapon_conf</code>, min box = <code>weapon_min_box_px</code>).
-              <code>weapon_checkpoint</code> (e.g. <code>gun_prob_best.pt</code>) scores each <strong>person crop</strong> for p(gun) / safe vs unsafe
-              (<code>weapon_unsafe_threshold</code> / <code>weapon_gun_threshold</code>). Optional orange boxes: separate firearm YOLO via <code>weapon_gun_*</code>.
-              Keys live under <code>webcam</code> in JSON; most flags are forwarded as <code>--weapon-extra-args</code> on that subprocess.
-              <code>layer8_ui.inference_overlay</code> is only a server-side stub today (not the live subprocess).
-            </p>
-            <div class="config-section">Person YOLO → crop classifier → optional firearm YOLO</div>
+            <div class="config-section">Model profile</div>
+            <div class="fields profile-row">
+              <div>
+                <label for="profile-select">Profile</label>
+                <select id="profile-select"></select>
+              </div>
+              <div class="row-actions" style="margin-top:0.35rem;">
+                <button type="button" class="btn primary" id="apply-profile">Apply profile</button>
+                <button type="button" class="btn ghost" id="refresh-profiles">Reload list</button>
+              </div>
+              <div class="fields profile-row" style="margin-top:0.75rem; align-items:flex-end;">
+                <div>
+                  <label for="profile-new-id">Profile id</label>
+                  <input id="profile-new-id" type="text" placeholder="office_yolov8s" autocomplete="off" />
+                </div>
+                <div>
+                  <label for="profile-new-name">Name</label>
+                  <input id="profile-new-name" type="text" placeholder="Balanced" autocomplete="off" />
+                </div>
+                <div class="row-actions" style="margin-top:1.35rem;">
+                  <button type="button" class="btn primary" id="save-profile-snapshot">Save to profile</button>
+                </div>
+              </div>
+            </div>
+            <div class="config-section">Parameters</div>
+            <datalist id="dl-gun-checkpoints"></datalist>
+            <datalist id="dl-person-yolo"></datalist>
             <div class="fields" id="fields-model"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="save-model">Save</button>
@@ -546,6 +611,8 @@
     const TAB_IDS = ["thermal", "webcam", "model", "mmwave"];
     const PREVIEW_KEY = "scanu_main_preview";
     let settings = {};
+    /** Populated by /api/model/options — person YOLO + every *.pt under trained_models/gun_detection. */
+    let modelOpts = { person_yolo_options: [], gun_checkpoints: [] };
     let lastStatus = {};
     let eventSource = null;
     let thermalWs = null;
@@ -567,14 +634,17 @@
         ["fps", "number"],
         ["video", "text"],
         ["live_frame", "text"],
+        ["output", "text"],
         ["webcam_device", "number"],
+        ["webcam_width", "number"],
+        ["webcam_height", "number"],
+        ["metrics_json", "text"],
       ],
       model: [
-        ["weapon_yolo_model", "text"],
+        ["person_detection_model", "text"],
         ["weapon_conf", "number"],
         ["weapon_min_box_px", "number"],
         ["weapon_show_yolo_name", "number"],
-        ["weapon_checkpoint", "text"],
         ["weapon_unsafe_threshold", "number"],
         ["weapon_gun_threshold", "number"],
         ["weapon_image_size", "number"],
@@ -711,6 +781,81 @@
       setError("model", "");
     }
 
+    /** FastAPI may return { error }, { detail: string }, or { detail: [{ msg }] }. */
+    function apiErrorMessage(payload) {
+      if (!payload || typeof payload !== "object") return "";
+      if (payload.error) return String(payload.error);
+      const d = payload.detail;
+      if (typeof d === "string") return d;
+      if (Array.isArray(d))
+        return d
+          .map((x) => (x && typeof x === "object" && "msg" in x ? String(x.msg) : String(x)))
+          .filter(Boolean)
+          .join("; ");
+      return "";
+    }
+
+    function fmtMemShort(mb) {
+      if (mb == null || mb === undefined) return "—";
+      const n = Number(mb);
+      if (n >= 1024) return (n / 1024).toFixed(1) + " GB";
+      return String(Math.round(n)) + " MB";
+    }
+
+    async function refreshSystemMetrics() {
+      const cpuEl = el("sys-cpu");
+      const ramEl = el("sys-ram");
+      const gpuEl = el("sys-gpu");
+      if (!cpuEl || !ramEl || !gpuEl) return;
+      try {
+        const r = await fetch("/api/system/metrics");
+        const m = await r.json();
+        if (m.cpu_percent != null && m.cpu_percent !== undefined) {
+          cpuEl.textContent = String(m.cpu_percent) + "%";
+          cpuEl.title =
+            m.load_1m != null ? "1m load average: " + m.load_1m : "CPU utilization (approx.)";
+        } else if (m.load_1m != null) {
+          cpuEl.textContent = "load " + String(m.load_1m);
+          cpuEl.title = "1m load average (CPU % unavailable)";
+        } else {
+          cpuEl.textContent = "—";
+          cpuEl.title = "";
+        }
+        if (m.mem && m.mem.total_mb) {
+          ramEl.textContent =
+            fmtMemShort(m.mem.used_mb) +
+            " / " +
+            fmtMemShort(m.mem.total_mb) +
+            " (" +
+            String(m.mem.percent) +
+            "%)";
+          ramEl.title = "System RAM";
+        } else {
+          ramEl.textContent = "—";
+          ramEl.title = "";
+        }
+        if (m.gpu && m.gpu.util_percent != null) {
+          const vu = String(m.gpu.util_percent) + "%";
+          const vr =
+            m.gpu.mem_total_mb > 0
+              ? String(m.gpu.mem_used_mb) + "/" + String(m.gpu.mem_total_mb) + " MiB"
+              : "";
+          gpuEl.textContent = vr ? vu + " · " + vr : vu;
+          gpuEl.title = "NVIDIA GPU (nvidia-smi)";
+        } else {
+          gpuEl.textContent = "—";
+          gpuEl.title = "No GPU data (nvidia-smi not available)";
+        }
+      } catch (_) {
+        cpuEl.textContent = "—";
+        ramEl.textContent = "—";
+        gpuEl.textContent = "—";
+        cpuEl.title = "";
+        ramEl.title = "";
+        gpuEl.title = "";
+      }
+    }
+
     function renderFields(sensor) {
       const root = el("fields-" + sensor);
       if (!root) return;
@@ -721,6 +866,12 @@
           const h = document.createElement("div");
           h.className = "config-section";
           h.textContent = "Runner (frames 0 = until Stop)";
+          root.appendChild(h);
+        }
+        if (sensor === "webcam" && key === "webcam_device") {
+          const h = document.createElement("div");
+          h.className = "config-section";
+          h.textContent = "Camera · resolution · metrics JSON";
           root.appendChild(h);
         }
         const wrap = document.createElement("div");
@@ -747,12 +898,67 @@
       });
     }
 
+    function _appendSelectModelField(root, key, sec, options, opts) {
+      const { allowEmpty, emptyLabel } = opts || {};
+      const wrap = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = key;
+      label.htmlFor = `model-${key}`;
+      const sel = document.createElement("select");
+      sel.id = `model-${key}`;
+      sel.dataset.sensor = "webcam";
+      sel.dataset.key = key;
+      let cur = sec[key];
+      if (key === "person_detection_model") {
+        cur = sec.person_detection_model ?? sec.weapon_yolo_model ?? "";
+      }
+      cur = cur === undefined || cur === null ? "" : String(cur);
+      if (allowEmpty) {
+        const o0 = document.createElement("option");
+        o0.value = "";
+        o0.textContent = emptyLabel || "— none —";
+        sel.appendChild(o0);
+      }
+      const seen = new Set();
+      (options || []).forEach((name) => {
+        if (!name || seen.has(name)) return;
+        seen.add(name);
+        const o = document.createElement("option");
+        o.value = name;
+        o.textContent = name;
+        sel.appendChild(o);
+      });
+      if (cur && !seen.has(cur)) {
+        const ox = document.createElement("option");
+        ox.value = cur;
+        ox.textContent = `${cur} (current)`;
+        sel.appendChild(ox);
+      }
+      sel.value = cur;
+      if (sel.value !== cur && !allowEmpty && options && options.length) {
+        sel.selectedIndex = 0;
+      }
+      wrap.appendChild(label);
+      wrap.appendChild(sel);
+      root.appendChild(wrap);
+    }
+
     function renderModelFields() {
       const root = el("fields-model");
       if (!root) return;
       root.innerHTML = "";
       const sec = settings.webcam || {};
+      const personOpts = modelOpts.person_yolo_options || [];
+      const gunOpts = modelOpts.gun_checkpoints || [];
       FIELD_DEFS.model.forEach(([key, type]) => {
+        if (key === "person_detection_model") {
+          _appendSelectModelField(root, key, sec, personOpts, { allowEmpty: false });
+          return;
+        }
+        if (key === "weapon_gun_yolo_model") {
+          _appendSelectModelField(root, key, sec, gunOpts, { allowEmpty: true, emptyLabel: "— none (classifier only) —" });
+          return;
+        }
         const wrap = document.createElement("div");
         const label = document.createElement("label");
         label.textContent = key;
@@ -803,12 +1009,92 @@
       return out;
     }
 
+    /** Merged webcam dict for profile snapshot: Model form + Webcam tab + last loaded settings. */
+    function currentWebcamProfileValues() {
+      const wModel = readModelSection();
+      const wCam = readSection("webcam");
+      const merged = { ...(settings.webcam || {}), ...wCam, ...wModel };
+      const p = String(wModel.person_detection_model || merged.person_detection_model || merged.weapon_yolo_model || "").trim();
+      if (p) {
+        merged.person_detection_model = p;
+        merged.weapon_yolo_model = p;
+      }
+      return merged;
+    }
+
+    async function loadModelOptions() {
+      try {
+        const r = await fetch("/api/model/options");
+        const o = await r.json();
+        const gun = o.gun_checkpoints || [];
+        const person = o.person_yolo_options || o.person_yolo_suggestions || [];
+        modelOpts = { person_yolo_options: person, gun_checkpoints: gun };
+        const dg = el("dl-gun-checkpoints");
+        const dp = el("dl-person-yolo");
+        if (dg) {
+          dg.innerHTML = "";
+          gun.forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            dg.appendChild(opt);
+          });
+        }
+        if (dp) {
+          dp.innerHTML = "";
+          person.forEach((name) => {
+            const opt = document.createElement("option");
+            opt.value = name;
+            dp.appendChild(opt);
+          });
+        }
+      } catch (_) { /* ignore */ }
+    }
+
+    async function loadProfiles() {
+      try {
+        const r = await fetch("/api/model/profiles");
+        const data = await r.json();
+        const sel = el("profile-select");
+        if (!sel) return;
+        const fromSettings = (settings.webcam || {}).active_model_profile_id || "";
+        const cur = sel.value || fromSettings;
+        sel.innerHTML = "";
+        const profs = data.profiles || {};
+        Object.keys(profs).sort().forEach((id) => {
+          const p = profs[id] || {};
+          const opt = document.createElement("option");
+          opt.value = id;
+          const lbl = p.label ? String(p.label) : id;
+          opt.textContent = lbl;
+          opt.title = id;
+          sel.appendChild(opt);
+        });
+        if (cur && [...sel.options].some((o) => o.value === cur)) sel.value = cur;
+      } catch (_) { /* ignore */ }
+    }
+
+    async function syncProfileFromSavedWebcam(profileId) {
+      if (!profileId) return;
+      const r = await fetch("/api/model/profiles/sync_from_config", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: profileId }),
+      });
+      let payload = {};
+      try {
+        payload = await r.json();
+      } catch (_) {}
+      if (!r.ok) throw new Error(apiErrorMessage(payload) || "Could not update model_profiles.json for selected profile");
+    }
+
     async function loadConfig() {
       const r = await fetch("/api/config");
       settings = await r.json();
       el("software_root").value = settings.software_root || "";
       SENSORS.forEach(renderFields);
+      await loadModelOptions();
       renderModelFields();
+      await loadProfiles();
       refreshMmwaveThumb();
       refreshMainPreview();
     }
@@ -827,13 +1113,36 @@
       settings[sensor] = { ...(settings[sensor] || {}), ...readSection(sensor) };
       await saveAllSettings();
       renderFields(sensor);
-      if (sensor === "webcam") renderModelFields();
+      if (sensor === "webcam") {
+        const pid = el("profile-select").value;
+        if (pid) {
+          try {
+            await syncProfileFromSavedWebcam(pid);
+          } catch (e) {
+            setError(sensor, String(e));
+            return;
+          }
+        }
+        renderModelFields();
+      }
       setError(sensor, "");
     }
 
     async function saveModel() {
-      settings.webcam = { ...(settings.webcam || {}), ...readModelSection() };
+      const o = readModelSection();
+      const p = String(o.person_detection_model || "").trim();
+      if (p) o.weapon_yolo_model = p;
+      settings.webcam = { ...(settings.webcam || {}), ...o };
       await saveAllSettings();
+      const pid = el("profile-select").value;
+      if (pid) {
+        try {
+          await syncProfileFromSavedWebcam(pid);
+        } catch (e) {
+          setError("model", String(e));
+          return;
+        }
+      }
       renderModelFields();
       renderFields("webcam");
       setError("model", "");
@@ -943,16 +1252,33 @@
     async function runAction(sensor, action) {
       clearErrors();
       const r = await fetch(`/api/${action}/${sensor}`, { method: "POST" });
-      const payload = await r.json();
-      if (!r.ok && payload.error) setError(sensor, payload.error);
+      let payload = {};
+      try {
+        payload = await r.json();
+      } catch (_) {}
+      const msg = apiErrorMessage(payload) || (!r.ok ? `HTTP ${r.status}` : "");
+      if (!r.ok && msg) {
+        setError(sensor, msg);
+        // Webcam failures were only on err-webcam; Model tab users expect err-model too.
+        if (sensor === "webcam" && (action === "run" || action === "restart")) {
+          setError("model", `${action} webcam: ${msg}`);
+        }
+      }
       await oneShotStatus();
     }
 
     async function runGroup(action) {
       clearErrors();
       const r = await fetch(`/api/${action}`, { method: "POST" });
-      const payload = await r.json();
-      if (!r.ok && payload.error) SENSORS.forEach((s) => setError(s, payload.error));
+      let payload = {};
+      try {
+        payload = await r.json();
+      } catch (_) {}
+      const msg = apiErrorMessage(payload) || (!r.ok ? `HTTP ${r.status}` : "");
+      if (!r.ok && msg) {
+        SENSORS.forEach((s) => setError(s, msg));
+        setError("model", `${action.replace(/_/g, " ")}: ${msg}`);
+      }
       await oneShotStatus();
     }
 
@@ -1006,6 +1332,57 @@
     el("cmd-model").addEventListener("click", () =>
       showCommand("webcam", "cmd-out-model").catch((e) => setError("model", String(e)))
     );
+    el("apply-profile").addEventListener("click", async () => {
+      setError("model", "");
+      const id = el("profile-select").value;
+      if (!id) {
+        setError("model", "Select a profile first.");
+        return;
+      }
+      const r = await fetch("/api/model/profiles/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      let payload = {};
+      try {
+        payload = await r.json();
+      } catch (_) {}
+      if (!r.ok) {
+        setError("model", apiErrorMessage(payload) || "Apply profile failed");
+        return;
+      }
+      await loadConfig();
+    });
+    el("refresh-profiles").addEventListener("click", () => loadProfiles().catch(() => {}));
+    el("save-profile-snapshot").addEventListener("click", async () => {
+      setError("model", "");
+      const id = el("profile-new-id").value.trim();
+      const name = el("profile-new-name").value.trim();
+      if (!id) {
+        setError("model", "Enter a profile id (slug) for Save to profile.");
+        return;
+      }
+      const values = currentWebcamProfileValues();
+      const r = await fetch("/api/model/profiles/snapshot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, name, description: "", values }),
+      });
+      let payload = {};
+      try {
+        payload = await r.json();
+      } catch (_) {}
+      if (!r.ok) {
+        setError("model", apiErrorMessage(payload) || "Save to profile failed");
+        return;
+      }
+      el("profile-new-id").value = "";
+      el("profile-new-name").value = "";
+      await loadConfig();
+      const sel = el("profile-select");
+      if (sel && [...sel.options].some((o) => o.value === id)) sel.value = id;
+    });
 
     if (mainPreviewMode() === "webcam") {
       el("src-thermal").classList.remove("active");
@@ -1017,6 +1394,8 @@
       startLiveStatus();
       pollMetrics();
       setInterval(pollMetrics, 2500);
+      refreshSystemMetrics();
+      setInterval(refreshSystemMetrics, 5000);
     });
   </script>
 </body>

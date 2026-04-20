@@ -14,6 +14,7 @@ import signal
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 from typing import Any, Literal
 
@@ -174,6 +175,15 @@ def stop(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
     return {"ok": True, "stopped_pid": pid}
 
 
+def _tail_log(path: Path, max_chars: int = 2800) -> str:
+    if not path.is_file():
+        return ""
+    try:
+        return path.read_text(encoding="utf-8", errors="replace")[-max_chars:].strip()
+    except OSError:
+        return ""
+
+
 def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[str, Any]:
     path = _state_path(layer8_dir)
     cur = status(sensor, layer8_dir)
@@ -209,6 +219,23 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
         st = _read_state(path)
         st[sensor] = {"pid": proc.pid, "log_file": str(log_path)}
         _write_state(path, st)
+
+    # If the child dies during imports or camera open, surface failure instead of "Run OK" + idle.
+    for _ in range(24):
+        code = proc.poll()
+        if code is not None:
+            tail = _tail_log(log_path)
+            with _lock:
+                st2 = _read_state(path)
+                if st2.get(sensor, {}).get("pid") == proc.pid:
+                    st2.pop(sensor, None)
+                    _write_state(path, st2)
+            err = (
+                f"{sensor} subprocess exited immediately (code {code}). "
+                f"Check paths, camera index, GPU memory, and checkpoint. Log ({log_path}):\n{tail}"
+            )
+            return {"ok": False, "error": err}
+        time.sleep(0.12)
 
     return {
         "ok": True,
