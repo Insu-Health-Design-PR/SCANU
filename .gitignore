@@ -1,35 +1,13 @@
-# Python bytecode and cache artifacts
-__pycache__/
+# Python
+**/__pycache__/
 *.py[cod]
 *$py.class
 
-# Radar example captures — keep JSON; omit large video binaries
-software/layer1_radar/examples/data/
-software/layer4_inference/trained_models/outputs/thermal_previews/
-software/layer4_inference/data/
-# Local/vendor SDK copies (testing only; not part of product tree)
-software/vendor/
+# Layer 8 — runtime / generated (keep empty tree via .gitkeep only)
+software/layer8_ui/artifacts/**
+!software/layer8_ui/artifacts/.gitkeep
 
-# macOS Finder metadata
-.DS_Store
-
-# Python tooling
-.pytest_cache/
-.venv/
-
-# Layer 8 frontend caches and build artifacts
-software/layer8_ui/frontend/.vite/
-software/layer8_ui/frontend/node_modules/
-software/layer8_ui/frontend/dist/
-software/layer8_ui/frontend/*.tsbuildinfo
-software/layer8_ui/frontend/vite.config.js
-software/layer8_ui/frontend/vite.config.d.ts
-
-# Layer 8 legacy runtime outputs
-software/layer8_ui/legacy/logs/*
-!software/layer8_ui/legacy/logs/.gitkeep
-software/layer8_ui/legacy/artifacts/*
-!software/layer8_ui/legacy/artifacts/.gitkeep
-
-# Playwright artifacts
-software/layer8_ui/frontend/test-results/
+software/layer8_ui/logs/**
+!software/layer8_ui/logs/.gitkeep
+software/layer8_ui/.sensor_pids.json
+software/layer8_ui/profiles/*.bak
