@@ -6,6 +6,20 @@ This guide is for your Jetson path:
 ~/Desktop/SCANU-dev_adrian/software
 ```
 
+## 0) Start backend + frontend together (single command)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+chmod +x scripts/start_layer8_stack.sh
+./scripts/start_layer8_stack.sh
+```
+
+Optional first run with dependency install:
+
+```bash
+INSTALL_FRONTEND_DEPS=1 ./scripts/start_layer8_stack.sh
+```
+
 ## 1) Start Layer 8 backend (Terminal A)
 
 ```bash
