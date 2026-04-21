@@ -1,3 +1,8 @@
 WARNING ⚠️ torchvision==0.26 is incompatible with torch==2.8.
 Run 'pip install torchvision==0.23' to fix torchvision or 'pip install -U torch torchvision' to update both.
 For a full compatibility table see https://github.com/pytorch/vision#installation
+usage: webcam_layer8_runner.py [-h] [--webcam-device WEBCAM_DEVICE]
+                               --checkpoint CHECKPOINT --live-frame LIVE_FRAME
+                               [--video VIDEO] [--frames FRAMES]
+                               [--weapon-extra-args WEAPON_EXTRA_ARGS]
+webcam_layer8_runner.py: error: unrecognized arguments: --capture-width 1920 --capture-height 1080 --metrics-json /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui/artifacts/live_threat_metrics.json

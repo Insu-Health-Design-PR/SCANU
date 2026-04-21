@@ -26,9 +26,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
+import warnings
+from collections.abc import Mapping
 import urllib.request
 from pathlib import Path
+from time import time
 
 import cv2
 import numpy as np
@@ -36,13 +40,24 @@ import torch
 from torchvision import transforms
 from ultralytics import YOLO
 
-from weapon_ai.modeling import build_model
+from .modeling import build_model
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_FIREARM_YOLO = _REPO_ROOT / "trained_models" / "gun_detection" / "firearm_yolov8n_best.pt"
 _FIREARM_HF_URL = (
     "https://huggingface.co/Subh775/Firearm_Detection_Yolov8n/resolve/main/weights/best.pt"
 )
+
+_SAFE_MAX = 0.20
+_UNSAFE_MIN = 0.75
+
+
+def _threat_bucket(score: float) -> str:
+    if score >= _UNSAFE_MIN:
+        return "unsafe"
+    if score >= _SAFE_MAX:
+        return "suspicious"
+    return "safe"
 
 
 def _ensure_firearm_yolo_weights(dest: Path) -> None:
@@ -197,9 +212,11 @@ def _print_run_summary(
             f"Per-frame max {score_name} — mean: {fm.mean():.4f}  peak (worst frame): {fm.max():.4f}"
         )
     peak = float(arr.max())
-    verdict = "UNSAFE" if peak >= unsafe_threshold else "SAFE"
+    verdict = _threat_bucket(peak).upper()
     print(
-        f"FINAL (clip): {verdict}  |  peak {score_name}={peak:.4f}  (threshold={unsafe_threshold})"
+        f"FINAL (clip): {verdict}  |  peak {score_name}={peak:.4f}  "
+        f"(safe<{_SAFE_MAX}, suspicious<{_UNSAFE_MIN}, unsafe>={_UNSAFE_MIN}; "
+        f"legacy border threshold={unsafe_threshold})"
     )
     print("=" * 60)
 
@@ -211,6 +228,31 @@ def _parse_yolo_classes(s: str | None) -> list[int] | None:
     if t == "all":
         return None
     return [int(x.strip()) for x in s.split(",") if x.strip()]
+
+
+def _frame_to_bgr_for_infer(frame: np.ndarray | None) -> np.ndarray | None:
+    """Normalize odd V4L2/OpenCV frames (1/2/4-channel) into 3-channel BGR."""
+    if frame is None or not hasattr(frame, "shape"):
+        return None
+    if frame.size == 0:
+        return None
+    if frame.ndim == 2:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if frame.ndim != 3:
+        return None
+    ch = int(frame.shape[2])
+    if ch == 3:
+        return frame
+    if ch == 1:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if ch == 4:
+        return cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    if ch == 2:
+        # Some V4L2 formats expose 2-channel layouts; duplicate into BGR for inference.
+        a = np.ascontiguousarray(frame[:, :, 0])
+        b = np.ascontiguousarray(frame[:, :, 1])
+        return cv2.merge([a, b, a])
+    return None
 
 
 # Keys accepted inside --config (flat dict); unknown keys are ignored with a warning.
@@ -250,6 +292,13 @@ _INFER_CONFIG_KEYS = frozenset(
         "gun_prob_floor",
         "gun_conf_scale",
         "live_jpg",
+        "live_metrics_json",
+        "capture_width",
+        "capture_height",
+        "classifier_device",
+        "yolo_device",
+        "cuda_empty_cache",
+        "cuda_empty_cache_every",
     }
 )
 
@@ -290,6 +339,8 @@ def _coerce_infer_config_values(cfg: dict) -> dict:
         out["gun_yolo_model"] = Path(out["gun_yolo_model"])
     if "live_jpg" in out and out["live_jpg"] is not None and out["live_jpg"] != "":
         out["live_jpg"] = Path(out["live_jpg"])
+    if "live_metrics_json" in out and out["live_metrics_json"] is not None and out["live_metrics_json"] != "":
+        out["live_metrics_json"] = Path(out["live_metrics_json"])
     if "source" in out and out["source"] is not None and not isinstance(out["source"], str):
         out["source"] = str(out["source"])
     return out
@@ -302,22 +353,52 @@ def _filter_infer_config(cfg: dict, path: Path) -> dict:
     return {k: v for k, v in cfg.items() if k in _INFER_CONFIG_KEYS}
 
 
+def _pop_infer_config_file(argv: list[str]) -> tuple[Path | None, list[str]]:
+    """
+    Strip only exact ``--config`` / ``--config=`` from argv.
+
+    Argparse with default ``allow_abbrev=True`` can treat ``--conf`` as ``--config``; even
+    ``allow_abbrev=False`` on a pre-parser is easy to get wrong across versions. Exact-token
+    handling keeps ``--conf 0.25`` (YOLO confidence) safe.
+    """
+    cfg: Path | None = None
+    out: list[str] = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--config":
+            if i + 1 >= len(argv):
+                raise SystemExit("--config requires a path to a .json or .yaml file")
+            cfg = Path(argv[i + 1])
+            i += 2
+            continue
+        if a.startswith("--config="):
+            cfg = Path(a.split("=", 1)[1])
+            i += 1
+            continue
+        out.append(a)
+        i += 1
+    return cfg, out
+
+
+def _write_live_metrics_json(path: Path, payload: dict) -> None:
+    path = path.expanduser().resolve()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    tmp.replace(path)
+
+
 def main() -> None:
-    pre = argparse.ArgumentParser(add_help=False)
-    pre.add_argument(
-        "--config",
-        type=Path,
-        default=None,
-        help="JSON or YAML file with infer options; CLI overrides file.",
-    )
-    pre_args, argv_rest = pre.parse_known_args()
+    infer_config_path, argv_rest = _pop_infer_config_file(sys.argv[1:])
     file_defaults: dict = {}
-    if pre_args.config is not None:
-        loaded = _load_infer_config(pre_args.config)
-        file_defaults = _coerce_infer_config_values(_filter_infer_config(loaded, pre_args.config))
+    if infer_config_path is not None:
+        loaded = _load_infer_config(infer_config_path)
+        file_defaults = _coerce_infer_config_values(_filter_infer_config(loaded, infer_config_path))
 
     p = argparse.ArgumentParser(
         description=__doc__,
+        allow_abbrev=False,
         epilog=(
             "Use --config path.yaml or path.json (before other flags) to load options; "
             "CLI arguments override the file. See weapon_ai/infer_thermal.example.yaml."
@@ -325,6 +406,18 @@ def main() -> None:
     )
     p.add_argument("--checkpoint", type=Path, default=None)
     p.add_argument("--source", type=str, default=None, help="thermal .mp4 path or webcam index")
+    p.add_argument(
+        "--capture_width",
+        type=int,
+        default=1920,
+        help="Requested capture width when source is a webcam index.",
+    )
+    p.add_argument(
+        "--capture_height",
+        type=int,
+        default=1080,
+        help="Requested capture height when source is a webcam index.",
+    )
     p.add_argument("--image_size", type=int, default=224)
     p.add_argument("--yolo_model", type=str, default="yolov8n.pt")
     p.add_argument("--conf", type=float, default=0.25)
@@ -406,6 +499,12 @@ def main() -> None:
         type=Path,
         default=None,
         help="Each processed frame, atomically write this JPEG path (for Layer 8 MJPEG preview).",
+    )
+    p.add_argument(
+        "--live_metrics_json",
+        type=Path,
+        default=None,
+        help="Per-frame threat summary JSON for Layer 8 dashboard.",
     )
     p.add_argument(
         "--no_imshow",
@@ -492,12 +591,45 @@ def main() -> None:
         action="store_true",
         help="RGB firearm model on thermal: set conf=0.02 and disable size filters (1.0). Expect large, imprecise boxes; use for demos only.",
     )
+    p.add_argument(
+        "--yolo_device",
+        type=str,
+        default="auto",
+        choices=("auto", "cuda", "cpu"),
+        help="Ultralytics YOLO device. On Jetson OOM try cpu (slow).",
+    )
+    p.add_argument(
+        "--classifier_device",
+        type=str,
+        default="auto",
+        choices=("auto", "cuda", "cpu"),
+        help="MobileNet gun/safe head. Use cpu on Jetson to avoid CUBLAS OOM with dual YOLO + high-res.",
+    )
+    p.add_argument(
+        "--cuda_empty_cache",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Call torch.cuda.empty_cache() periodically (helps fragmented Jetson VRAM). Use with --cuda-empty-cache-every.",
+    )
+    p.add_argument(
+        "--cuda_empty_cache_every",
+        type=int,
+        default=30,
+        metavar="N",
+        help="With --cuda-empty-cache, run empty_cache every N frames (default: 30). Use 1 for legacy per-frame behavior.",
+    )
+    p.add_argument(
+        "--quiet_third_party_warnings",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Suppress noisy dependency warnings (e.g. torchvision compatibility) and keep app logs focused.",
+    )
     if file_defaults:
         p.set_defaults(**file_defaults)
     args = p.parse_args(argv_rest)
 
-    if pre_args.config is not None:
-        print(f"Loaded infer config: {pre_args.config.resolve()}")
+    if infer_config_path is not None:
+        print(f"Loaded infer config: {infer_config_path.resolve()}")
 
     if args.checkpoint is None:
         raise SystemExit(
@@ -509,6 +641,23 @@ def main() -> None:
         )
     if args.gun_threshold is not None:
         args.unsafe_threshold = float(args.gun_threshold)
+    args.cuda_empty_cache_every = max(1, int(args.cuda_empty_cache_every))
+    if args.quiet_third_party_warnings:
+        warnings.filterwarnings(
+            "ignore",
+            message=r".*torchvision==.*incompatible with torch==.*",
+        )
+        warnings.filterwarnings(
+            "ignore",
+            message=r".*For a full compatibility table.*",
+        )
+        logging.getLogger("ultralytics").setLevel(logging.ERROR)
+        try:
+            from ultralytics.utils import LOGGER as _UL_LOGGER  # local import to avoid hard dependency here
+
+            _UL_LOGGER.setLevel(logging.ERROR)
+        except Exception:
+            pass
 
     if args.gun_thermal_debug:
         args.gun_conf = 0.02
@@ -530,8 +679,31 @@ def main() -> None:
     }[args.unsafe_border_color]
     _unsafe_text_bgr = (0, 0, 255) if args.unsafe_border_color == "black" else _unsafe_bgr
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    def _resolve_torch_device(choice: str) -> torch.device:
+        if choice == "cpu":
+            return torch.device("cpu")
+        if choice == "cuda":
+            if not torch.cuda.is_available():
+                raise SystemExit(
+                    "CUDA requested (--yolo_device / --classifier_device) but torch.cuda.is_available() is False"
+                )
+            return torch.device("cuda")
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    clf_device = _resolve_torch_device(args.classifier_device)
+    yolo_torch = _resolve_torch_device(args.yolo_device)
+    det_device: int | str = 0 if yolo_torch.type == "cuda" else "cpu"
+
     ck = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
+    if not isinstance(ck, Mapping):
+        raise SystemExit(f"Checkpoint is not a dict: {args.checkpoint}")
+    raw_sd = ck.get("model")
+    if not isinstance(raw_sd, Mapping):
+        raise SystemExit(
+            f"Checkpoint {args.checkpoint} is not a gun/safe classifier save: "
+            f"'model' must be a state_dict (got {type(raw_sd).__name__}). "
+            "Do not pass a YOLO .pt as --checkpoint."
+        )
     arch = ck.get("arch", "mobilenet_v3_small")
     is_gun_prob = (
         ck.get("objective") == "gun_prob_bce"
@@ -539,8 +711,8 @@ def main() -> None:
         or int(ck.get("num_classes", 2)) == 1
     )
     score_name = "p(gun)" if is_gun_prob else "p(unsafe)"
-    clf = build_model(arch, num_classes=1 if is_gun_prob else 2).to(device)
-    clf.load_state_dict(ck["model"])
+    clf = build_model(arch, num_classes=1 if is_gun_prob else 2).to(clf_device)
+    clf.load_state_dict(raw_sd)
     clf.eval()
     infer_gray3 = str(ck.get("preprocess", "")).startswith("gray3ch")
 
@@ -559,7 +731,6 @@ def main() -> None:
     yolo_classes = _parse_yolo_classes(args.yolo_classes)
     person_only = yolo_classes is not None and yolo_classes == [0]
     detector = YOLO(args.yolo_model)
-    det_device = 0 if device.type == "cuda" else "cpu"
 
     gun_detector: YOLO | None = None
     if not args.no_gun_yolo:
@@ -569,15 +740,42 @@ def main() -> None:
         gun_detector = YOLO(str(gpath))
 
     src = int(args.source) if args.source.isdigit() else args.source
-    cap = cv2.VideoCapture(src)
+    if isinstance(src, int) and sys.platform.startswith("linux"):
+        cap = cv2.VideoCapture(src, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            cap = cv2.VideoCapture(src)
+    else:
+        cap = cv2.VideoCapture(src)
     if not cap.isOpened():
         raise SystemExit(f"Cannot open {args.source}")
+    if isinstance(src, int):
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(args.capture_width))
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(args.capture_height))
+        # Match layer8_ui.webcam_runner: avoid driver default multi-frame queues (often 4+), which feels like lag.
+        cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+        aw = int(round(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0))
+        ah = int(round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0))
+        ew, eh = int(args.capture_width), int(args.capture_height)
+        if aw > 0 and ah > 0 and (abs(aw - ew) > 8 or abs(ah - eh) > 8):
+            print(
+                f"Webcam negotiated {aw}x{ah} (requested {ew}x{eh}). "
+                "The device may still be capturing or scaling in a higher-latency mode.",
+                flush=True,
+            )
 
     det_mode = "person only" if person_only else ("all YOLO classes" if yolo_classes is None else str(yolo_classes))
     print(
-        f"q=quit | YOLO ({det_mode}) on thermal | label = safe/UNSAFE + {score_name} | "
-        "UNSAFE = colored border (not filled)"
+        f"q=quit | YOLO ({det_mode}) device={det_device} | classifier={clf_device} | "
+        f"label = safe/UNSAFE + {score_name} | UNSAFE = colored border (not filled)"
     )
+    if args.cuda_empty_cache and torch.cuda.is_available():
+        print(
+            f"CUDA: empty_cache every {args.cuda_empty_cache_every} frame(s) "
+            "(Jetson VRAM workaround; use --cuda-empty-cache-every 1 for every frame).",
+            flush=True,
+        )
     if gun_detector is not None:
         roi = "full frame" if args.gun_full_frame else "inside each person box only"
         print(
@@ -605,10 +803,14 @@ def main() -> None:
     if args.live_jpg is not None:
         args.live_jpg = args.live_jpg.expanduser().resolve()
         args.live_jpg.parent.mkdir(parents=True, exist_ok=True)
+    if args.live_metrics_json is not None:
+        args.live_metrics_json = args.live_metrics_json.expanduser().resolve()
+        args.live_metrics_json.parent.mkdir(parents=True, exist_ok=True)
     print("Summary prints when the video ends or you press q.")
     all_probs: list[float] = []
     frame_max_probs: list[float] = []
     frame_count = 0
+    bad_frame_count = 0
     writer: cv2.VideoWriter | None = None
     try:
         with torch.no_grad():
@@ -621,9 +823,20 @@ def main() -> None:
                     break
 
                 if args.composite_mode:
-                    thermal = _extract_thermal_column(bgr_full, args.thermal_panel)
+                    thermal_raw = _extract_thermal_column(bgr_full, args.thermal_panel)
                 else:
-                    thermal = bgr_full
+                    thermal_raw = bgr_full
+
+                thermal = _frame_to_bgr_for_infer(thermal_raw)
+                if thermal is None:
+                    bad_frame_count += 1
+                    if bad_frame_count <= 3 or bad_frame_count % 30 == 0:
+                        shp = getattr(thermal_raw, "shape", None)
+                        print(
+                            f"Warning: skipped frame {frame_count} due to unsupported frame shape={shp}.",
+                            flush=True,
+                        )
+                    continue
 
                 vis = thermal.copy()
                 h, w = vis.shape[:2]
@@ -662,7 +875,7 @@ def main() -> None:
                             in_rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
                         else:
                             in_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
-                        x = tf(in_rgb).unsqueeze(0).to(device)
+                        x = tf(in_rgb).unsqueeze(0).to(clf_device)
                         logits = clf(x)
                         if is_gun_prob:
                             prob = torch.sigmoid(logits.reshape(-1))[0].item()
@@ -833,12 +1046,16 @@ def main() -> None:
                     frame_max_probs.append(max(probs))
 
                 unsafe_first: list[tuple[int, int, int, int, float, str]] = []
+                suspicious_list: list[tuple[int, int, int, int, float, str]] = []
                 safe_list: list[tuple[int, int, int, int, float, str]] = []
                 for x1, y1, x2, y2, prob, _cid, ytag in rows:
                     prefix = f"{ytag} " if args.show_yolo_name else ""
-                    label_txt = f"{prefix}{'UNSAFE' if prob >= args.unsafe_threshold else 'safe'} {prob:.2f}"
-                    if prob >= args.unsafe_threshold:
+                    bucket = _threat_bucket(float(prob))
+                    label_txt = f"{prefix}{bucket.upper()} {prob:.2f}"
+                    if bucket == "unsafe":
                         unsafe_first.append((x1, y1, x2, y2, prob, label_txt))
+                    elif bucket == "suspicious":
+                        suspicious_list.append((x1, y1, x2, y2, prob, label_txt))
                     else:
                         safe_list.append((x1, y1, x2, y2, prob, label_txt))
 
@@ -852,6 +1069,19 @@ def main() -> None:
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5,
                         (0, 220, 0),
+                        2,
+                    )
+
+                for x1, y1, x2, y2, _prob, label_txt in suspicious_list:
+                    cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 165, 255), 2)
+                    ty = max(y1 - 6, 18)
+                    cv2.putText(
+                        vis,
+                        label_txt,
+                        (x1, ty),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        (0, 165, 255),
                         2,
                     )
 
@@ -907,6 +1137,45 @@ def main() -> None:
                     if ok_lj:
                         tmp.write_bytes(buf.tobytes())
                         tmp.replace(args.live_jpg)
+
+                if args.live_metrics_json is not None:
+                    person_rows = [r for r in rows if r[5] in (None, 0)]
+                    persons_total = int(len(person_rows))
+                    persons_with_gun = int(sum(1 for r in person_rows if float(r[4]) >= _UNSAFE_MIN))
+                    gun_detected = bool(persons_with_gun > 0 or gun_count > 0)
+                    person_peak = max((float(r[4]) for r in person_rows), default=0.0)
+                    gun_boost = 0.0
+                    if gun_count > 0:
+                        gun_boost = max(
+                            float(args.gun_prob_floor),
+                            min(0.99, float(frame_gun_best_conf) * float(args.gun_conf_scale)),
+                        )
+                    risk_score = max(person_peak, gun_boost)
+                    unsafe_pct = (
+                        round(100.0 * float(persons_with_gun) / float(persons_total), 1)
+                        if persons_total > 0
+                        else 0.0
+                    )
+                    if persons_total <= 0:
+                        prediction = "no_person"
+                    else:
+                        prediction = _threat_bucket(risk_score)
+                    payload = {
+                        "ts": time(),
+                        "frame": int(frame_count),
+                        "unsafe_score": round(float(risk_score), 4),
+                        "unsafe_pct": unsafe_pct,
+                        "gun_detected": gun_detected,
+                        "persons_with_gun": persons_with_gun,
+                        "persons_total": persons_total,
+                        "prediction": prediction,
+                        "mmwave_torso_score": None,
+                    }
+                    _write_live_metrics_json(args.live_metrics_json, payload)
+
+                if args.cuda_empty_cache and torch.cuda.is_available():
+                    if frame_count % int(args.cuda_empty_cache_every) == 0:
+                        torch.cuda.empty_cache()
 
                 if not args.no_imshow:
                     title = "thermal | objects + threat (border = unsafe)"
