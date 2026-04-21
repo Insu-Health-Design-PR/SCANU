@@ -124,7 +124,7 @@ def build_command(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) 
     return build_mmwave_command(settings, layer8_dir)
 
 
-def command_cwd(sensor: SensorId, settings: dict[str, Any]) -> Path:
+def command_cwd(sensor: SensorId, settings: dict[str, Any], _layer8_dir: Path | None = None) -> Path:
     if sensor == "webcam":
         return webcam_runner.webcam_command_cwd(settings)
     if sensor == "thermal":

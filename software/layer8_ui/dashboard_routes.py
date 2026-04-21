@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import json
 import shutil
+import time
+import uuid
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Literal
@@ -62,6 +65,24 @@ class SnapshotModelProfileBody(BaseModel):
     description: str = ""
     # Optional: current Model + Webcam form state so operators need not Save before "Save to profile".
     values: dict[str, Any] | None = None
+
+
+class CompatReconfigRequest(BaseModel):
+    radar_id: str = "radar_main"
+    config_path: str | None = None
+    config_text: str | None = None
+
+
+class CompatResetSoftRequest(BaseModel):
+    radar_id: str = "radar_main"
+
+
+class UiPreferencesPayload(BaseModel):
+    appliedLayout: str = "Triple View"
+    previewLayout: str = "Triple View"
+    focusView: str = "rgb"
+    layoutStyle: str = "grid"
+    customModules: dict[str, bool] = {}
 
 
 _PROFILE_FILE_META_KEYS = frozenset({"version", "schema", "__schema__", "_meta"})
@@ -174,11 +195,282 @@ def _save_model_profiles(layer8_dir: Path, data: dict[str, Any]) -> None:
     tmp.replace(p)
 
 
+def _ui_prefs_path(layer8_dir: Path) -> Path:
+    return layer8_dir / "ui_prefs.json"
+
+
+def _default_ui_prefs() -> dict[str, Any]:
+    return {
+        "appliedLayout": "Triple View",
+        "previewLayout": "Triple View",
+        "focusView": "rgb",
+        "layoutStyle": "grid",
+        "customModules": {
+            "rgb": True,
+            "thermal": True,
+            "pointCloud": True,
+            "presence": True,
+            "systemStatus": True,
+            "execution": True,
+            "consoleLog": True,
+        },
+    }
+
+
+def _load_ui_prefs(layer8_dir: Path) -> dict[str, Any]:
+    p = _ui_prefs_path(layer8_dir)
+    base = _default_ui_prefs()
+    if not p.is_file():
+        return base
+    try:
+        raw = json.loads(p.read_text())
+    except (OSError, json.JSONDecodeError):
+        return base
+    if not isinstance(raw, dict):
+        return base
+    merged = {**base, **raw}
+    custom = raw.get("customModules")
+    if isinstance(custom, dict):
+        merged["customModules"] = {**base["customModules"], **custom}
+    return merged
+
+
+def _save_ui_prefs(layer8_dir: Path, payload: dict[str, Any]) -> dict[str, Any]:
+    p = _ui_prefs_path(layer8_dir)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    normalized = _default_ui_prefs()
+    normalized.update({k: payload[k] for k in ("appliedLayout", "previewLayout", "focusView", "layoutStyle") if k in payload})
+    custom = payload.get("customModules")
+    if isinstance(custom, dict):
+        normalized["customModules"] = {**normalized["customModules"], **custom}
+    tmp = p.with_suffix(".tmp")
+    tmp.write_text(json.dumps(normalized, indent=2))
+    tmp.replace(p)
+    return normalized
+
+
 def build_router(layer8_dir: Path) -> APIRouter:
     layer8_dir = Path(layer8_dir).resolve()
     thermal_stream = thermal_runner.get_thermal_shared_stream(layer8_dir)
     webcam_stream = webcam_runner.get_webcam_shared_stream(layer8_dir)
     router = APIRouter()
+
+    def _iso_now() -> str:
+        return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+
+    def _sensor_statuses() -> dict[str, dict[str, Any]]:
+        return {name: sensor_runner.status(name, layer8_dir) for name in ("thermal", "webcam", "mmwave")}
+
+    def _read_metrics() -> dict[str, Any]:
+        s = load(layer8_dir)
+        rel = (s.get("webcam") or {}).get("metrics_json") or "layer8_ui/artifacts/live_threat_metrics.json"
+        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        base: dict[str, Any] = {
+            "unsafe_pct": None,
+            "unsafe_score": None,
+            "gun_detected": None,
+            "persons_with_gun": None,
+            "persons_total": None,
+            "prediction": None,
+            "mmwave_torso_score": None,
+            "frame": None,
+            "ts": None,
+            "note": "Start the webcam runner; infer_thermal_objects writes webcam.metrics_json each frame.",
+        }
+        if path is None or not path.is_file():
+            return base
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return {**base, "note": "Metrics file exists but is not valid JSON yet."}
+        if not isinstance(data, dict):
+            return {**base, "note": "Metrics JSON must be an object."}
+        out = {**base}
+        for k in (
+            "unsafe_pct",
+            "unsafe_score",
+            "gun_detected",
+            "persons_with_gun",
+            "persons_total",
+            "prediction",
+            "mmwave_torso_score",
+            "frame",
+            "ts",
+        ):
+            if k in data:
+                out[k] = data[k]
+        out["note"] = ""
+        return out
+
+    def _status_payload() -> dict[str, Any]:
+        statuses = _sensor_statuses()
+        online_count = sum(1 for s in statuses.values() if bool(s.get("running")))
+        metrics = _read_metrics()
+        confidence = 0.0
+        if isinstance(metrics.get("unsafe_score"), (int, float)):
+            confidence = float(metrics["unsafe_score"])
+        elif isinstance(metrics.get("unsafe_pct"), (int, float)):
+            confidence = max(0.0, min(1.0, float(metrics["unsafe_pct"]) / 100.0))
+        has_fault = online_count == 0
+        return {
+            "state": "SCANNING" if online_count > 0 else "IDLE",
+            "fused_score": confidence,
+            "confidence": confidence,
+            "health": {
+                "has_fault": has_fault,
+                "sensor_online_count": online_count,
+            },
+            "active_radars": ["radar_main"] if bool(statuses.get("mmwave", {}).get("running")) else [],
+        }
+
+    def _health_payload() -> dict[str, Any]:
+        status = _status_payload()
+        online_count = int(status["health"]["sensor_online_count"])
+        has_fault = bool(status["health"]["has_fault"])
+        return {
+            "healthy": online_count > 0 and not has_fault,
+            "has_fault": has_fault,
+            "sensor_online_count": online_count,
+        }
+
+    def _read_live_jpeg_b64(sensor: Literal["thermal", "webcam"]) -> str | None:
+        s = load(layer8_dir)
+        runner_on = bool(sensor_runner.status(sensor, layer8_dir).get("running"))
+        rel = (s.get(sensor) or {}).get("live_frame") or ""
+        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+
+        raw: bytes | None = None
+        if runner_on and path is not None and path.is_file():
+            try:
+                raw = path.read_bytes()
+            except OSError:
+                raw = None
+        else:
+            if sensor == "thermal":
+                raw = thermal_stream.latest_jpg()
+            else:
+                raw = webcam_stream.latest_jpg()
+            if not raw and path is not None and path.is_file():
+                try:
+                    raw = path.read_bytes()
+                except OSError:
+                    raw = None
+        if not raw:
+            return None
+        return base64.b64encode(raw).decode("ascii")
+
+    def _read_point_cloud() -> list[dict[str, float]]:
+        s = load(layer8_dir)
+        rel = (s.get("mmwave") or {}).get("output") or "layer8_ui/artifacts/mmwave_frames.json"
+        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        if path is None or not path.is_file():
+            return []
+        try:
+            payload = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return []
+        if not isinstance(payload, list) or not payload:
+            return []
+        frame = payload[-1]
+        points = frame.get("points") if isinstance(frame, dict) else []
+        if not isinstance(points, list):
+            return []
+        out: list[dict[str, float]] = []
+        for p in points[:512]:
+            if not isinstance(p, dict):
+                continue
+            x = p.get("x", p.get("x_m", p.get("pos_x", 0.0)))
+            y = p.get("y", p.get("y_m", p.get("pos_y", 0.0)))
+            z = p.get("z", p.get("z_m", p.get("pos_z", 0.0)))
+            try:
+                out.append({"x": float(x), "y": float(y), "z": float(z)})
+            except (TypeError, ValueError):
+                continue
+        return out
+
+    def _visual_payload() -> dict[str, Any]:
+        metrics = _read_metrics()
+        statuses = _sensor_statuses()
+        online_count = sum(1 for s in statuses.values() if bool(s.get("running")))
+        detected = bool(metrics.get("gun_detected")) or (int(metrics.get("persons_total") or 0) > 0)
+        confidence = 0.0
+        if isinstance(metrics.get("unsafe_score"), (int, float)):
+            confidence = float(metrics["unsafe_score"])
+        elif isinstance(metrics.get("unsafe_pct"), (int, float)):
+            confidence = max(0.0, min(1.0, float(metrics["unsafe_pct"]) / 100.0))
+        return {
+            "timestamp_ms": int(time.time() * 1000),
+            "source_mode": "live" if online_count > 0 else "simulate",
+            "rgb_jpeg_b64": _read_live_jpeg_b64("webcam"),
+            "thermal_jpeg_b64": _read_live_jpeg_b64("thermal"),
+            "point_cloud": _read_point_cloud(),
+            "presence": {
+                "detected": detected,
+                "confidence": confidence,
+            },
+            "meta": {
+                "ready": online_count > 0,
+                "rgb_enabled": bool(statuses.get("webcam", {}).get("running")),
+                "thermal_enabled": bool(statuses.get("thermal", {}).get("running")),
+                "point_cloud_enabled": bool(statuses.get("mmwave", {}).get("running")),
+                "presence_enabled": True,
+            },
+        }
+
+    def _alerts_payload(limit: int = 50) -> dict[str, Any]:
+        status = _status_payload()
+        health = _health_payload()
+        metrics = _read_metrics()
+        alerts: list[dict[str, Any]] = []
+        if health["has_fault"]:
+            alerts.append(
+                {
+                    "event_id": f"fault-{uuid.uuid4().hex[:8]}",
+                    "level": "fault",
+                    "timestamp_utc": _iso_now(),
+                    "message": "No sensors are currently running.",
+                }
+            )
+        if bool(metrics.get("gun_detected")):
+            alerts.append(
+                {
+                    "event_id": f"warn-{uuid.uuid4().hex[:8]}",
+                    "level": "warning",
+                    "timestamp_utc": _iso_now(),
+                    "message": "Gun-like object detected by webcam inference.",
+                }
+            )
+        if isinstance(metrics.get("note"), str) and metrics["note"]:
+            alerts.append(
+                {
+                    "event_id": f"info-{uuid.uuid4().hex[:8]}",
+                    "level": "info",
+                    "timestamp_utc": _iso_now(),
+                    "message": metrics["note"],
+                }
+            )
+        if not alerts:
+            alerts.append(
+                {
+                    "event_id": f"ok-{uuid.uuid4().hex[:8]}",
+                    "level": "info",
+                    "timestamp_utc": _iso_now(),
+                    "message": f"System state: {status['state']}",
+                }
+            )
+        return {"alerts": alerts[: max(1, int(limit))]}
+
+    def _normalize_route_result(result: Any) -> tuple[bool, Any]:
+        if isinstance(result, JSONResponse):
+            payload: Any
+            try:
+                payload = json.loads(result.body.decode("utf-8"))
+            except Exception:
+                payload = {"ok": False, "error": "invalid_json_response"}
+            return bool(payload.get("ok")), payload
+        if isinstance(result, dict):
+            return bool(result.get("ok")), result
+        return False, {"ok": False, "error": "unexpected_result_type"}
 
     @router.get("/api/system/metrics")
     def get_system_metrics() -> dict[str, Any]:
@@ -621,6 +913,30 @@ def build_router(layer8_dir: Path) -> APIRouter:
             if held:
                 webcam_stream.remove_client()
 
+    @router.websocket("/ws/events")
+    async def websocket_events(websocket: WebSocket) -> None:
+        await websocket.accept()
+        try:
+            await websocket.send_json({"event_type": "status_update", "payload": _status_payload()})
+            while True:
+                status_payload = _status_payload()
+                visual_payload = _visual_payload()
+                await websocket.send_json({"event_type": "status_update", "payload": status_payload})
+                await websocket.send_json({"event_type": "visual_update", "payload": visual_payload})
+                if bool(status_payload.get("health", {}).get("has_fault")):
+                    await websocket.send_json(
+                        {
+                            "event_type": "sensor_fault",
+                            "payload": {
+                                "timestamp_utc": _iso_now(),
+                                "message": "No sensors are currently running.",
+                            },
+                        }
+                    )
+                await asyncio.sleep(1.0)
+        except (WebSocketDisconnect, ConnectionResetError, BrokenPipeError):
+            pass
+
     @router.get("/embed/thermal")
     def embed_thermal_page() -> FileResponse:
         """Minimal full-page thermal viewer for a second screen or another operator."""
@@ -651,50 +967,71 @@ def build_router(layer8_dir: Path) -> APIRouter:
 
     @router.get("/api/dashboard/metrics")
     def dashboard_metrics() -> dict[str, Any]:
-        s = load(layer8_dir)
-        rel = (s.get("webcam") or {}).get("metrics_json") or "layer8_ui/artifacts/live_threat_metrics.json"
-        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-        base: dict[str, Any] = {
-            "unsafe_pct": None,
-            "unsafe_score": None,
-            "gun_detected": None,
-            "persons_with_gun": None,
-            "persons_total": None,
-            "prediction": None,
-            "mmwave_torso_score": None,
-            "frame": None,
-            "ts": None,
-            "note": "Start the webcam runner; infer_thermal_objects writes webcam.metrics_json each frame.",
-        }
-        if path is None or not path.is_file():
-            return base
-        try:
-            raw = path.read_text()
-            data = json.loads(raw)
-        except (OSError, json.JSONDecodeError):
-            return {**base, "note": "Metrics file exists but is not valid JSON yet."}
-        if not isinstance(data, dict):
-            return {**base, "note": "Metrics JSON must be an object."}
-        out = {**base}
-        for k in (
-            "unsafe_pct",
-            "unsafe_score",
-            "gun_detected",
-            "persons_with_gun",
-            "persons_total",
-            "prediction",
-            "mmwave_torso_score",
-            "frame",
-            "ts",
-        ):
-            if k in data:
-                out[k] = data[k]
-        out["note"] = ""
-        return out
+        return _read_metrics()
 
     @router.get("/api/status")
     def all_status() -> dict[str, Any]:
-        return {name: sensor_runner.status(name, layer8_dir) for name in ("thermal", "webcam", "mmwave")}
+        return _status_payload()
+
+    @router.get("/api/health")
+    def get_health() -> dict[str, Any]:
+        return _health_payload()
+
+    @router.get("/api/alerts/recent")
+    def get_recent_alerts(limit: int = 50) -> dict[str, Any]:
+        return _alerts_payload(limit=limit)
+
+    @router.get("/api/visual/latest")
+    def get_visual_latest() -> dict[str, Any]:
+        return _visual_payload()
+
+    @router.get("/api/visual/rgb")
+    def get_visual_rgb() -> dict[str, Any]:
+        visual = _visual_payload()
+        return {
+            "timestamp_ms": visual.get("timestamp_ms"),
+            "source_mode": visual.get("source_mode"),
+            "rgb_jpeg_b64": visual.get("rgb_jpeg_b64"),
+            "meta": visual.get("meta", {}),
+        }
+
+    @router.get("/api/visual/thermal")
+    def get_visual_thermal() -> dict[str, Any]:
+        visual = _visual_payload()
+        return {
+            "timestamp_ms": visual.get("timestamp_ms"),
+            "source_mode": visual.get("source_mode"),
+            "thermal_jpeg_b64": visual.get("thermal_jpeg_b64"),
+            "meta": visual.get("meta", {}),
+        }
+
+    @router.get("/api/visual/point-cloud")
+    def get_visual_point_cloud() -> dict[str, Any]:
+        visual = _visual_payload()
+        return {
+            "timestamp_ms": visual.get("timestamp_ms"),
+            "source_mode": visual.get("source_mode"),
+            "point_cloud": visual.get("point_cloud", []),
+            "meta": visual.get("meta", {}),
+        }
+
+    @router.get("/api/visual/presence")
+    def get_visual_presence() -> dict[str, Any]:
+        visual = _visual_payload()
+        return {
+            "timestamp_ms": visual.get("timestamp_ms"),
+            "source_mode": visual.get("source_mode"),
+            "presence": visual.get("presence"),
+            "meta": visual.get("meta", {}),
+        }
+
+    @router.get("/api/ui/preferences")
+    def get_ui_preferences() -> dict[str, Any]:
+        return _load_ui_prefs(layer8_dir)
+
+    @router.post("/api/ui/preferences")
+    def set_ui_preferences(payload: UiPreferencesPayload) -> dict[str, Any]:
+        return _save_ui_prefs(layer8_dir, payload.model_dump())
 
     @router.get("/api/status/stream")
     async def stream_status() -> StreamingResponse:
@@ -798,6 +1135,52 @@ def build_router(layer8_dir: Path) -> APIRouter:
         sensor_runner.stop("webcam", layer8_dir)
         sensor_runner.stop("mmwave", layer8_dir)
         return run_all_sensors()
+
+    @router.post("/api/control/reconfig")
+    def control_reconfig(body: CompatReconfigRequest) -> dict[str, Any]:
+        text = (body.config_text or "").lower()
+        if "sensorstop" in text and "sensorstart" in text:
+            result = restart_all_sensors()
+            success, details = _normalize_route_result(result)
+            return {
+                "radar_id": body.radar_id,
+                "action": "apply_config",
+                "success": success,
+                "reason": None if success else "restart_all_failed",
+                "details": details,
+            }
+        if "sensorstop" in text:
+            result = stop_all_sensors()
+            success, details = _normalize_route_result(result)
+            return {
+                "radar_id": body.radar_id,
+                "action": "apply_config",
+                "success": success,
+                "reason": None if success else "stop_all_failed",
+                "details": details,
+            }
+
+        result = run_all_sensors()
+        success, details = _normalize_route_result(result)
+        return {
+            "radar_id": body.radar_id,
+            "action": "apply_config",
+            "success": success,
+            "reason": None if success else "run_all_failed",
+            "details": details,
+        }
+
+    @router.post("/api/control/reset-soft")
+    def control_reset_soft(body: CompatResetSoftRequest) -> dict[str, Any]:
+        result = restart_all_sensors()
+        success, details = _normalize_route_result(result)
+        return {
+            "radar_id": body.radar_id,
+            "action": "reset_soft",
+            "success": success,
+            "reason": None if success else "restart_all_failed",
+            "details": details,
+        }
 
     return router
 

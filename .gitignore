@@ -36,3 +36,7 @@ software/layer8_ui/frontend/test-results/
 # Personal local git helpers (do not version)
 scripts/git-whoami.sh
 scripts/githooks/pre-commit
+
+# Layer 8 runtime local state
+software/layer8_ui/ui_prefs.json
+software/layer8_ui/logs/*.log

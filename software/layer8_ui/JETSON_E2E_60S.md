@@ -1,0 +1,67 @@
+# Layer 8 Jetson E2E (60s)
+
+This guide is for your Jetson path:
+
+```bash
+~/Desktop/SCANU-dev_adrian/software
+```
+
+## 1) Start Layer 8 backend (Terminal A)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software
+python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8080
+```
+
+## 2) Start Layer 8 frontend (Terminal B)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+npm install
+VITE_LAYER8_API_BASE="http://127.0.0.1:8080" \
+VITE_LAYER8_WS_URL="ws://127.0.0.1:8080/ws/events" \
+npm run dev -- --host 0.0.0.0 --port 4173 --strictPort
+```
+
+## 3) Run 60-second verification (Terminal C)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+chmod +x scripts/verify_layer8_e2e_60s.sh
+./scripts/verify_layer8_e2e_60s.sh
+```
+
+Expected final line:
+
+```text
+[PASS] Layer 8 end-to-end compatibility checks passed
+```
+
+## 4) Open UI
+
+Local Jetson browser:
+
+```text
+http://127.0.0.1:4173
+```
+
+From another device on LAN:
+
+```bash
+hostname -I
+```
+
+Then open:
+
+```text
+http://<JETSON_IP>:4173
+```
+
+## Notes
+
+- This verifies frontend/backend contract endpoints used by `dashboardApi.ts`.
+- If `/ws/events` check is skipped, install websockets:
+
+```bash
+pip install websockets
+```
