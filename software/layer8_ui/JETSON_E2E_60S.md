@@ -131,27 +131,3 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 
 
 
-7777777777777777
-
-
-
-[vite] connecting... client:495:9
-[vite] connected. client:618:15
-Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools react-dom.development.js:29895:17
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/ui/preferences. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/visual/latest. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/ui/preferences. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/alerts/recent?limit=50. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/health. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/status. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200. 2
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/health. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/alerts/recent?limit=50. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/visual/latest. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 200.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/ui/preferences. (Reason: CORS header ‘Access-Control-Allow-Origin’ missing). Status code: 405.
-Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://127.0.0.1:8080/api/ui/preferences. (Reason: CORS request did not succeed). Status code: (null).
-
-​
-
-
-
-
