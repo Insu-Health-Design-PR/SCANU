@@ -6,7 +6,7 @@ This guide is for your Jetson path:
 ~/Desktop/SCANU-dev_adrian/software
 ```
 
-## 0) Install dependencies first (recommended)
+## 0) Install dependencies first
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software
@@ -23,30 +23,13 @@ chmod +x scripts/start_layer8_stack.sh
 ./scripts/start_layer8_stack.sh
 ```
 
-Optional first run with dependency install:
+Optional first run with frontend install:
 
 ```bash
 INSTALL_FRONTEND_DEPS=1 ./scripts/start_layer8_stack.sh
 ```
 
-## 2) Start Layer 8 backend (Terminal A)
-
-```bash
-cd ~/Desktop/SCANU-dev_adrian/software
-python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8080
-```
-
-## 3) Start Layer 8 frontend (Terminal B)
-
-```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
-npm install
-VITE_LAYER8_API_BASE="http://127.0.0.1:8080" \
-VITE_LAYER8_WS_URL="ws://127.0.0.1:8080/ws/events" \
-npm run dev -- --host 0.0.0.0 --port 4173 --strictPort
-```
-
-## 4) Run 60-second verification (Terminal C)
+## 2) Run API contract check (60s)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
@@ -54,13 +37,36 @@ chmod +x scripts/verify_layer8_e2e_60s.sh
 ./scripts/verify_layer8_e2e_60s.sh
 ```
 
-Expected final line:
+Expected:
 
 ```text
 [PASS] Layer 8 end-to-end compatibility checks passed
 ```
 
-## 5) Open UI
+## 3) Run live hardware check (cameras + sensors)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+chmod +x scripts/verify_layer8_live_jetson.sh
+./scripts/verify_layer8_live_jetson.sh
+```
+
+Optional strict point-cloud requirement:
+
+```bash
+REQUIRE_POINT_CLOUD=1 ./scripts/verify_layer8_live_jetson.sh
+```
+
+This script validates:
+
+- frontend and backend are reachable
+- CORS preflight works on `/api/ui/preferences`
+- sensors become online (`sensor_online_count > 0`)
+- `source_mode` becomes `live`
+- RGB and Thermal frames are non-empty
+- optional point-cloud presence
+
+## 4) Open UI
 
 Local Jetson browser:
 
@@ -82,52 +88,11 @@ http://<JETSON_IP>:4173
 
 ## Notes
 
-- This verifies frontend/backend contract endpoints used by `dashboardApi.ts`.
-- If `/ws/events` check is skipped, install websockets:
+- Backend allows CORS for frontend development access.
+- `start_layer8_stack.sh` no longer forces `VITE_LAYER8_API_BASE=127.0.0.1` by default.
+  It lets frontend auto-resolve backend host, which is better for LAN access.
+- If frontend fails because of Node/npm mismatch (`npm: command not found`, `dpkg` overwrite errors), use:
 
-```bash
-pip install websockets
+```text
+software/layer8_ui/NODE20_JETSON_RECOVERY.md
 ```
-
-## Troubleshooting: frontend stops on Jetson
-
-If you see `Frontend stopped` and `EBADENGINE` warnings with `node v12`, update Node first.
-
-### 1) Check frontend log
-
-```bash
-cat ~/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
-```
-
-### 2) Install Node 20 (recommended for Vite 5)
-
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt-get install -y nodejs
-node -v
-npm -v
-```
-
-### 3) Reinstall frontend dependencies cleanly
-
-```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
-rm -rf node_modules package-lock.json
-npm install
-```
-
-### 4) Start stack again
-
-```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
-./scripts/start_layer8_stack.sh
-```
-
-
-
-
-
-
-
-
-

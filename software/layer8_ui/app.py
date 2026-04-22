@@ -14,6 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from layer8_ui.dashboard_routes import build_router, index_handler
@@ -24,6 +25,13 @@ ARTIFACTS = LAYER8_DIR / "artifacts"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
 
 app = FastAPI(title="SCANU Layer 8 — sensor runners", version="0.1.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 if STATIC.is_dir():
     app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
