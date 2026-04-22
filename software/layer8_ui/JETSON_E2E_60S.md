@@ -6,6 +6,26 @@ This guide is for your Jetson path:
 ~/Desktop/SCANU-dev_adrian/software
 ```
 
+## Quick Commands (copy/paste)
+
+```bash
+# Terminal A: start backend + frontend together
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/start_layer8_stack.sh
+```
+
+```bash
+# Terminal B: validate live backend+frontend+cameras+sensors
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/verify_layer8_live_jetson.sh
+```
+
+```bash
+# Optional strict check: require point cloud data
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+REQUIRE_POINT_CLOUD=1 ./scripts/verify_layer8_live_jetson.sh
+```
+
 ## 0) Install dependencies first
 
 ```bash
