@@ -88,3 +88,37 @@ http://<JETSON_IP>:4173
 ```bash
 pip install websockets
 ```
+
+## Troubleshooting: frontend stops on Jetson
+
+If you see `Frontend stopped` and `EBADENGINE` warnings with `node v12`, update Node first.
+
+### 1) Check frontend log
+
+```bash
+cat ~/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
+```
+
+### 2) Install Node 20 (recommended for Vite 5)
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node -v
+npm -v
+```
+
+### 3) Reinstall frontend dependencies cleanly
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 4) Start stack again
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/start_layer8_stack.sh
+```
