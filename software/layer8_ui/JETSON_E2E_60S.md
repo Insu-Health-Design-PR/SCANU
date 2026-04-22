@@ -6,7 +6,16 @@ This guide is for your Jetson path:
 ~/Desktop/SCANU-dev_adrian/software
 ```
 
-## 0) Start backend + frontend together (single command)
+## 0) Install dependencies first (recommended)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software
+python3 -m pip install -r layer8_ui/requirements.txt
+cd layer8_ui/frontend
+npm install
+```
+
+## 1) Start backend + frontend together (single command)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
@@ -20,14 +29,14 @@ Optional first run with dependency install:
 INSTALL_FRONTEND_DEPS=1 ./scripts/start_layer8_stack.sh
 ```
 
-## 1) Start Layer 8 backend (Terminal A)
+## 2) Start Layer 8 backend (Terminal A)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software
 python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8080
 ```
 
-## 2) Start Layer 8 frontend (Terminal B)
+## 3) Start Layer 8 frontend (Terminal B)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
@@ -37,7 +46,7 @@ VITE_LAYER8_WS_URL="ws://127.0.0.1:8080/ws/events" \
 npm run dev -- --host 0.0.0.0 --port 4173 --strictPort
 ```
 
-## 3) Run 60-second verification (Terminal C)
+## 4) Run 60-second verification (Terminal C)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
@@ -51,7 +60,7 @@ Expected final line:
 [PASS] Layer 8 end-to-end compatibility checks passed
 ```
 
-## 4) Open UI
+## 5) Open UI
 
 Local Jetson browser:
 
