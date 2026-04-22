@@ -49,6 +49,16 @@ Optional first run with frontend install:
 INSTALL_FRONTEND_DEPS=1 ./scripts/start_layer8_stack.sh
 ```
 
+Run with backend on port `8087`:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+BACKEND_PORT=8087 \
+VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
+VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
+./scripts/start_layer8_stack.sh
+```
+
 ## 2) Run API contract check (60s)
 
 ```bash
