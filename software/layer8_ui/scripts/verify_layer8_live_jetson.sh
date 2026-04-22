@@ -38,6 +38,7 @@ check_http_200 "$FRONTEND_URL"
 check_http_200 "$BACKEND_URL/api/status"
 check_http_200 "$BACKEND_URL/api/health"
 check_http_200 "$BACKEND_URL/api/visual/latest"
+check_http_200 "$BACKEND_URL/api/layers/summary"
 
 echo "[live-check] CORS preflight /api/ui/preferences"
 OPTIONS_CODE="$(curl -sS -o /tmp/layer8_live_cors.$$ -w "%{http_code}" -X OPTIONS \
@@ -76,15 +77,23 @@ thermal_seen = 0
 pc_seen = 0
 online_seen = 0
 live_seen = 0
+layers_integrated_seen = 0
 
 for _ in range(samples):
     status = get_json("/api/status")
     visual = get_json("/api/visual/latest")
+    layers = get_json("/api/layers/summary")
     online = int(((status.get("health") or {}).get("sensor_online_count")) or 0)
     if online > 0:
         online_seen += 1
     if visual.get("source_mode") == "live":
         live_seen += 1
+    if isinstance(layers, dict):
+        l = layers.get("layers") or {}
+        l6 = l.get("layer6") or {}
+        l7 = l.get("layer7") or {}
+        if l6.get("integrated") is True and l7.get("integrated") is True:
+            layers_integrated_seen += 1
 
     rgb = visual.get("rgb_jpeg_b64")
     thermal = visual.get("thermal_jpeg_b64")
@@ -118,6 +127,8 @@ if thermal_seen == 0:
     failures.append("thermal_jpeg_b64 never had a non-empty frame")
 if require_pc and pc_seen == 0:
     failures.append("point_cloud stayed empty while REQUIRE_POINT_CLOUD=1")
+if layers_integrated_seen == 0:
+    failures.append("layer6/layer7 integration was not observed in /api/layers/summary")
 
 if failures:
     for f in failures:
@@ -129,6 +140,6 @@ print("[ok] live samples:", live_seen, "of", samples)
 print("[ok] rgb frames:", rgb_seen, "of", samples)
 print("[ok] thermal frames:", thermal_seen, "of", samples)
 print("[ok] point cloud non-empty:", pc_seen, "of", samples)
+print("[ok] layer6/layer7 integrated samples:", layers_integrated_seen, "of", samples)
 print("[PASS] Layer 8 live Jetson check passed")
 PY
-

@@ -91,9 +91,11 @@ This script validates:
 
 - frontend and backend are reachable
 - CORS preflight works on `/api/ui/preferences`
+- layer summary endpoint works on `/api/layers/summary`
 - sensors become online (`sensor_online_count > 0`)
 - `source_mode` becomes `live`
 - RGB and Thermal frames are non-empty
+- Layer 6 and Layer 7 integration is visible from backend summary
 - optional point-cloud presence
 
 ## 4) Open UI

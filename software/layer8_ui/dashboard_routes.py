@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import base64
+from collections import deque
 import json
 import shutil
 import time
@@ -25,6 +26,18 @@ from layer8_ui.preview_media import (
     mjpeg_placeholder_jpeg,
 )
 from layer8_ui.settings_store import DEFAULT_SETTINGS, load, reset_webcam_weapon_defaults, save
+
+try:
+    from layer6_state_machine.models import SystemHealth
+    from layer6_state_machine.orchestrator import Layer6Orchestrator
+except Exception:  # pragma: no cover
+    Layer6Orchestrator = None  # type: ignore[assignment]
+    SystemHealth = None  # type: ignore[assignment]
+
+try:
+    from layer7_alerts.integration import L6ToL7Bridge
+except Exception:  # pragma: no cover
+    L6ToL7Bridge = None  # type: ignore[assignment]
 
 SensorName = Literal["thermal", "webcam", "mmwave"]
 
@@ -254,6 +267,15 @@ def build_router(layer8_dir: Path) -> APIRouter:
     thermal_stream = thermal_runner.get_thermal_shared_stream(layer8_dir)
     webcam_stream = webcam_runner.get_webcam_shared_stream(layer8_dir)
     router = APIRouter()
+    layer6_orchestrator = Layer6Orchestrator() if Layer6Orchestrator is not None else None
+    layer7_bridge = L6ToL7Bridge() if L6ToL7Bridge is not None else None
+    layer7_recent_alerts: deque[dict[str, Any]] = deque(maxlen=200)
+    layer6_cache: dict[str, Any] = {
+        "ts_ms": 0.0,
+        "event": None,
+        "snapshot": None,
+        "action_request": None,
+    }
 
     def _iso_now() -> str:
         return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -302,25 +324,63 @@ def build_router(layer8_dir: Path) -> APIRouter:
         out["note"] = ""
         return out
 
+    def _to_float(value: Any, default: float = 0.0) -> float:
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return float(default)
+
+    def _to_int(value: Any, default: int = 0) -> int:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return int(default)
+
+    def _normalize_alert_level(level: str) -> str:
+        ll = str(level).strip().lower()
+        if ll in {"fault", "error"}:
+            return "fault"
+        if ll in {"warning", "warn", "alert"}:
+            return "warning"
+        return "info"
+
     def _status_payload() -> dict[str, Any]:
         statuses = _sensor_statuses()
         online_count = sum(1 for s in statuses.values() if bool(s.get("running")))
         metrics = _read_metrics()
+        point_cloud = _read_point_cloud()
         confidence = 0.0
         if isinstance(metrics.get("unsafe_score"), (int, float)):
             confidence = float(metrics["unsafe_score"])
         elif isinstance(metrics.get("unsafe_pct"), (int, float)):
             confidence = max(0.0, min(1.0, float(metrics["unsafe_pct"]) / 100.0))
         has_fault = online_count == 0
+        state = "SCANNING" if online_count > 0 else "IDLE"
+        fused_score = confidence
+        active_radars: list[str] = ["radar_main"] if bool(statuses.get("mmwave", {}).get("running")) else []
+
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud)
+        snapshot = l6.get("snapshot")
+        if snapshot is not None:
+            snap_state = getattr(snapshot, "state", state)
+            state = str(snap_state.value if hasattr(snap_state, "value") else snap_state)
+            fused_score = _to_float(getattr(snapshot, "fused_score", fused_score), fused_score)
+            confidence = _to_float(getattr(snapshot, "confidence", confidence), confidence)
+            snap_health = getattr(snapshot, "health", {}) or {}
+            has_fault = bool(snap_health.get("has_fault", has_fault))
+            online_count = _to_int(snap_health.get("sensor_online_count", online_count), online_count)
+            act = getattr(snapshot, "active_radars", tuple()) or tuple()
+            active_radars = [str(x) for x in act] if act else active_radars
+
         return {
-            "state": "SCANNING" if online_count > 0 else "IDLE",
-            "fused_score": confidence,
+            "state": state,
+            "fused_score": fused_score,
             "confidence": confidence,
             "health": {
                 "has_fault": has_fault,
                 "sensor_online_count": online_count,
             },
-            "active_radars": ["radar_main"] if bool(statuses.get("mmwave", {}).get("running")) else [],
+            "active_radars": active_radars,
         }
 
     def _health_payload() -> dict[str, Any]:
@@ -388,6 +448,57 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 continue
         return out
 
+    def _layer6_tick(
+        *,
+        statuses: dict[str, dict[str, Any]],
+        metrics: dict[str, Any],
+        point_cloud: list[dict[str, float]],
+        force: bool = False,
+    ) -> dict[str, Any]:
+        if layer6_orchestrator is None or SystemHealth is None:
+            return {}
+        now_ms = float(time.time() * 1000.0)
+        if not force and (now_ms - float(layer6_cache.get("ts_ms") or 0.0)) < 150.0:
+            return dict(layer6_cache)
+
+        online_count = sum(1 for s in statuses.values() if bool(s.get("running")))
+        confidence = 0.0
+        if isinstance(metrics.get("unsafe_score"), (int, float)):
+            confidence = _to_float(metrics.get("unsafe_score"), 0.0)
+        elif isinstance(metrics.get("unsafe_pct"), (int, float)):
+            confidence = max(0.0, min(1.0, _to_float(metrics.get("unsafe_pct"), 0.0) / 100.0))
+        raw_inputs = {
+            "frame_number": _to_int(metrics.get("frame"), int(now_ms) % 1_000_000),
+            "timestamp_ms": now_ms,
+            "radar_id": "radar_main",
+            "mmwave_frame": {"points": point_cloud},
+            "presence_frame": {
+                "presence_raw": confidence,
+                "motion_raw": confidence,
+            },
+            "thermal_presence": confidence,
+            "fused_score": confidence,
+        }
+        health = SystemHealth(
+            has_fault=(online_count == 0),
+            fault_code="no_sensors_online" if online_count == 0 else None,
+            fault_clear_requested=(online_count > 0),
+            sensor_online_count=online_count,
+        )
+        try:
+            event, snapshot, action_request = layer6_orchestrator.tick(raw_inputs, health=health, now_ms=now_ms)
+            layer6_cache.update(
+                {
+                    "ts_ms": now_ms,
+                    "event": event,
+                    "snapshot": snapshot,
+                    "action_request": action_request,
+                }
+            )
+            return dict(layer6_cache)
+        except Exception:
+            return {}
+
     def _visual_payload() -> dict[str, Any]:
         metrics = _read_metrics()
         statuses = _sensor_statuses()
@@ -421,7 +532,33 @@ def build_router(layer8_dir: Path) -> APIRouter:
         status = _status_payload()
         health = _health_payload()
         metrics = _read_metrics()
-        alerts: list[dict[str, Any]] = []
+        statuses = _sensor_statuses()
+        point_cloud = _read_point_cloud()
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud, force=True)
+        event = l6.get("event")
+        snapshot = l6.get("snapshot")
+        action_request = l6.get("action_request")
+
+        if layer7_bridge is not None and event is not None:
+            try:
+                if getattr(event, "previous_state", None) != getattr(event, "current_state", None):
+                    payload = layer7_bridge.ingest(event, snapshot=snapshot, action_request=action_request)
+                    layer7_recent_alerts.appendleft(
+                        {
+                            "event_id": payload.event_id,
+                            "level": _normalize_alert_level(str(payload.level.value)),
+                            "timestamp_utc": payload.timestamp_utc,
+                            "message": payload.message,
+                            "state": payload.state,
+                            "radar_id": payload.radar_id,
+                            "scores": payload.scores,
+                            "metadata": payload.metadata,
+                        }
+                    )
+            except Exception:
+                pass
+
+        alerts: list[dict[str, Any]] = list(layer7_recent_alerts)
         if health["has_fault"]:
             alerts.append(
                 {
@@ -459,6 +596,74 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 }
             )
         return {"alerts": alerts[: max(1, int(limit))]}
+
+    def _layers_summary_payload() -> dict[str, Any]:
+        settings = load(layer8_dir)
+        sw = software_root_from_settings(settings)
+        statuses = _sensor_statuses()
+        metrics = _read_metrics()
+        point_cloud = _read_point_cloud()
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud)
+        snapshot = l6.get("snapshot")
+
+        layer2_features = sw / "layer2_signal_processing" / "layer2_features.json"
+        layer3_dataset = sw / "layer3_features" / "dataset.py"
+        layer4_metrics_rel = (settings.get("webcam") or {}).get("metrics_json") or "layer8_ui/artifacts/live_threat_metrics.json"
+        layer4_metrics_path = resolved_artifact_path(settings, relative_to_software=str(layer4_metrics_rel), layer8_dir=layer8_dir)
+        layer5_dir = sw / "layer5_fusion"
+        layer5_impl = [p.name for p in layer5_dir.glob("*.py") if p.name != "__init__.py"]
+
+        state_value = ""
+        fused_score = 0.0
+        if snapshot is not None:
+            snap_state = getattr(snapshot, "state", "")
+            state_value = str(snap_state.value if hasattr(snap_state, "value") else snap_state)
+            fused_score = _to_float(getattr(snapshot, "fused_score", 0.0), 0.0)
+
+        return {
+            "timestamp_ms": int(time.time() * 1000),
+            "layers": {
+                "layer1": {
+                    "mmwave_running": bool(statuses.get("mmwave", {}).get("running")),
+                    "thermal_running": bool(statuses.get("thermal", {}).get("running")),
+                    "webcam_running": bool(statuses.get("webcam", {}).get("running")),
+                    "sensor_online_count": sum(1 for s in statuses.values() if bool(s.get("running"))),
+                },
+                "layer2": {
+                    "features_file": str(layer2_features),
+                    "features_file_exists": layer2_features.is_file(),
+                },
+                "layer3": {
+                    "dataset_module": str(layer3_dataset),
+                    "dataset_module_exists": layer3_dataset.is_file(),
+                },
+                "layer4": {
+                    "metrics_path": str(layer4_metrics_path) if layer4_metrics_path is not None else "",
+                    "metrics_available": bool(layer4_metrics_path and layer4_metrics_path.is_file()),
+                    "gun_detected": bool(metrics.get("gun_detected")),
+                    "persons_total": _to_int(metrics.get("persons_total"), 0),
+                },
+                "layer5": {
+                    "module_dir": str(layer5_dir),
+                    "implementation_files": layer5_impl,
+                    "implemented": len(layer5_impl) > 0,
+                },
+                "layer6": {
+                    "integrated": layer6_orchestrator is not None,
+                    "state": state_value,
+                    "fused_score": fused_score,
+                },
+                "layer7": {
+                    "integrated": layer7_bridge is not None,
+                    "recent_alerts_count": len(layer7_recent_alerts),
+                },
+                "layer8": {
+                    "api_ready": True,
+                    "ui_prefs_path": str(_ui_prefs_path(layer8_dir)),
+                    "point_cloud_points": len(point_cloud),
+                },
+            },
+        }
 
     def _normalize_route_result(result: Any) -> tuple[bool, Any]:
         if isinstance(result, JSONResponse):
@@ -980,6 +1185,10 @@ def build_router(layer8_dir: Path) -> APIRouter:
     @router.get("/api/alerts/recent")
     def get_recent_alerts(limit: int = 50) -> dict[str, Any]:
         return _alerts_payload(limit=limit)
+
+    @router.get("/api/layers/summary")
+    def get_layers_summary() -> dict[str, Any]:
+        return _layers_summary_payload()
 
     @router.get("/api/visual/latest")
     def get_visual_latest() -> dict[str, Any]:
