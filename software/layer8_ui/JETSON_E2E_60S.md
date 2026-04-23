@@ -10,19 +10,19 @@ This guide is for your Jetson path:
 
 ```bash
 # Terminal A: start backend + frontend together
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ./scripts/start_layer8_stack.sh
 ```
 
 ```bash
 # Terminal B: validate live backend+frontend+cameras+sensors
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ./scripts/verify_layer8_live_jetson.sh
 ```
 
 ```bash
 # Optional strict check: require point cloud data
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 REQUIRE_POINT_CLOUD=1 ./scripts/verify_layer8_live_jetson.sh
 ```
 
@@ -38,7 +38,7 @@ npm install
 ## 1) Start backend + frontend together (single command)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 chmod +x scripts/start_layer8_stack.sh
 ./scripts/start_layer8_stack.sh
 ```
@@ -52,7 +52,7 @@ INSTALL_FRONTEND_DEPS=1 ./scripts/start_layer8_stack.sh
 Run with backend on port `8087`:
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 BACKEND_PORT=8087 \
 VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
 VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
@@ -62,7 +62,7 @@ VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
 ## 2) Run API contract check (60s)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 chmod +x scripts/verify_layer8_e2e_60s.sh
 ./scripts/verify_layer8_e2e_60s.sh
 ```
@@ -76,7 +76,7 @@ Expected:
 ## 3) Run live hardware check (cameras + sensors)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 chmod +x scripts/verify_layer8_live_jetson.sh
 ./scripts/verify_layer8_live_jetson.sh
 ```
