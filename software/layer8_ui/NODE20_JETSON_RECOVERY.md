@@ -39,7 +39,7 @@ Expected:
 ## 4) Reinstall frontend dependencies
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui/frontend
 rm -rf node_modules package-lock.json
 npm install
 ```
@@ -47,7 +47,7 @@ npm install
 ## 5) Start Layer 8 backend + frontend in one command
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 ./scripts/start_layer8_stack.sh
 ```
 
@@ -67,5 +67,5 @@ hostname -I
 Check log:
 
 ```bash
-cat ~/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
+cat ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui/logs/frontend.dev.log
 ```

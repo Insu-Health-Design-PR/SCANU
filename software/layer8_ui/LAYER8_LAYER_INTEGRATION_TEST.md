@@ -5,13 +5,13 @@ Use this test to validate, from terminal, that Layer 8 is collecting and exposin
 Path on Jetson:
 
 ```bash
-~/Desktop/SCANU-dev_adrian/software/layer8_ui
+~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 ```
 
 ## 0) Frontend dependency check (fix `vite: not found`)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui/frontend
 npm install
 npx vite --version
 ```
@@ -19,14 +19,14 @@ npx vite --version
 ## 1) Start Layer 8 stack (default backend port 8087)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 ./scripts/start_layer8_stack.sh
 ```
 
 ## 2) Optional custom port/API overrides
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 BACKEND_PORT=8087 \
 VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
 VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
@@ -36,7 +36,7 @@ VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
 ## 3) Run integration test (contract + integration wiring)
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 ./scripts/verify_layer8_layers_integration.sh
 ```
 
@@ -51,7 +51,7 @@ Expected final line:
 Use this when you want to enforce that Layer 1 sensors are online and Layer 4 metrics are active.
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+cd ~/Desktop/SCANU-dev_adrian/SCANU/software/layer8_ui
 STRICT_RUNTIME=1 ./scripts/verify_layer8_layers_integration.sh
 ```
 
