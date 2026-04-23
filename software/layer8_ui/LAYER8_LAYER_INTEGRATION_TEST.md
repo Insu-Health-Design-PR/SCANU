@@ -71,6 +71,30 @@ You should see layer keys:
 
 
 
+4444444444
+insu@insu-desktop:~$ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/start_layer8_stack.sh
+[layer8] Starting backend on 0.0.0.0:8080
+[layer8] Starting frontend on 0.0.0.0:4173
+[layer8] Backend PID:  71515
+[layer8] Frontend PID: 71516
+[layer8] Frontend URL: http://127.0.0.1:4173
+[layer8] Backend URL:  http://127.0.0.1:8080
+[layer8] API/WS override:
+  - VITE_LAYER8_API_BASE=<auto>
+  - VITE_LAYER8_WS_URL=<auto>
+[layer8] Logs:
+  - /home/insu/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/backend.dev.log
+  - /home/insu/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
+[layer8] Press Ctrl+C to stop both services.
+[layer8] Frontend stopped. Check log: /home/insu/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian/software/layer8_ui$ cat ~/Desktop/SCANU-dev_adrian/software/layer8_ui/logs/frontend.dev.log
+
+> scanu-layer8-ui@0.1.0 dev
+> vite --host 0.0.0.0 --port 4173 --strictPort
+
+sh: 1: vite: not found
+insu@insu-desktop:~/Desktop/SCANU-dev_adrian/software/layer8_ui$ 
 
 
 
