@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BACKEND_URL="${BACKEND_URL:-http://127.0.0.1:8080}"
+BACKEND_URL="${BACKEND_URL:-http://127.0.0.1:8087}"
 FRONTEND_URL="${FRONTEND_URL:-http://127.0.0.1:4173}"
 DURATION_SEC="${DURATION_SEC:-60}"
 INTERVAL_SEC="${INTERVAL_SEC:-5}"
