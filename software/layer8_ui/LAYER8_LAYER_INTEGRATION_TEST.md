@@ -8,10 +8,28 @@ Path on Jetson:
 ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ```
 
+## 0) Frontend dependency check (fix `vite: not found`)
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui/frontend
+npm install
+npx vite --version
+```
+
 ## 1) Start Layer 8 stack
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/start_layer8_stack.sh
+```
+
+Run backend on `8087`:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+BACKEND_PORT=8087 \
+VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
+VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
 ./scripts/start_layer8_stack.sh
 ```
 
