@@ -55,13 +55,13 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ./scripts/start_layer8_stack.sh
 ```
 
-Default backend is now `8087`.  
+Default backend is now `8088`.  
 If you force another port, set both env vars too:
 
 ```bash
-BACKEND_PORT=8087 \
-VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
-VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
+BACKEND_PORT=8088 \
+VITE_LAYER8_API_BASE="http://127.0.0.1:8088" \
+VITE_LAYER8_WS_URL="ws://127.0.0.1:8088/ws/events" \
 ./scripts/start_layer8_stack.sh
 ```
 
@@ -77,9 +77,9 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 Check backend endpoints:
 
 ```bash
-curl -s http://127.0.0.1:8087/api/status | jq
-curl -s http://127.0.0.1:8087/api/health | jq
-curl -s http://127.0.0.1:8087/api/layers/summary | jq
+curl -s http://127.0.0.1:8088/api/status | jq
+curl -s http://127.0.0.1:8088/api/health | jq
+curl -s http://127.0.0.1:8088/api/layers/summary | jq
 ```
 
 ## 5) Check logs quickly
@@ -94,7 +94,7 @@ tail -n 120 logs/frontend.dev.log
 
 ```bash
 lsof -i :4173
-lsof -i :8087
+lsof -i :8088
 ```
 
 Then stop old process and run again:

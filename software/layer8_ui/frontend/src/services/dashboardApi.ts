@@ -66,12 +66,12 @@ function toUrlOrNull(input: string | undefined): URL | null {
 
 function resolveApiBase(): string {
   const envApiBase = import.meta.env.VITE_LAYER8_API_BASE as string | undefined;
-  if (typeof window === 'undefined') return envApiBase ?? 'http://127.0.0.1:8087';
+  if (typeof window === 'undefined') return envApiBase ?? 'http://127.0.0.1:8088';
 
   const browserHost = window.location.hostname;
   const browserIsLocal = isLoopbackHost(browserHost);
-  const localDefault = 'http://127.0.0.1:8087';
-  const sameHostDefault = `${window.location.protocol}//${browserHost}:8087`;
+  const localDefault = 'http://127.0.0.1:8088';
+  const sameHostDefault = `${window.location.protocol}//${browserHost}:8088`;
   const envUrl = toUrlOrNull(envApiBase);
 
   if (browserIsLocal && envUrl && !isLoopbackHost(envUrl.hostname)) {

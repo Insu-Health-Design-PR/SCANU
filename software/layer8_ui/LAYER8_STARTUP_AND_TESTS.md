@@ -23,7 +23,7 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ```
 
 Defaults:
-- backend: `http://127.0.0.1:8087`
+- backend: `http://127.0.0.1:8088`
 - frontend: `http://127.0.0.1:4173`
 
 ## 3) Start backend only (debug mode)
@@ -44,9 +44,9 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
-BACKEND_PORT=8087 \
-VITE_LAYER8_API_BASE="http://127.0.0.1:8087" \
-VITE_LAYER8_WS_URL="ws://127.0.0.1:8087/ws/events" \
+BACKEND_PORT=8088 \
+VITE_LAYER8_API_BASE="http://127.0.0.1:8088" \
+VITE_LAYER8_WS_URL="ws://127.0.0.1:8088/ws/events" \
 ./scripts/start_layer8_stack.sh
 ```
 
