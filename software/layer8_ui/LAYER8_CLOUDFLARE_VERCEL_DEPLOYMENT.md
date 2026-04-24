@@ -1,0 +1,97 @@
+# Layer 8 Cloudflare Tunnel + Vercel Deployment
+
+Use this when the Jetson runs the backend and Vercel hosts the frontend.
+
+## 1) Start backend on Jetson
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+LAYER8_API_KEY="change-this-key" ./scripts/start_layer8_backend_only.sh
+```
+
+Backend default:
+
+```text
+http://127.0.0.1:8088
+```
+
+## 2) Validate backend locally
+
+Health is public:
+
+```bash
+curl -sS http://127.0.0.1:8088/api/health
+```
+
+Protected endpoints require the API key:
+
+```bash
+curl -sS -H "X-Layer8-Api-Key: change-this-key" http://127.0.0.1:8088/api/status
+curl -sS -H "X-Layer8-Api-Key: change-this-key" http://127.0.0.1:8088/api/visual/latest
+```
+
+Or use the script:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+LAYER8_API_KEY="change-this-key" ./scripts/check_layer8_backend.sh
+```
+
+## 3) Start Cloudflare Tunnel
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8088
+```
+
+Cloudflare prints a public HTTPS URL like:
+
+```text
+https://example.trycloudflare.com
+```
+
+## 4) Validate public backend URL
+
+```bash
+BACKEND_URL="https://example.trycloudflare.com" \
+LAYER8_API_KEY="change-this-key" \
+./scripts/check_layer8_backend.sh
+```
+
+Manual checks:
+
+```bash
+curl -sS https://example.trycloudflare.com/api/health
+curl -sS -H "X-Layer8-Api-Key: change-this-key" https://example.trycloudflare.com/api/status
+curl -sS -H "X-Layer8-Api-Key: change-this-key" https://example.trycloudflare.com/api/visual/latest
+```
+
+## 5) Configure Vercel frontend environment
+
+Set these in Vercel Project Settings -> Environment Variables:
+
+```text
+VITE_LAYER8_API_BASE=https://example.trycloudflare.com
+VITE_LAYER8_WS_URL=wss://example.trycloudflare.com/ws/events
+VITE_LAYER8_API_KEY=change-this-key
+```
+
+Then redeploy the Vercel project.
+
+## 6) Expected frontend behavior
+
+The Vercel frontend should load:
+
+- RGB Camera
+- Thermal Camera
+- Point Cloud
+- Presence Sensor
+- System Status
+- Console Log
+- Execution Controls
+
+The browser console should not show CORS, mixed-content, or WebSocket connection errors.
+
+## Security note
+
+This API key is demo-level protection. Browser environment variables are visible to users after build, so do not treat this as production-grade authentication.
+

@@ -33,11 +33,25 @@ cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ./scripts/start_layer8_backend_only.sh
 ```
 
+With API key protection enabled:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+LAYER8_API_KEY="change-this-key" ./scripts/start_layer8_backend_only.sh
+```
+
 ## 4) Quick backend check (health/status/routes)
 
 ```bash
 cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
 ./scripts/check_layer8_backend.sh
+```
+
+When `LAYER8_API_KEY` is enabled on the backend:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+LAYER8_API_KEY="change-this-key" ./scripts/check_layer8_backend.sh
 ```
 
 ## 5) Optional custom ports/URLs

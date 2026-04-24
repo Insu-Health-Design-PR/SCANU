@@ -5,13 +5,13 @@ This document explains what the Layer 8 frontend needs when it runs on a differe
 Jetson backend base URL (default):
 
 ```text
-http://<JETSON_IP>:8088
+https://<CLOUDFLARE_TUNNEL_URL>
 ```
 
 WebSocket URL:
 
 ```text
-ws://<JETSON_IP>:8088/ws/events
+wss://<CLOUDFLARE_TUNNEL_URL>/ws/events
 ```
 
 ## Required Endpoints Used by Frontend
@@ -89,8 +89,9 @@ ws://<JETSON_IP>:8088/ws/events
 Set these env vars where frontend runs:
 
 ```bash
-VITE_LAYER8_API_BASE="http://<JETSON_IP>:8088"
-VITE_LAYER8_WS_URL="ws://<JETSON_IP>:8088/ws/events"
+VITE_LAYER8_API_BASE="https://<CLOUDFLARE_TUNNEL_URL>"
+VITE_LAYER8_WS_URL="wss://<CLOUDFLARE_TUNNEL_URL>/ws/events"
+VITE_LAYER8_API_KEY="<same-key-as-jetson>"
 ```
 
 Why this is required:
@@ -102,10 +103,10 @@ Why this is required:
 From the frontend host:
 
 ```bash
-curl -sS http://<JETSON_IP>:8088/api/health
-curl -sS http://<JETSON_IP>:8088/api/status
-curl -sS http://<JETSON_IP>:8088/api/visual/latest
-curl -sS "http://<JETSON_IP>:8088/api/alerts/recent?limit=10"
+curl -sS https://<CLOUDFLARE_TUNNEL_URL>/api/health
+curl -sS -H "X-Layer8-Api-Key: <key>" https://<CLOUDFLARE_TUNNEL_URL>/api/status
+curl -sS -H "X-Layer8-Api-Key: <key>" https://<CLOUDFLARE_TUNNEL_URL>/api/visual/latest
+curl -sS -H "X-Layer8-Api-Key: <key>" "https://<CLOUDFLARE_TUNNEL_URL>/api/alerts/recent?limit=10"
 ```
 
 Expected:
@@ -115,7 +116,7 @@ Expected:
 WebSocket check (basic):
 
 ```text
-ws://<JETSON_IP>:8088/ws/events
+wss://<CLOUDFLARE_TUNNEL_URL>/ws/events?token=<key>
 ```
 
 Expected:
@@ -124,5 +125,16 @@ Expected:
 
 ## CORS Note
 
-Layer 8 backend currently enables permissive CORS middleware (`allow_origins=["*"]`), so cross-origin frontend access is allowed by default.
+Layer 8 backend allows CORS origins from `LAYER8_CORS_ORIGINS`.
 
+Default local/dev behavior remains permissive:
+
+```bash
+LAYER8_CORS_ORIGINS="*"
+```
+
+For a Vercel deployment, prefer:
+
+```bash
+LAYER8_CORS_ORIGINS="https://your-vercel-app.vercel.app"
+```

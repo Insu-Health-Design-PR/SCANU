@@ -99,9 +99,21 @@ function resolveWsEventsUrl(apiBase: string): string {
 const API_BASE = resolveApiBase();
 const WS_EVENTS_URL = resolveWsEventsUrl(API_BASE);
 const PREFS_ENDPOINT = `${API_BASE}/api/ui/preferences`;
+const API_KEY = (import.meta.env.VITE_LAYER8_API_KEY as string | undefined)?.trim() ?? '';
+
+function authHeaders(extra?: HeadersInit): HeadersInit {
+  return API_KEY ? { ...extra, 'X-Layer8-Api-Key': API_KEY } : (extra ?? {});
+}
+
+function eventsSocketUrl(): string {
+  if (!API_KEY) return WS_EVENTS_URL;
+  const url = new URL(WS_EVENTS_URL);
+  url.searchParams.set('token', API_KEY);
+  return url.toString();
+}
 
 async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url, { headers: { Accept: 'application/json' } });
+  const response = await fetch(url, { headers: authHeaders({ Accept: 'application/json' }) });
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}: ${url}`);
   }
@@ -111,10 +123,10 @@ async function fetchJson<T>(url: string): Promise<T> {
 async function postJson<T>(url: string, body: Record<string, unknown>): Promise<T> {
   const response = await fetch(url, {
     method: 'POST',
-    headers: {
+    headers: authHeaders({
       Accept: 'application/json',
       'Content-Type': 'application/json',
-    },
+    }),
     body: JSON.stringify(body),
   });
   if (!response.ok) {
@@ -463,7 +475,7 @@ export const dashboardApi = {
   },
 
   createEventsSocket(): WebSocket {
-    return new WebSocket(WS_EVENTS_URL);
+    return new WebSocket(eventsSocketUrl());
   },
 
   async fetchUiPrefs(): Promise<Partial<UiPreferences> | null> {
