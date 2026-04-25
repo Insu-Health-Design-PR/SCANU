@@ -26,17 +26,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
+import warnings
 from collections.abc import Mapping
 import urllib.request
 from pathlib import Path
-from time import time
+from time import sleep, time
 
 import cv2
 import numpy as np
 import torch
-from torchvision import transforms
-from ultralytics import YOLO
+
+from .live_frame_ipc import LiveFrameWriter
 
 from .modeling import build_model
 
@@ -228,6 +230,42 @@ def _parse_yolo_classes(s: str | None) -> list[int] | None:
     return [int(x.strip()) for x in s.split(",") if x.strip()]
 
 
+def _frame_to_bgr_for_infer(frame: np.ndarray | None) -> np.ndarray | None:
+    """Normalize odd V4L2/OpenCV frames (1/2/4-channel) into 3-channel BGR."""
+    if frame is None or not hasattr(frame, "shape"):
+        return None
+    if frame.size == 0:
+        return None
+    if frame.ndim == 2:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if frame.ndim != 3:
+        return None
+    ch = int(frame.shape[2])
+    if ch == 3:
+        return frame
+    if ch == 1:
+        return cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+    if ch == 4:
+        return cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
+    if ch == 2:
+        packed = np.ascontiguousarray(frame)
+        # Typical webcam packed YUV 4:2:2 stream (YUYV/YUY2).
+        try:
+            return cv2.cvtColor(packed, cv2.COLOR_YUV2BGR_YUY2)
+        except cv2.error:
+            pass
+        # Alternate packed layout used by some devices.
+        try:
+            return cv2.cvtColor(packed, cv2.COLOR_YUV2BGR_UYVY)
+        except cv2.error:
+            pass
+        # Last resort keeps inference alive even if color decode is imperfect.
+        a = np.ascontiguousarray(frame[:, :, 0])
+        b = np.ascontiguousarray(frame[:, :, 1])
+        return cv2.merge([a, b, a])
+    return None
+
+
 # Keys accepted inside --config (flat dict); unknown keys are ignored with a warning.
 _INFER_CONFIG_KEYS = frozenset(
     {
@@ -260,11 +298,13 @@ _INFER_CONFIG_KEYS = frozenset(
         "gun_thermal",
         "gun_min_box_px",
         "gun_take_best",
+        "gun_label_weapon_min",
         "gun_threshold",
         "fuse_gun_to_prob",
         "gun_prob_floor",
         "gun_conf_scale",
         "live_jpg",
+        "live_ipc_frame",
         "live_metrics_json",
         "capture_width",
         "capture_height",
@@ -474,6 +514,12 @@ def main() -> None:
         help="Each processed frame, atomically write this JPEG path (for Layer 8 MJPEG preview).",
     )
     p.add_argument(
+        "--live_ipc_frame",
+        type=Path,
+        default=None,
+        help="Optional mmap frame channel path (single-producer latest JPEG) for low-latency UI preview.",
+    )
+    p.add_argument(
         "--live_metrics_json",
         type=Path,
         default=None,
@@ -537,6 +583,12 @@ def main() -> None:
         help="Skip firearm boxes if width or height exceeds this fraction of frame W/H. Set to 1.0 to disable.",
     )
     p.add_argument(
+        "--gun_label_weapon_min",
+        type=float,
+        default=0.65,
+        help="Orange firearm box text: show 'object' below this YOLO score, 'weapon' at or above (not the raw class name).",
+    )
+    p.add_argument(
         "--gun_full_frame",
         action="store_true",
         help="Run firearm YOLO on the full thermal frame (legacy). Default: only inside each person box crop.",
@@ -591,6 +643,12 @@ def main() -> None:
         metavar="N",
         help="With --cuda-empty-cache, run empty_cache every N frames (default: 30). Use 1 for legacy per-frame behavior.",
     )
+    p.add_argument(
+        "--quiet_third_party_warnings",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Suppress noisy dependency warnings (e.g. torchvision compatibility) and keep app logs focused.",
+    )
     if file_defaults:
         p.set_defaults(**file_defaults)
     args = p.parse_args(argv_rest)
@@ -609,6 +667,25 @@ def main() -> None:
     if args.gun_threshold is not None:
         args.unsafe_threshold = float(args.gun_threshold)
     args.cuda_empty_cache_every = max(1, int(args.cuda_empty_cache_every))
+    if args.quiet_third_party_warnings:
+        warnings.filterwarnings(
+            "ignore",
+            message=r".*torchvision==.*incompatible with torch==.*",
+        )
+        warnings.filterwarnings(
+            "ignore",
+            message=r".*For a full compatibility table.*",
+        )
+        logging.getLogger("ultralytics").setLevel(logging.ERROR)
+        try:
+            from ultralytics.utils import LOGGER as _UL_LOGGER  # local import to avoid hard dependency here
+
+            _UL_LOGGER.setLevel(logging.ERROR)
+        except Exception:
+            pass
+    from torchvision import transforms
+    # Import after warning filters so startup compatibility warnings can be muted.
+    from ultralytics import YOLO
 
     if args.gun_thermal_debug:
         args.gun_conf = 0.02
@@ -691,11 +768,24 @@ def main() -> None:
         gun_detector = YOLO(str(gpath))
 
     src = int(args.source) if args.source.isdigit() else args.source
-    if isinstance(src, int) and sys.platform.startswith("linux"):
-        cap = cv2.VideoCapture(src, cv2.CAP_V4L2)
-        if not cap.isOpened():
-            cap.release()
-            cap = cv2.VideoCapture(src)
+    if isinstance(src, int):
+        cap = None
+        # Some UVC devices on Jetson fail briefly after reconnect; retry before hard fail.
+        for _attempt in range(20):
+            if sys.platform.startswith("linux"):
+                c = cv2.VideoCapture(src, cv2.CAP_V4L2)
+                if not c.isOpened():
+                    c.release()
+                    c = cv2.VideoCapture(src)
+            else:
+                c = cv2.VideoCapture(src)
+            if c.isOpened():
+                cap = c
+                break
+            c.release()
+            sleep(0.15)
+        if cap is None:
+            raise SystemExit(f"Cannot open {args.source}")
     else:
         cap = cv2.VideoCapture(src)
     if not cap.isOpened():
@@ -703,8 +793,8 @@ def main() -> None:
     if isinstance(src, int):
         cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(args.capture_width))
         cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(args.capture_height))
-        # Match layer8_ui.webcam_runner: avoid driver default multi-frame queues (often 4+), which feels like lag.
-        cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)
+        # Webcam path should be normal RGB/BGR for YOLO; avoid raw 2-channel V4L2 formats.
+        cap.set(cv2.CAP_PROP_CONVERT_RGB, 1)
         cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         aw = int(round(cap.get(cv2.CAP_PROP_FRAME_WIDTH) or 0))
         ah = int(round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT) or 0))
@@ -754,6 +844,11 @@ def main() -> None:
     if args.live_jpg is not None:
         args.live_jpg = args.live_jpg.expanduser().resolve()
         args.live_jpg.parent.mkdir(parents=True, exist_ok=True)
+    live_ipc_writer: LiveFrameWriter | None = None
+    if args.live_ipc_frame is not None:
+        args.live_ipc_frame = args.live_ipc_frame.expanduser().resolve()
+        args.live_ipc_frame.parent.mkdir(parents=True, exist_ok=True)
+        live_ipc_writer = LiveFrameWriter(args.live_ipc_frame)
     if args.live_metrics_json is not None:
         args.live_metrics_json = args.live_metrics_json.expanduser().resolve()
         args.live_metrics_json.parent.mkdir(parents=True, exist_ok=True)
@@ -761,6 +856,7 @@ def main() -> None:
     all_probs: list[float] = []
     frame_max_probs: list[float] = []
     frame_count = 0
+    bad_frame_count = 0
     writer: cv2.VideoWriter | None = None
     try:
         with torch.no_grad():
@@ -773,9 +869,20 @@ def main() -> None:
                     break
 
                 if args.composite_mode:
-                    thermal = _extract_thermal_column(bgr_full, args.thermal_panel)
+                    thermal_raw = _extract_thermal_column(bgr_full, args.thermal_panel)
                 else:
-                    thermal = bgr_full
+                    thermal_raw = bgr_full
+
+                thermal = _frame_to_bgr_for_infer(thermal_raw)
+                if thermal is None:
+                    bad_frame_count += 1
+                    if bad_frame_count <= 3 or bad_frame_count % 30 == 0:
+                        shp = getattr(thermal_raw, "shape", None)
+                        print(
+                            f"Warning: skipped frame {frame_count} due to unsupported frame shape={shp}.",
+                            flush=True,
+                        )
+                    continue
 
                 vis = thermal.copy()
                 h, w = vis.shape[:2]
@@ -800,6 +907,8 @@ def main() -> None:
                 if boxes is not None and len(boxes) > 0:
                     xyxy = boxes.xyxy.cpu().numpy()
                     cls_ids = boxes.cls.cpu().numpy().astype(int) if boxes.cls is not None else None
+                    row_meta: list[tuple[int, int, int, int, int | None, str]] = []
+                    batch_tensors: list[torch.Tensor] = []
                     for i, row in enumerate(xyxy):
                         x1, y1, x2, y2 = _clamp_box(row, w, h)
                         if (x2 - x1) < args.min_box_px or (y2 - y1) < args.min_box_px:
@@ -814,18 +923,24 @@ def main() -> None:
                             in_rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
                         else:
                             in_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
-                        x = tf(in_rgb).unsqueeze(0).to(clf_device)
-                        logits = clf(x)
-                        if is_gun_prob:
-                            prob = torch.sigmoid(logits.reshape(-1))[0].item()
-                        else:
-                            prob = torch.softmax(logits, dim=1)[0, 1].item()
                         cid = int(cls_ids[i]) if cls_ids is not None and i < len(cls_ids) else None
                         yolo_tag = id_to_name.get(cid, str(cid)) if cid is not None else "obj"
-                        rows.append((x1, y1, x2, y2, prob, cid, yolo_tag))
+                        row_meta.append((x1, y1, x2, y2, cid, yolo_tag))
+                        batch_tensors.append(tf(in_rgb))
+                    if batch_tensors:
+                        x_batch = torch.stack(batch_tensors, dim=0).to(clf_device)
+                        logits_batch = clf(x_batch)
+                        if is_gun_prob:
+                            probs = torch.sigmoid(logits_batch.reshape(-1)).detach().cpu().tolist()
+                        else:
+                            probs = torch.softmax(logits_batch, dim=1)[:, 1].detach().cpu().tolist()
+                        for (x1, y1, x2, y2, cid, yolo_tag), prob in zip(row_meta, probs):
+                            rows.append((x1, y1, x2, y2, float(prob), cid, yolo_tag))
 
                 gun_count = 0
                 frame_gun_best_conf = 0.0
+                # Per-row firearm confidence (same row index as `rows`) to avoid boosting every person.
+                person_gun_best_conf: dict[int, float] = {}
                 if gun_detector is not None:
                     if args.gun_thermal_debug:
                         infer_gun_conf = float(args.gun_conf)
@@ -838,10 +953,16 @@ def main() -> None:
 
                     def _emit_firearm_overlay(gx1: int, gy1: int, gx2: int, gy2: int, gname: str, gc: float) -> None:
                         nonlocal gun_count, frame_gun_best_conf
+                        _ = gname  # YOLO class name; overlay uses coarse object/weapon label by score
                         gx1, gy1, gx2, gy2 = max(0, gx1), max(0, gy1), min(w, gx2), min(h, gy2)
                         gun_count += 1
                         frame_gun_best_conf = max(frame_gun_best_conf, float(gc))
-                        glabel = f"{gname} {gc:.2f}"
+                        kind = (
+                            "object"
+                            if float(gc) < float(args.gun_label_weapon_min)
+                            else "weapon"
+                        )
+                        glabel = f"{kind} {gc:.2f}"
                         orange = (0, 140, 255)
                         cv2.rectangle(vis, (gx1, gy1), (gx2, gy2), orange, 3)
                         gty = max(gy1 - 6, 18)
@@ -901,6 +1022,31 @@ def main() -> None:
                                 continue
                             _emit_firearm_overlay(gx1, gy1, gx2, gy2, gnm, gc)
 
+                    def _best_valid_conf(
+                        candidates: list[tuple[float, int, int, int, int, str]],
+                        pr: int,
+                        pb: int,
+                    ) -> float:
+                        best = 0.0
+                        for gc, gx1, gy1, gx2, gy2, _gnm in candidates:
+                            gx1, gy1, gx2, gy2 = max(0, gx1), max(0, gy1), min(w, gx2), min(h, gy2)
+                            if not _gun_detection_valid(
+                                gx1,
+                                gy1,
+                                gx2,
+                                gy2,
+                                w,
+                                h,
+                                args.gun_max_area_frac,
+                                args.gun_max_side_frac,
+                                args.gun_min_box_px,
+                                ref_w=pr,
+                                ref_h=pb,
+                            ):
+                                continue
+                            best = max(best, float(gc))
+                        return best
+
                     if args.gun_full_frame:
                         gres = gun_detector.predict(
                             source=thermal,
@@ -924,7 +1070,7 @@ def main() -> None:
                                 candidates_ff.append((gc, gx1, gy1, gx2, gy2, gnm))
                         _draw_gun_from_candidates(candidates_ff, w, h)
                     elif rows:
-                        for px1, py1, px2, py2, _prob, pcid, ptag in rows:
+                        for ridx, (px1, py1, px2, py2, _prob, pcid, ptag) in enumerate(rows):
                             if pcid is not None and pcid != 0:
                                 continue
                             qx1, qy1, qx2, qy2 = _expand_person_roi_for_gun(
@@ -967,17 +1113,23 @@ def main() -> None:
                                     gnm = gnames.get(cid, "gun")
                                     gc = float(g_conf[j]) if g_conf is not None and j < len(g_conf) else 0.0
                                     candidates_roi.append((gc, gx1, gy1, gx2, gy2, gnm))
+                            best_gc = _best_valid_conf(candidates_roi, pr, pb)
+                            if best_gc > 0.0:
+                                person_gun_best_conf[ridx] = max(person_gun_best_conf.get(ridx, 0.0), best_gc)
                             _draw_gun_from_candidates(candidates_roi, pr, pb)
 
-                if args.fuse_gun_to_prob and gun_count > 0 and rows:
-                    gun_boost = max(
-                        float(args.gun_prob_floor),
-                        min(0.99, float(frame_gun_best_conf) * float(args.gun_conf_scale)),
-                    )
-                    rows = [
-                        (x1, y1, x2, y2, max(prob, gun_boost), cid, ytag)
-                        for (x1, y1, x2, y2, prob, cid, ytag) in rows
-                    ]
+                if args.fuse_gun_to_prob and rows:
+                    fused_rows: list[tuple[int, int, int, int, float, int | None, str]] = []
+                    for ridx, (x1, y1, x2, y2, prob, cid, ytag) in enumerate(rows):
+                        gc = person_gun_best_conf.get(ridx, 0.0)
+                        if gc > 0.0:
+                            gun_boost = max(
+                                float(args.gun_prob_floor),
+                                min(0.99, float(gc) * float(args.gun_conf_scale)),
+                            )
+                            prob = max(prob, gun_boost)
+                        fused_rows.append((x1, y1, x2, y2, prob, cid, ytag))
+                    rows = fused_rows
 
                 if rows:
                     probs = [r[4] for r in rows]
@@ -1070,12 +1222,16 @@ def main() -> None:
                             raise SystemExit(f"Cannot open VideoWriter for {args.output}")
                     writer.write(vis)
 
-                if args.live_jpg is not None:
-                    tmp = args.live_jpg.with_suffix(args.live_jpg.suffix + ".tmp")
+                if args.live_jpg is not None or live_ipc_writer is not None:
                     ok_lj, buf = cv2.imencode(".jpg", vis, [int(cv2.IMWRITE_JPEG_QUALITY), 85])
                     if ok_lj:
-                        tmp.write_bytes(buf.tobytes())
-                        tmp.replace(args.live_jpg)
+                        jb = buf.tobytes()
+                        if args.live_jpg is not None:
+                            tmp = args.live_jpg.with_suffix(args.live_jpg.suffix + ".tmp")
+                            tmp.write_bytes(jb)
+                            tmp.replace(args.live_jpg)
+                        if live_ipc_writer is not None:
+                            live_ipc_writer.write(jb)
 
                 if args.live_metrics_json is not None:
                     person_rows = [r for r in rows if r[5] in (None, 0)]
@@ -1083,13 +1239,7 @@ def main() -> None:
                     persons_with_gun = int(sum(1 for r in person_rows if float(r[4]) >= _UNSAFE_MIN))
                     gun_detected = bool(persons_with_gun > 0 or gun_count > 0)
                     person_peak = max((float(r[4]) for r in person_rows), default=0.0)
-                    gun_boost = 0.0
-                    if gun_count > 0:
-                        gun_boost = max(
-                            float(args.gun_prob_floor),
-                            min(0.99, float(frame_gun_best_conf) * float(args.gun_conf_scale)),
-                        )
-                    risk_score = max(person_peak, gun_boost)
+                    risk_score = person_peak
                     unsafe_pct = (
                         round(100.0 * float(persons_with_gun) / float(persons_total), 1)
                         if persons_total > 0
@@ -1122,6 +1272,8 @@ def main() -> None:
                     if cv2.waitKey(1) & 0xFF == ord("q"):
                         break
     finally:
+        if live_ipc_writer is not None:
+            live_ipc_writer.close()
         if writer is not None:
             writer.release()
         cap.release()

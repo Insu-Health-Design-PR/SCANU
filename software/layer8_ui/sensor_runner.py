@@ -40,6 +40,22 @@ def _logs_dir(layer8_dir: Path) -> Path:
     return d
 
 
+def _sensor_file_logging() -> bool:
+    """Write sensor stdout to layer8_ui/logs/<sensor>.log (default: on). Set LAYER8_SENSOR_LOG=0 to disable."""
+    v = (os.environ.get("LAYER8_SENSOR_LOG") or "").strip().lower()
+    if v in ("0", "false", "no", "off"):
+        return False
+    return True
+
+
+def _truncate_log_file(path: Path) -> None:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"")
+    except OSError:
+        pass
+
+
 def _read_state(path: Path) -> dict[str, Any]:
     if not path.is_file():
         return {}
@@ -172,6 +188,7 @@ def stop(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
         st = _read_state(path)
         st.pop(sensor, None)
         _write_state(path, st)
+    _truncate_log_file(_logs_dir(layer8_dir) / f"{sensor}.log")
     return {"ok": True, "stopped_pid": pid}
 
 
@@ -196,11 +213,15 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
     except ValueError as e:
         return {"ok": False, "error": str(e)}
     cwd = command_cwd(sensor, settings)
-    log_path = _logs_dir(layer8_dir) / f"{sensor}.log"
+    use_file_log = _sensor_file_logging()
+    log_path: Path | None = (_logs_dir(layer8_dir) / f"{sensor}.log") if use_file_log else None
+    if log_path is not None:
+        _truncate_log_file(log_path)
     env = os.environ.copy()
+    env["PYTHONUNBUFFERED"] = "1"
     env["PYTHONPATH"] = f"{sw.parent}:{sw}{os.pathsep}{env.get('PYTHONPATH', '')}"
 
-    log_f = open(log_path, "ab", buffering=0)
+    log_f = open(log_path, "ab", buffering=0) if log_path is not None else open(os.devnull, "ab", buffering=0)
     try:
         proc = subprocess.Popen(
             cmd,
@@ -217,23 +238,27 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
 
     with _lock:
         st = _read_state(path)
-        st[sensor] = {"pid": proc.pid, "log_file": str(log_path)}
+        st[sensor] = {"pid": proc.pid, "log_file": str(log_path) if log_path is not None else ""}
         _write_state(path, st)
 
     # If the child dies during imports or camera open, surface failure instead of "Run OK" + idle.
     for _ in range(24):
         code = proc.poll()
         if code is not None:
-            tail = _tail_log(log_path)
+            tail = _tail_log(log_path) if log_path is not None else ""
             with _lock:
                 st2 = _read_state(path)
                 if st2.get(sensor, {}).get("pid") == proc.pid:
                     st2.pop(sensor, None)
                     _write_state(path, st2)
-            err = (
-                f"{sensor} subprocess exited immediately (code {code}). "
-                f"Check paths, camera index, GPU memory, and checkpoint. Log ({log_path}):\n{tail}"
-            )
+            if log_path and tail:
+                err = f"{sensor} subprocess exited immediately (code {code}). Log ({log_path}):\n{tail}"
+            else:
+                err = (
+                    f"{sensor} subprocess exited immediately (code {code}). "
+                    "Check paths, camera index, GPU memory, and checkpoint. "
+                    "Sensor logs: layer8_ui/logs/ (set LAYER8_SENSOR_LOG=0 to disable file logging)."
+                )
             return {"ok": False, "error": err}
         time.sleep(0.12)
 
@@ -243,7 +268,7 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
         "command": cmd,
         "cwd": str(cwd),
         "software_root": str(sw),
-        "log_file": str(log_path),
+        "log_file": str(log_path) if log_path is not None else "",
     }
 
 

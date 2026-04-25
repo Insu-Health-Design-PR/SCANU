@@ -240,16 +240,13 @@ class ThermalSharedStream:
                                     search_max_index=int(detect_max_index),
                                 )
                                 self._next_detect_retry_ts = now_ts + max(0.5, float(detect_retry_s))
-                            if fallback_device is not None and fallback_device != int(device):
-                                cap = cv2.VideoCapture(int(fallback_device), cv2.CAP_V4L2)
-                                if cap.isOpened():
-                                    device = int(fallback_device)
+                            if fallback_device is not None:
+                                try_cap = cv2.VideoCapture(int(fallback_device), cv2.CAP_V4L2)
+                                if try_cap.isOpened():
+                                    cap = try_cap
                                     self._resolved_device = int(fallback_device)
                                 else:
-                                    cap.release()
-                                    cap = None
-                            elif fallback_device is not None:
-                                self._resolved_device = int(fallback_device)
+                                    try_cap.release()
                         if cap is not None and cap.isOpened():
                             active_camera_cfg = settings_cam_cfg
                             next_open_retry_ts = 0.0

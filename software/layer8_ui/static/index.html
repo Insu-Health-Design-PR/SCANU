@@ -202,6 +202,38 @@
       height: 100%;
       object-fit: contain;
     }
+    .side-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .side-card .k {
+      font-size: 0.64rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+    }
+    .side-slot {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: #000;
+      aspect-ratio: 4 / 3;
+      max-height: 200px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .side-slot img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    @media (max-width: 520px) {
+      .side-grid { grid-template-columns: 1fr; }
+    }
 
     .chrome-tabs {
       display: flex;
@@ -256,13 +288,15 @@
     }
     @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
 
-    .fields label {
+    .fields label,
+    .ai-profile-fields label {
       display: block;
       font-size: 0.65rem;
       color: var(--muted);
       margin-bottom: 0.15rem;
     }
-    .fields input, .fields textarea, .fields select {
+    .fields input, .fields textarea, .fields select,
+    .ai-profile-fields input, .ai-profile-fields select {
       width: 100%;
       padding: 0.32rem 0.45rem;
       border-radius: var(--radius-sm);
@@ -272,7 +306,8 @@
       font-family: var(--mono);
       font-size: 0.7rem;
     }
-    .fields select {
+    .fields select,
+    .ai-profile-fields select {
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
@@ -283,14 +318,26 @@
       background-repeat: no-repeat;
       background-position: right 0.5rem center;
     }
-    .fields select:focus {
+    .fields select:focus,
+    .ai-profile-fields select:focus,
+    .ai-profile-fields input:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 2px var(--accent-dim);
     }
-    .fields select option {
+    .fields select option,
+    .ai-profile-fields select option {
       background: var(--surface2);
       color: var(--text);
+    }
+    .ai-profile-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+      min-width: 0;
+    }
+    .ai-profile-fields > div {
+      min-width: 0;
     }
     .fields textarea { min-height: 48px; resize: vertical; }
     .profile-row > .row-actions {
@@ -420,6 +467,65 @@
       margin-top: 0.5rem;
       line-height: 1.35;
     }
+    .metrics-line {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      line-height: 1.5;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.2rem 0.65rem;
+      align-items: center;
+    }
+    .metrics-line strong { color: var(--text); font-weight: 600; }
+    .metrics-line .sep { opacity: 0.35; user-select: none; }
+    .line-label {
+      font-size: 0.64rem;
+      color: var(--muted);
+      margin: 0.5rem 0 0.25rem;
+      font-weight: 600;
+    }
+    .tab-prose {
+      font-size: 0.64rem;
+      color: var(--muted);
+      margin: 0 0 0.5rem;
+      line-height: 1.35;
+    }
+    .flat-details {
+      margin: 0.4rem 0 0.15rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.5rem;
+      background: rgba(0,0,0,0.15);
+    }
+    .flat-details > summary {
+      cursor: pointer;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    details.adv-block {
+      margin-top: 0.65rem;
+      padding: 0.5rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: rgba(0,0,0,0.2);
+    }
+    details.adv-block > summary {
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      align-items: end;
+    }
+    .form-row-2.form-row-profile {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    @media (max-width: 500px) { .form-row-2 { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -451,132 +557,132 @@
   <main class="dash">
     <aside class="left-col">
       <div class="panel">
-        <div class="panel-h">Threat summary</div>
+        <div class="panel-h">Status</div>
         <div class="panel-b">
-          <div class="metrics-grid">
-            <div class="metric">
-              <div class="k">Unsafe %</div>
-              <div class="v" id="metric-unsafe">—</div>
-            </div>
-            <div class="metric">
-              <div class="k">Gun detected</div>
-              <div class="v" id="metric-gun">—</div>
-            </div>
-            <div class="metric">
-              <div class="k">Persons w/ gun</div>
-              <div class="v" id="metric-persons-gun">—</div>
-            </div>
-            <div class="metric">
-              <div class="k">mmWave torso</div>
-              <div class="v" id="metric-mmwave-score">—</div>
-            </div>
+          <div class="metrics-line" id="metrics-line">
+            <span>Unsafe <strong id="metric-unsafe">—</strong></span>
+            <span class="sep">·</span>
+            <span>Gun <strong id="metric-gun">—</strong></span>
+            <span class="sep">·</span>
+            <span>Persons+gun <strong id="metric-persons-gun">—</strong></span>
+            <span class="sep">·</span>
+            <span>mmW <strong id="metric-mmwave-score">—</strong></span>
+            <span class="sep">·</span>
+            <span>Pred: <span class="pred-pill" id="metric-pred">—</span></span>
           </div>
-          <div class="metric" style="margin-top:0.5rem;">
-            <div class="k">Prediction</div>
-            <div class="v" style="margin-top:0.25rem;"><span class="pred-pill" id="metric-pred">—</span></div>
-          </div>
-          <p class="metrics-footnote" id="metrics-note"></p>
+          <p class="metrics-footnote" id="metrics-note" style="margin-top:0.4rem;margin-bottom:0;"></p>
 
-          <div class="panel-h" style="margin: 0.85rem -1rem 0.5rem; border-top: 1px solid var(--border);">mmWave plot</div>
-          <div class="mmwave-slot">
-            <img id="vid-mmwave" alt="mmWave" src="/api/preview/live/mmwave" />
+          <div class="panel-h" style="margin: 0.85rem -1rem 0.5rem; border-top: 1px solid var(--border);">Previews</div>
+          <div class="side-grid">
+            <div class="side-card" id="mmwave-plot-wrap">
+              <div class="k">mmWave plot</div>
+              <div class="side-slot">
+                <img id="vid-mmwave" alt="mmWave" src="/api/preview/live/mmwave" />
+              </div>
+            </div>
+            <div class="side-card">
+              <div class="k" id="secondary-title">Webcam</div>
+              <div class="side-slot">
+                <img id="vid-secondary" alt="Secondary preview" />
+              </div>
+            </div>
           </div>
 
           <div class="chrome-tabs" role="tablist">
             <button type="button" class="active" data-tab="thermal" id="tabbtn-thermal">Thermal</button>
-            <button type="button" data-tab="webcam" id="tabbtn-webcam">Webcam</button>
-            <button type="button" data-tab="model" id="tabbtn-model">Model</button>
+            <button type="button" data-tab="ai-camera" id="tabbtn-ai-camera">AI Camera</button>
             <button type="button" data-tab="mmwave" id="tabbtn-mmwave">mmWave</button>
           </div>
 
           <div class="tab-panel active" id="tab-thermal" role="tabpanel">
-            <p class="metrics-footnote" style="margin-top:0;">Subprocess + live stream: <code>layer8_ui.thermal_runner</code> → <code>layer1_radar/examples/thermal_only_capture.py</code></p>
-            <div class="config-section">Thermal</div>
+            <p class="tab-prose" style="margin-top:0;">Thermal capture — resolution list comes from v4l2 for the device you pick.</p>
             <div class="fields" id="fields-thermal"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-thermal">Run</button>
               <button type="button" class="btn" id="stop-thermal">Stop</button>
               <button type="button" class="btn" id="restart-thermal">Restart</button>
               <button type="button" class="btn ghost" id="save-thermal">Save</button>
+              <button type="button" class="btn ghost" id="btn-thermal-autoconf" title="Set device + resolution from v4l2-ctl">Auto-configure</button>
               <button type="button" class="btn ghost" id="reset-thermal">Defaults</button>
               <button type="button" class="btn ghost" id="cmd-thermal">Cmd</button>
             </div>
             <div class="err" id="err-thermal"></div>
-            <div class="status-line" id="st-thermal"><span class="dot off"></span><span class="txt">Thermal idle</span></div>
+            <div class="status-line" id="st-thermal"><span class="dot off"></span><span class="txt">Thermal · idle</span></div>
             <pre class="log-mini" id="log-thermal"></pre>
             <pre class="log-mini" id="cmd-out-thermal" style="display:none;max-height:100px;"></pre>
           </div>
 
-          <div class="tab-panel" id="tab-webcam" role="tabpanel">
-            <p class="metrics-footnote" style="margin-top:0;">Capture + live stream: <code>layer8_ui.webcam_runner</code> · weapon runner cwd <code>layer4_inference/</code></p>
-            <div class="config-section">Webcam device &amp; files</div>
+          <div class="tab-panel" id="tab-ai-camera" role="tabpanel">
+            <p class="tab-prose">Run = camera + model. No recording if video/output are empty.</p>
+            <div class="form-row-2 form-row-profile" style="gap:0.5rem;">
+              <div class="ai-profile-fields">
+                <div>
+                  <label for="profile-select">Profile</label>
+                  <select id="profile-select" aria-label="Model profile"></select>
+                </div>
+              </div>
+              <div class="row-actions" style="margin:0; flex-wrap:wrap;">
+                <button type="button" class="btn primary" id="apply-profile">Apply</button>
+                <button type="button" class="btn ghost" id="refresh-profiles">Reload</button>
+              </div>
+            </div>
+            <details class="flat-details" style="margin-top:0.5rem;">
+              <summary>Save current as new profile</summary>
+              <div class="ai-profile-fields" style="margin-top:0.4rem;">
+                <div>
+                  <label for="profile-new-name">Profile name</label>
+                  <input id="profile-new-name" type="text" placeholder="e.g. office front door" autocomplete="off" />
+                </div>
+              </div>
+              <div class="row-actions" style="margin-top:0.35rem;">
+                <button type="button" class="btn" id="save-profile-snapshot">Save</button>
+              </div>
+            </details>
             <div class="fields" id="fields-webcam"></div>
+            <div class="row-actions" style="margin:0.1rem 0 0.15rem; justify-content:flex-end;">
+              <button type="button" class="btn ghost" id="btn-webcam-autoconf">Auto-detect (v4l2)</button>
+            </div>
+            <details class="flat-details" style="margin-top:0.5rem;" id="ai-model-wrap">
+              <summary>Model (thresholds, YOLO, guns) — expand to edit</summary>
+            <datalist id="dl-gun-checkpoints"></datalist>
+            <datalist id="dl-person-yolo"></datalist>
+            <div class="fields" id="fields-model" style="margin-top:0.4rem;"></div>
+            </details>
+            <details class="adv-block" id="webcam-adv-wrap" style="margin-top:0.45rem;">
+              <summary>Advanced (paths, retries, frames, metrics JSON)</summary>
+              <div class="fields" id="fields-webcam-adv" style="margin-top:0.5rem;"></div>
+            </details>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-webcam">Run</button>
               <button type="button" class="btn" id="stop-webcam">Stop</button>
               <button type="button" class="btn" id="restart-webcam">Restart</button>
-              <button type="button" class="btn ghost" id="save-webcam">Save</button>
-              <button type="button" class="btn ghost" id="reset-webcam">Defaults</button>
+              <button type="button" class="btn primary" id="save-webcam" title="Save camera + model settings">Save</button>
+              <button type="button" class="btn ghost" id="reset-webcam">Defaults (camera)</button>
+              <button type="button" class="btn ghost" id="reset-model">Reset model</button>
               <button type="button" class="btn ghost" id="cmd-webcam">Cmd</button>
             </div>
             <div class="err" id="err-webcam"></div>
-            <div class="status-line" id="st-webcam"><span class="dot off"></span><span class="txt">Webcam idle</span></div>
+            <div class="status-line" id="st-webcam"><span class="dot off"></span><span class="txt">AI camera · idle</span></div>
             <pre class="log-mini" id="log-webcam"></pre>
             <pre class="log-mini" id="cmd-out-webcam" style="display:none;max-height:100px;"></pre>
-          </div>
-
-          <div class="tab-panel" id="tab-model" role="tabpanel">
-            <div class="config-section">Model profile</div>
-            <div class="fields profile-row">
-              <div>
-                <label for="profile-select">Profile</label>
-                <select id="profile-select"></select>
-              </div>
-              <div class="row-actions" style="margin-top:0.35rem;">
-                <button type="button" class="btn primary" id="apply-profile">Apply profile</button>
-                <button type="button" class="btn ghost" id="refresh-profiles">Reload list</button>
-              </div>
-              <div class="fields profile-row" style="margin-top:0.75rem; align-items:flex-end;">
-                <div>
-                  <label for="profile-new-id">Profile id</label>
-                  <input id="profile-new-id" type="text" placeholder="office_yolov8s" autocomplete="off" />
-                </div>
-                <div>
-                  <label for="profile-new-name">Name</label>
-                  <input id="profile-new-name" type="text" placeholder="Balanced" autocomplete="off" />
-                </div>
-                <div class="row-actions" style="margin-top:1.35rem;">
-                  <button type="button" class="btn primary" id="save-profile-snapshot">Save to profile</button>
-                </div>
-              </div>
-            </div>
-            <div class="config-section">Parameters</div>
-            <datalist id="dl-gun-checkpoints"></datalist>
-            <datalist id="dl-person-yolo"></datalist>
-            <div class="fields" id="fields-model"></div>
-            <div class="row-actions">
-              <button type="button" class="btn primary" id="save-model">Save</button>
-              <button type="button" class="btn ghost" id="reset-model">Reset weapon defaults</button>
-              <button type="button" class="btn ghost" id="cmd-model">Cmd (webcam pipeline)</button>
-            </div>
-            <div class="err" id="err-model"></div>
             <pre class="log-mini" id="cmd-out-model" style="display:none;max-height:100px;"></pre>
           </div>
 
           <div class="tab-panel" id="tab-mmwave" role="tabpanel">
-            <p class="metrics-footnote" style="margin-top:0;"><code>layer8_ui.sensor_runner</code> → <code>layer1_radar/examples/live_capture.py</code> (UART / TLV stack)</p>
+            <p class="metrics-footnote" style="margin-top:0;"><code>layer8_ui.sensor_runner</code> → <code>layer1_radar/.../live_capture.py</code>. <strong>Advanced</strong> holds optional file outputs (default: no new saves beyond live preview).</p>
             <div class="fields" id="fields-mmwave"></div>
             <div class="row-actions">
               <button type="button" class="btn primary" id="run-mmwave">Run</button>
               <button type="button" class="btn" id="stop-mmwave">Stop</button>
               <button type="button" class="btn" id="restart-mmwave">Restart</button>
               <button type="button" class="btn ghost" id="save-mmwave">Save</button>
+              <button type="button" class="btn ghost" id="btn-mmwave-autoconf" title="Guess CLI/Data from /dev/ttyUSB* and ttyACM*">Auto-detect</button>
               <button type="button" class="btn ghost" id="reset-mmwave">Defaults</button>
               <button type="button" class="btn ghost" id="cmd-mmwave">Cmd</button>
               <a class="btn" href="/api/preview/output/mmwave" target="_blank" rel="noopener">JSON</a>
             </div>
             <div class="err" id="err-mmwave"></div>
-            <div class="status-line" id="st-mmwave"><span class="dot off"></span><span class="txt">mmWave idle</span></div>
+            <div class="status-line" id="st-mmwave"><span class="dot off"></span><span class="txt">mmWave · idle</span></div>
             <pre class="log-mini" id="log-mmwave"></pre>
             <pre class="log-mini" id="cmd-out-mmwave" style="display:none;max-height:100px;"></pre>
           </div>
@@ -608,8 +714,16 @@
 
   <script>
     const SENSORS = ["thermal", "webcam", "mmwave"];
-    const TAB_IDS = ["thermal", "webcam", "model", "mmwave"];
+    const TAB_IDS = ["thermal", "ai-camera", "mmwave"];
     const PREVIEW_KEY = "scanu_main_preview";
+    /** 720p, 1080p, 1440p, 4K at 30 fps (default AI camera) */
+    const AI_RES_LADDER = [
+      { id: "custom", label: "Custom (use fields below)", w: 0, h: 0, fps: 30 },
+      { id: "r720", label: "720p 1280×720 @ 30", w: 1280, h: 720, fps: 30 },
+      { id: "r1080", label: "1080p 1920×1080 @ 30 (default)", w: 1920, h: 1080, fps: 30 },
+      { id: "r1440", label: "1440p 2560×1440 @ 30", w: 2560, h: 1440, fps: 30 },
+      { id: "r4k", label: "4K 3840×2160 @ 30", w: 3840, h: 2160, fps: 30 }
+    ];
     let settings = {};
     /** Populated by /api/model/options — person YOLO + every *.pt under trained_models/gun_detection. */
     let modelOpts = { person_yolo_options: [], gun_checkpoints: [] };
@@ -622,25 +736,7 @@
     let webcamObjectUrl = null;
     let _webcamWsReconnect = null;
 
-    const FIELD_DEFS = {
-      thermal: [
-        ["frames", "number"], ["fps", "number"], ["video", "text"], ["live_frame", "text"], ["output", "text"],
-        ["thermal_device", "number"], ["thermal_auto_detect", "number"], ["thermal_detect_max_index", "number"], ["thermal_detect_retry_s", "number"],
-        ["thermal_width", "number"], ["thermal_height", "number"],
-        ["thermal_fps", "number"], ["panel_w", "number"], ["panel_h", "number"]
-      ],
-      webcam: [
-        ["frames", "number"],
-        ["fps", "number"],
-        ["video", "text"],
-        ["live_frame", "text"],
-        ["output", "text"],
-        ["webcam_device", "number"],
-        ["webcam_width", "number"],
-        ["webcam_height", "number"],
-        ["metrics_json", "text"],
-      ],
-      model: [
+    const FIELD_DEFS_MODEL = [
         ["person_detection_model", "text"],
         ["weapon_conf", "number"],
         ["weapon_min_box_px", "number"],
@@ -655,12 +751,37 @@
         ["weapon_no_gun_yolo", "number"],
         ["weapon_gun_yolo_model", "text"],
         ["weapon_extra_args", "textarea"],
-      ],
-      mmwave: [
-        ["frames", "number"], ["mmwave_only", "number"], ["config", "text"], ["cli_port", "text"], ["data_port", "text"],
-        ["video", "text"], ["live_frame", "text"], ["output", "text"], ["no_frame_timeout_s", "number"], ["extra_args", "textarea"]
-      ]
-    };
+    ];
+    const FIELD_DEFS_MMWAVE_ADV = [
+        ["frames", "number"],
+        ["mmwave_only", "number"],
+        ["config", "text"],
+        ["video", "text"],
+        ["live_frame", "text"],
+        ["output", "text"],
+        ["no_frame_timeout_s", "number"],
+        ["extra_args", "textarea"],
+    ];
+    const FIELD_DEFS_THERMAL_ADV = [
+        ["frames", "number"],
+        ["video", "text"],
+        ["live_frame", "text"],
+        ["output", "text"],
+        ["thermal_auto_detect", "number"],
+        ["thermal_detect_max_index", "number"],
+        ["thermal_detect_retry_s", "number"],
+        ["panel_w", "number"],
+        ["panel_h", "number"],
+    ];
+    const FIELD_DEFS_WEBCAM_ADV = [
+        ["frames", "number"],
+        ["webcam_detect_max_index", "number"],
+        ["webcam_detect_retry_s", "number"],
+        ["video", "text"],
+        ["output", "text"],
+        ["live_frame", "text"],
+        ["metrics_json", "text"],
+    ];
 
     function el(id) { return document.getElementById(id); }
 
@@ -673,6 +794,7 @@
       el("src-thermal").classList.toggle("active", mode === "thermal");
       el("src-webcam").classList.toggle("active", mode === "webcam");
       refreshMainPreview();
+      refreshSecondaryPreview();
     }
 
     function stopWebcamWs() {
@@ -767,6 +889,15 @@
       img.src = `/api/preview/live_direct/${mode}?t=${Date.now()}`;
     }
 
+    function refreshSecondaryPreview() {
+      const mode = mainPreviewMode() === "thermal" ? "webcam" : "thermal";
+      const img = el("vid-secondary");
+      const title = el("secondary-title");
+      if (title) title.textContent = mode === "thermal" ? "Thermal" : "Webcam";
+      if (!img) return;
+      img.src = `/api/preview/live_direct/${mode}?t=${Date.now()}`;
+    }
+
     function refreshMmwaveThumb() {
       el("vid-mmwave").src = `/api/preview/live/mmwave?t=${Date.now()}`;
     }
@@ -778,7 +909,6 @@
 
     function clearErrors() {
       SENSORS.forEach((s) => setError(s, ""));
-      setError("model", "");
     }
 
     /** FastAPI may return { error }, { detail: string }, or { detail: [{ msg }] }. */
@@ -856,46 +986,313 @@
       }
     }
 
-    function renderFields(sensor) {
-      const root = el("fields-" + sensor);
+    function _appendFieldRow(root, sensor, key, type, sec) {
+      const wrap = document.createElement("div");
+      const label = document.createElement("label");
+      label.textContent = key;
+      label.htmlFor = `${sensor}-${key}`;
+      let input;
+      if (type === "textarea") {
+        input = document.createElement("textarea");
+        input.rows = 2;
+      } else {
+        input = document.createElement("input");
+        input.type = type === "number" ? "number" : "text";
+        if (type === "number") input.step = "any";
+      }
+      input.id = `${sensor}-${key}`;
+      input.dataset.sensor = sensor;
+      input.dataset.key = key;
+      const value = sec[key];
+      input.value = value === undefined || value === null ? "" : String(value);
+      wrap.appendChild(label);
+      wrap.appendChild(input);
+      root.appendChild(wrap);
+    }
+
+    function renderThermalTab() {
+      const root = el("fields-thermal");
       if (!root) return;
+      const sec = settings.thermal || {};
       root.innerHTML = "";
-      const sec = settings[sensor] || {};
-      FIELD_DEFS[sensor].forEach(([key, type]) => {
-        if (sensor === "webcam" && key === "frames") {
-          const h = document.createElement("div");
-          h.className = "config-section";
-          h.textContent = "Runner (frames 0 = until Stop)";
-          root.appendChild(h);
-        }
-        if (sensor === "webcam" && key === "webcam_device") {
-          const h = document.createElement("div");
-          h.className = "config-section";
-          h.textContent = "Camera · resolution · metrics JSON";
-          root.appendChild(h);
-        }
-        const wrap = document.createElement("div");
-        const label = document.createElement("label");
-        label.textContent = key;
-        label.htmlFor = `${sensor}-${key}`;
-        let input;
-        if (type === "textarea") {
-          input = document.createElement("textarea");
-          input.rows = 2;
-        } else {
-          input = document.createElement("input");
-          input.type = type === "number" ? "number" : "text";
-          if (type === "number") input.step = "any";
-        }
-        input.id = `${sensor}-${key}`;
-        input.dataset.sensor = sensor;
-        input.dataset.key = key;
-        const value = sec[key];
-        input.value = value === undefined || value === null ? "" : String(value);
-        wrap.appendChild(label);
-        wrap.appendChild(input);
-        root.appendChild(wrap);
+      const r1 = document.createElement("div");
+      const labDev = document.createElement("label");
+      labDev.textContent = "thermal_device (/dev/videoN)";
+      labDev.htmlFor = "thermal-thermal_device";
+      const inDev = document.createElement("input");
+      inDev.type = "number";
+      inDev.id = "thermal-thermal_device";
+      inDev.dataset.sensor = "thermal";
+      inDev.dataset.key = "thermal_device";
+      inDev.value = String(sec.thermal_device != null ? sec.thermal_device : 0);
+      inDev.addEventListener("change", () => { loadThermalResOptions(); });
+      r1.appendChild(labDev);
+      r1.appendChild(inDev);
+      root.appendChild(r1);
+      const rSel = document.createElement("div");
+      const lsel = document.createElement("label");
+      lsel.textContent = "Resolution (W×H) & FPS (default 15)";
+      lsel.htmlFor = "thermal-fmt-sel";
+      const sel = document.createElement("select");
+      sel.id = "thermal-fmt-sel";
+      rSel.appendChild(lsel);
+      rSel.appendChild(sel);
+      root.appendChild(rSel);
+      const r2 = document.createElement("div");
+      r2.className = "form-row-2";
+      r2.id = "thermal-custom-dims";
+      ["thermal_width", "thermal_height", "thermal_fps"].forEach((k) => {
+        const w = document.createElement("div");
+        const l = document.createElement("label");
+        l.textContent = k;
+        l.htmlFor = "thermal-" + k;
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.id = "thermal-" + k;
+        inp.dataset.sensor = "thermal";
+        inp.dataset.key = k;
+        inp.step = "any";
+        const v = sec[k];
+        inp.value = v != null && v !== "" ? String(v) : (k === "thermal_fps" ? "15" : "0");
+        w.appendChild(l);
+        w.appendChild(inp);
+        r2.appendChild(w);
       });
+      root.appendChild(r2);
+      const adv = document.createElement("details");
+      adv.className = "adv-block";
+      adv.open = false;
+      const sm = document.createElement("summary");
+      sm.textContent = "Advanced (recording, retries, panel size)";
+      adv.appendChild(sm);
+      const adRoot = document.createElement("div");
+      adRoot.className = "fields";
+      adv.appendChild(adRoot);
+      FIELD_DEFS_THERMAL_ADV.forEach(([k, t]) => _appendFieldRow(adRoot, "thermal", k, t, sec));
+      root.appendChild(adv);
+      loadThermalResOptions();
+    }
+
+    async function loadThermalResOptions() {
+      const sec = settings.thermal || {};
+      const sel = el("thermal-fmt-sel");
+      if (!sel) return;
+      const idx = Math.max(0, parseInt(String(sec.thermal_device != null ? sec.thermal_device : 0), 10) || 0);
+      let opts = [];
+      try {
+        const r = await fetch("/api/devices/v4l2/formats?index=" + encodeURIComponent(String(idx)));
+        const j = await r.json();
+        if (j.options && j.options.length) opts = j.options;
+      } catch (_) {}
+      sel.innerHTML = "";
+      if (!opts.length) {
+        const o = document.createElement("option");
+        o.value = "custom";
+        o.textContent = "Custom (set W×H and FPS below)";
+        sel.appendChild(o);
+      } else {
+        opts.forEach((o) => {
+          const op = document.createElement("option");
+          op.value = JSON.stringify({ w: o.width, h: o.height, fps: o.fps != null ? o.fps : 15 });
+          op.textContent = o.label || `${o.width}×${o.height} @ ${o.fps} fps`;
+          sel.appendChild(op);
+        });
+        const c = document.createElement("option");
+        c.value = "custom";
+        c.textContent = "Custom (edit W×H and FPS below)";
+        sel.appendChild(c);
+      }
+      const curW = sec.thermal_width;
+      const curH = sec.thermal_height;
+      const curF = sec.thermal_fps;
+      const match = [...sel.options].find(
+        (o) => o.value && o.value !== "custom" && (() => {
+          try { const p = JSON.parse(o.value); return p.w == curW && p.h == curH; } catch (_) { return false; }
+        })()
+      );
+      if (match) sel.value = match.value;
+      else if (sel.options.length) sel.selectedIndex = 0;
+      const toggleThCustom = () => {
+        const row = el("thermal-custom-dims");
+        if (row) row.style.display = sel.value === "custom" ? "" : "none";
+      };
+      toggleThCustom();
+      sel.onchange = () => {
+        const v = sel.value;
+        if (v && v !== "custom") {
+          try {
+            const p = JSON.parse(v);
+            const iw = el("thermal-thermal_width");
+            const ih = el("thermal-thermal_height");
+            const ifp = el("thermal-thermal_fps");
+            if (iw) iw.value = String(p.w);
+            if (ih) ih.value = String(p.h);
+            if (ifp) ifp.value = String(p.fps != null ? p.fps : 15);
+          } catch (_) {}
+        }
+        toggleThCustom();
+      };
+    }
+
+    function renderWebcamForAi() {
+      const main = el("fields-webcam");
+      const adv = el("fields-webcam-adv");
+      if (!main || !adv) return;
+      const sec = settings.webcam || {};
+      main.innerHTML = "";
+      adv.innerHTML = "";
+      const lres = document.createElement("div");
+      lres.className = "line-label";
+      lres.style.marginTop = "0";
+      lres.textContent = "Resolution";
+      main.appendChild(lres);
+      const ps = document.createElement("select");
+      ps.id = "ai-webcam-preset";
+      ps.style.width = "100%";
+      AI_RES_LADDER.forEach((row) => {
+        const o = document.createElement("option");
+        o.value = row.id;
+        o.textContent = row.label;
+        ps.appendChild(o);
+      });
+      const curW = Number(sec.webcam_width) || 1920;
+      const curH = Number(sec.webcam_height) || 1080;
+      const hit = AI_RES_LADDER.find((r) => r.w === curW && r.h === curH && r.id !== "custom");
+      ps.value = hit ? hit.id : "custom";
+      main.appendChild(ps);
+      const customWrap = document.createElement("div");
+      customWrap.id = "webcam-custom-dims";
+      customWrap.className = "form-row-2";
+      customWrap.style.display = ps.value === "custom" ? "" : "none";
+      [
+        ["webcam_width", "W"],
+        ["webcam_height", "H"],
+        ["fps", "FPS"],
+      ].forEach(([key, shortLabel]) => {
+        const w = document.createElement("div");
+        const l = document.createElement("label");
+        l.textContent = shortLabel;
+        l.htmlFor = "webcam-" + key;
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.id = "webcam-" + key;
+        inp.dataset.sensor = "webcam";
+        inp.dataset.key = key;
+        inp.step = "any";
+        const v = sec[key];
+        inp.value = v != null && v !== "" ? String(v) : key === "fps" ? "30" : key === "webcam_width" ? "1920" : "1080";
+        w.appendChild(l);
+        w.appendChild(inp);
+        customWrap.appendChild(w);
+      });
+      main.appendChild(customWrap);
+      const devRow = document.createElement("div");
+      devRow.className = "form-row-2";
+      devRow.style.alignItems = "end";
+      const w = document.createElement("div");
+      const l = document.createElement("label");
+      l.textContent = "Device (video index)";
+      l.htmlFor = "webcam-webcam_device";
+      const inDev = document.createElement("input");
+      inDev.type = "number";
+      inDev.id = "webcam-webcam_device";
+      inDev.dataset.sensor = "webcam";
+      inDev.dataset.key = "webcam_device";
+      inDev.value = String(sec.webcam_device != null ? sec.webcam_device : 0);
+      w.appendChild(l);
+      w.appendChild(inDev);
+      devRow.appendChild(w);
+      main.appendChild(devRow);
+      const syncAi = () => {
+        const c = el("webcam-custom-dims");
+        if (c) c.style.display = ps.value === "custom" ? "" : "none";
+        if (ps.value !== "custom") {
+          const row = AI_RES_LADDER.find((x) => x.id === ps.value);
+          if (row && row.w > 0) {
+            const iw = el("webcam-webcam_width");
+            const ih = el("webcam-webcam_height");
+            const fp = el("webcam-fps");
+            if (iw) iw.value = String(row.w);
+            if (ih) ih.value = String(row.h);
+            if (fp) fp.value = String(row.fps);
+          }
+        }
+      };
+      ps.onchange = syncAi;
+      FIELD_DEFS_WEBCAM_ADV.forEach(([k, t]) => {
+        _appendFieldRow(adv, "webcam", k, t, sec);
+      });
+      const wa = document.createElement("div");
+      const lwa = document.createElement("label");
+      lwa.htmlFor = "webcam-webcam_auto_detect";
+      lwa.textContent = "Auto-detect if open fails (webcam_auto_detect)";
+      const cwa = document.createElement("input");
+      cwa.type = "checkbox";
+      cwa.id = "webcam-webcam_auto_detect";
+      cwa.dataset.sensor = "webcam";
+      cwa.dataset.key = "webcam_auto_detect";
+      cwa.checked = !!Number(sec.webcam_auto_detect != null ? sec.webcam_auto_detect : 1);
+      wa.appendChild(lwa);
+      wa.appendChild(cwa);
+      adv.appendChild(wa);
+    }
+
+    function renderMmwaveTab() {
+      const root = el("fields-mmwave");
+      if (!root) return;
+      const sec = settings.mmwave || {};
+      root.innerHTML = "";
+      const g = document.createElement("div");
+      g.className = "form-row-2";
+      ["cli_port", "data_port"].forEach((k) => {
+        const w = document.createElement("div");
+        const l = document.createElement("label");
+        l.textContent = k;
+        l.htmlFor = "mmwave-" + k;
+        const inp = document.createElement("input");
+        inp.type = "text";
+        inp.id = "mmwave-" + k;
+        inp.dataset.sensor = "mmwave";
+        inp.dataset.key = k;
+        inp.value = sec[k] != null ? String(sec[k]) : "";
+        w.appendChild(l);
+        w.appendChild(inp);
+        g.appendChild(w);
+      });
+      root.appendChild(g);
+      const w = document.createElement("div");
+      const l = document.createElement("label");
+      l.htmlFor = "mmwave-mmwave_show_plot";
+      l.textContent = "Show mmWave plot in sidebar";
+      const c = document.createElement("input");
+      c.type = "checkbox";
+      c.id = "mmwave-mmwave_show_plot";
+      c.dataset.sensor = "mmwave";
+      c.dataset.key = "mmwave_show_plot";
+      c.checked = Number(sec.mmwave_show_plot != null ? sec.mmwave_show_plot : 1) !== 0;
+      w.appendChild(l);
+      w.appendChild(c);
+      root.appendChild(w);
+      const d = document.createElement("details");
+      d.className = "adv-block";
+      d.open = false;
+      d.appendChild((function () { const s = document.createElement("summary"); s.textContent = "Advanced (frames, file outputs, DCA config, UART timeout)"; return s; })());
+      const ar = document.createElement("div");
+      ar.className = "fields";
+      FIELD_DEFS_MMWAVE_ADV.forEach(([k, t]) => _appendFieldRow(ar, "mmwave", k, t, sec));
+      d.appendChild(ar);
+      root.appendChild(d);
+      const cb = el("mmwave-mmwave_show_plot");
+      if (cb) cb.addEventListener("change", applyMmwavePlotVis);
+      applyMmwavePlotVis();
+    }
+
+    function applyMmwavePlotVis() {
+      const wrap = el("mmwave-plot-wrap");
+      const sec = settings.mmwave || {};
+      const c = el("mmwave-mmwave_show_plot");
+      const on = c ? c.checked : Number(sec.mmwave_show_plot != null ? sec.mmwave_show_plot : 1) !== 0;
+      if (wrap) wrap.style.display = on ? "" : "none";
     }
 
     function _appendSelectModelField(root, key, sec, options, opts) {
@@ -950,7 +1347,7 @@
       const sec = settings.webcam || {};
       const personOpts = modelOpts.person_yolo_options || [];
       const gunOpts = modelOpts.gun_checkpoints || [];
-      FIELD_DEFS.model.forEach(([key, type]) => {
+      FIELD_DEFS_MODEL.forEach(([key, type]) => {
         if (key === "person_detection_model") {
           _appendSelectModelField(root, key, sec, personOpts, { allowEmpty: false });
           return;
@@ -983,36 +1380,52 @@
       });
     }
 
-    function readSection(sensor) {
-      const root = el("fields-" + sensor);
+    function readFieldsRoot(root) {
       const out = {};
       if (!root) return out;
       root.querySelectorAll("[data-key]").forEach((inp) => {
         const k = inp.dataset.key;
-        const raw = inp.value.trim();
+        if (inp.type === "checkbox") {
+          out[k] = inp.checked ? 1 : 0;
+          return;
+        }
+        const raw = inp.value != null ? String(inp.value).trim() : "";
         if (inp.type === "number") out[k] = raw === "" ? 0 : Number(raw);
         else out[k] = raw;
       });
       return out;
     }
 
+    function readSection(sensor) {
+      const root = el("fields-" + sensor);
+      return readFieldsRoot(root);
+    }
+
+    function readWebcamAll() {
+      const adv = readFieldsRoot(el("fields-webcam-adv"));
+      const fromFields = readFieldsRoot(el("fields-webcam"));
+      const ps = el("ai-webcam-preset");
+      if (ps && ps.value && ps.value !== "custom") {
+        const row = AI_RES_LADDER.find((x) => x.id === ps.value);
+        if (row && row.w > 0) {
+          fromFields.webcam_width = row.w;
+          fromFields.webcam_height = row.h;
+          fromFields.fps = row.fps;
+        }
+      } else {
+        if (fromFields.fps == null || fromFields.fps === "" || Number.isNaN(Number(fromFields.fps))) fromFields.fps = 30;
+      }
+      return { ...fromFields, ...adv };
+    }
+
     function readModelSection() {
-      const root = el("fields-model");
-      const out = {};
-      if (!root) return out;
-      root.querySelectorAll("[data-key]").forEach((inp) => {
-        const k = inp.dataset.key;
-        const raw = inp.value.trim();
-        if (inp.type === "number") out[k] = raw === "" ? 0 : Number(raw);
-        else out[k] = raw;
-      });
-      return out;
+      return readFieldsRoot(el("fields-model"));
     }
 
     /** Merged webcam dict for profile snapshot: Model form + Webcam tab + last loaded settings. */
     function currentWebcamProfileValues() {
       const wModel = readModelSection();
-      const wCam = readSection("webcam");
+      const wCam = readWebcamAll();
       const merged = { ...(settings.webcam || {}), ...wCam, ...wModel };
       const p = String(wModel.person_detection_model || merged.person_detection_model || merged.weapon_yolo_model || "").trim();
       if (p) {
@@ -1091,12 +1504,15 @@
       const r = await fetch("/api/config");
       settings = await r.json();
       el("software_root").value = settings.software_root || "";
-      SENSORS.forEach(renderFields);
+      renderThermalTab();
+      renderWebcamForAi();
+      renderMmwaveTab();
       await loadModelOptions();
       renderModelFields();
       await loadProfiles();
       refreshMmwaveThumb();
       refreshMainPreview();
+      refreshSecondaryPreview();
     }
 
     async function saveAllSettings() {
@@ -1109,43 +1525,40 @@
       settings = await r.json();
     }
 
-    async function saveSensor(sensor) {
-      settings[sensor] = { ...(settings[sensor] || {}), ...readSection(sensor) };
-      await saveAllSettings();
-      renderFields(sensor);
-      if (sensor === "webcam") {
-        const pid = el("profile-select").value;
-        if (pid) {
-          try {
-            await syncProfileFromSavedWebcam(pid);
-          } catch (e) {
-            setError(sensor, String(e));
-            return;
-          }
-        }
-        renderModelFields();
-      }
-      setError(sensor, "");
-    }
-
-    async function saveModel() {
+    async function saveWebcamAll() {
       const o = readModelSection();
       const p = String(o.person_detection_model || "").trim();
       if (p) o.weapon_yolo_model = p;
-      settings.webcam = { ...(settings.webcam || {}), ...o };
+      settings.webcam = { ...(settings.webcam || {}), ...readWebcamAll(), ...o };
       await saveAllSettings();
       const pid = el("profile-select").value;
       if (pid) {
         try {
           await syncProfileFromSavedWebcam(pid);
         } catch (e) {
-          setError("model", String(e));
+          setError("webcam", String(e));
           return;
         }
       }
+      renderWebcamForAi();
       renderModelFields();
-      renderFields("webcam");
-      setError("model", "");
+      setError("webcam", "");
+    }
+
+    async function saveSensor(sensor) {
+      if (sensor === "webcam") {
+        await saveWebcamAll();
+        return;
+      }
+      if (sensor === "thermal") {
+        settings.thermal = { ...(settings.thermal || {}), ...readFieldsRoot(el("fields-thermal")) };
+      } else if (sensor === "mmwave") {
+        settings.mmwave = { ...(settings.mmwave || {}), ...readFieldsRoot(el("fields-mmwave")) };
+      }
+      await saveAllSettings();
+      if (sensor === "thermal") renderThermalTab();
+      if (sensor === "mmwave") { renderMmwaveTab(); applyMmwavePlotVis(); }
+      setError(sensor, "");
     }
 
     async function resetModel() {
@@ -1153,16 +1566,17 @@
       if (!r.ok) throw new Error("Failed to reset weapon defaults");
       settings = await r.json();
       renderModelFields();
-      renderFields("webcam");
-      setError("model", "");
+      renderWebcamForAi();
+      setError("webcam", "");
     }
 
     async function resetSensor(sensor) {
       const r = await fetch(`/api/config/reset/${sensor}`, { method: "POST" });
       if (!r.ok) throw new Error("Failed to reset defaults");
       settings = await r.json();
-      renderFields(sensor);
-      if (sensor === "webcam") renderModelFields();
+      if (sensor === "thermal") renderThermalTab();
+      else if (sensor === "webcam") { renderWebcamForAi(); renderModelFields(); }
+      else if (sensor === "mmwave") { renderMmwaveTab(); applyMmwavePlotVis(); }
       setError(sensor, "");
     }
 
@@ -1176,8 +1590,19 @@
       if (!r.ok) throw new Error("Failed to reset defaults");
       settings = await r.json();
       el("software_root").value = settings.software_root || "";
-      SENSORS.forEach(renderFields);
+      renderThermalTab();
+      renderWebcamForAi();
+      renderMmwaveTab();
       renderModelFields();
+    }
+
+    function clearLogPanel(sensor) {
+      const log = el("log-" + sensor);
+      if (log) log.textContent = "";
+    }
+
+    function clearAllLogPanels() {
+      SENSORS.forEach(clearLogPanel);
     }
 
     function applyStatus(st) {
@@ -1193,16 +1618,31 @@
             dot.classList.toggle("off", !running);
           }
           const txt = line.querySelector(".txt");
-          const name = sensor === "mmwave" ? "mmWave" : sensor.charAt(0).toUpperCase() + sensor.slice(1);
+          let name;
+          if (sensor === "mmwave") name = "mmWave";
+          else if (sensor === "webcam") name = "AI camera";
+          else name = sensor.charAt(0).toUpperCase() + sensor.slice(1);
           if (txt) {
             txt.textContent = running ? `${name} · pid ${info.pid}` : `${name} · idle`;
           }
         }
         const log = el("log-" + sensor);
-        if (log) log.textContent = info.log_tail || "(no log)";
+        if (log) {
+          const tail = (info.log_tail != null && info.log_tail !== undefined) ? String(info.log_tail) : "";
+          const t = tail.trim();
+          if (t) {
+            log.textContent = t;
+          } else if (running) {
+            log.textContent = info.log_file
+              ? "… waiting for log output (stdout) …"
+              : "Sensor file logging is off (set LAYER8_SENSOR_LOG unset/1, or clear 0 to enable).";
+          } else {
+            log.textContent = "";
+          }
+        }
       });
-      refreshMainPreview();
-      refreshMmwaveThumb();
+      // Do not reconnect preview streams on every status tick.
+      // Frequent reconnects cause noisy access logs and extra load.
     }
 
     async function pollMetrics() {
@@ -1250,6 +1690,9 @@
     }
 
     async function runAction(sensor, action) {
+      if (action === "run" || action === "stop" || action === "restart") {
+        clearLogPanel(sensor);
+      }
       clearErrors();
       const r = await fetch(`/api/${action}/${sensor}`, { method: "POST" });
       let payload = {};
@@ -1259,15 +1702,14 @@
       const msg = apiErrorMessage(payload) || (!r.ok ? `HTTP ${r.status}` : "");
       if (!r.ok && msg) {
         setError(sensor, msg);
-        // Webcam failures were only on err-webcam; Model tab users expect err-model too.
-        if (sensor === "webcam" && (action === "run" || action === "restart")) {
-          setError("model", `${action} webcam: ${msg}`);
-        }
       }
       await oneShotStatus();
     }
 
     async function runGroup(action) {
+      if (action === "run_all" || action === "stop_all" || action === "restart_all") {
+        clearAllLogPanels();
+      }
       clearErrors();
       const r = await fetch(`/api/${action}`, { method: "POST" });
       let payload = {};
@@ -1277,7 +1719,6 @@
       const msg = apiErrorMessage(payload) || (!r.ok ? `HTTP ${r.status}` : "");
       if (!r.ok && msg) {
         SENSORS.forEach((s) => setError(s, msg));
-        setError("model", `${action.replace(/_/g, " ")}: ${msg}`);
       }
       await oneShotStatus();
     }
@@ -1291,7 +1732,7 @@
       pre.style.display = pre.style.display === "none" ? "block" : "none";
     }
 
-    /* Tabs: thermal | webcam | model | mmwave */
+    /* Tabs: thermal | ai-camera | mmwave */
     document.querySelectorAll(".chrome-tabs button").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.dataset.tab;
@@ -1309,6 +1750,7 @@
       stopThermalWs();
       stopWebcamWs();
       refreshMainPreview();
+      refreshSecondaryPreview();
       refreshMmwaveThumb();
     });
 
@@ -1327,16 +1769,12 @@
       el(`cmd-${sensor}`).addEventListener("click", () => showCommand(sensor).catch((e) => setError(sensor, String(e))));
     });
 
-    el("save-model").addEventListener("click", () => saveModel().catch((e) => setError("model", String(e))));
-    el("reset-model").addEventListener("click", () => resetModel().catch((e) => setError("model", String(e))));
-    el("cmd-model").addEventListener("click", () =>
-      showCommand("webcam", "cmd-out-model").catch((e) => setError("model", String(e)))
-    );
+    el("reset-model").addEventListener("click", () => resetModel().catch((e) => setError("webcam", String(e))));
     el("apply-profile").addEventListener("click", async () => {
-      setError("model", "");
+      setError("webcam", "");
       const id = el("profile-select").value;
       if (!id) {
-        setError("model", "Select a profile first.");
+        setError("webcam", "Select a profile first.");
         return;
       }
       const r = await fetch("/api/model/profiles/apply", {
@@ -1349,39 +1787,105 @@
         payload = await r.json();
       } catch (_) {}
       if (!r.ok) {
-        setError("model", apiErrorMessage(payload) || "Apply profile failed");
+        setError("webcam", apiErrorMessage(payload) || "Apply profile failed");
         return;
       }
       await loadConfig();
     });
     el("refresh-profiles").addEventListener("click", () => loadProfiles().catch(() => {}));
     el("save-profile-snapshot").addEventListener("click", async () => {
-      setError("model", "");
-      const id = el("profile-new-id").value.trim();
+      setError("webcam", "");
       const name = el("profile-new-name").value.trim();
-      if (!id) {
-        setError("model", "Enter a profile id (slug) for Save to profile.");
+      if (!name) {
+        setError("webcam", "Enter a profile name.");
         return;
       }
       const values = currentWebcamProfileValues();
       const r = await fetch("/api/model/profiles/snapshot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, name, description: "", values }),
+        body: JSON.stringify({ name, description: "", values }),
       });
       let payload = {};
       try {
         payload = await r.json();
       } catch (_) {}
       if (!r.ok) {
-        setError("model", apiErrorMessage(payload) || "Save to profile failed");
+        setError("webcam", apiErrorMessage(payload) || "Save to profile failed");
         return;
       }
-      el("profile-new-id").value = "";
+      const savedKey = payload.saved_as;
       el("profile-new-name").value = "";
       await loadConfig();
       const sel = el("profile-select");
-      if (sel && [...sel.options].some((o) => o.value === id)) sel.value = id;
+      if (sel && savedKey && [...sel.options].some((o) => o.value === savedKey)) sel.value = savedKey;
+    });
+
+    el("btn-thermal-autoconf").addEventListener("click", async () => {
+      setError("thermal", "");
+      try {
+        const r = await fetch("/api/devices/v4l2");
+        const j = await r.json();
+        if (!j.ok && j.error) {
+          setError("thermal", j.error);
+          return;
+        }
+        if (j.suggested_thermal != null) {
+          settings.thermal = { ...(settings.thermal || {}), thermal_device: j.suggested_thermal };
+          await saveAllSettings();
+          const cr = await fetch("/api/config");
+          settings = await cr.json();
+        }
+        renderThermalTab();
+        if (j.warning) window.alert(j.warning);
+      } catch (e) {
+        setError("thermal", String(e));
+      }
+    });
+
+    el("btn-webcam-autoconf").addEventListener("click", async () => {
+      setError("webcam", "");
+      try {
+        const r = await fetch("/api/devices/v4l2");
+        const j = await r.json();
+        if (!j.ok && j.error) {
+          setError("webcam", j.error);
+          return;
+        }
+        if (j.suggested_webcam != null) {
+          settings.webcam = { ...(settings.webcam || {}), webcam_device: j.suggested_webcam };
+          await saveAllSettings();
+          const cr = await fetch("/api/config");
+          settings = await cr.json();
+        }
+        renderWebcamForAi();
+        if (j.warning) window.alert(j.warning);
+      } catch (e) {
+        setError("webcam", String(e));
+      }
+    });
+
+    el("btn-mmwave-autoconf").addEventListener("click", async () => {
+      setError("mmwave", "");
+      try {
+        const r = await fetch("/api/devices/serial");
+        const j = await r.json();
+        if (!j.ok && j.error) {
+          setError("mmwave", j.error);
+          return;
+        }
+        settings.mmwave = {
+          ...(settings.mmwave || {}),
+          cli_port: j.suggested_cli || settings.mmwave?.cli_port,
+          data_port: j.suggested_data || settings.mmwave?.data_port,
+        };
+        await saveAllSettings();
+        const cr = await fetch("/api/config");
+        settings = await cr.json();
+        renderMmwaveTab();
+      } catch (e) {
+        setError("mmwave", String(e));
+      }
     });
 
     if (mainPreviewMode() === "webcam") {

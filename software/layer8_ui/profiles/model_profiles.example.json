@@ -4,6 +4,9 @@
     "description": "1080p; copy into model_profiles.json or create via dashboard Save to profile.",
     "values": {
       "webcam_device": 0,
+      "webcam_auto_detect": 1,
+      "webcam_detect_max_index": 8,
+      "webcam_detect_retry_s": 8,
       "webcam_width": 1920,
       "webcam_height": 1080,
       "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
@@ -18,9 +21,9 @@
       "weapon_gun_imgsz": 768,
       "weapon_gun_min_box_px": 8,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 0,
+      "weapon_no_gun_yolo": 1,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_extra_args": "--yolo_classes 0",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -29,6 +32,9 @@
     "description": "1440p-class; tune device index and paths for your machine.",
     "values": {
       "webcam_device": 0,
+      "webcam_auto_detect": 1,
+      "webcam_detect_max_index": 8,
+      "webcam_detect_retry_s": 8,
       "webcam_width": 2560,
       "webcam_height": 1440,
       "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
@@ -43,9 +49,9 @@
       "weapon_gun_imgsz": 960,
       "weapon_gun_min_box_px": 10,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 0,
+      "weapon_no_gun_yolo": 1,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_extra_args": "--yolo_classes 0",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -54,6 +60,9 @@
     "description": "720p; lighter load.",
     "values": {
       "webcam_device": 0,
+      "webcam_auto_detect": 1,
+      "webcam_detect_max_index": 8,
+      "webcam_detect_retry_s": 8,
       "webcam_width": 1280,
       "webcam_height": 720,
       "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
@@ -68,9 +77,9 @@
       "weapon_gun_imgsz": 512,
       "weapon_gun_min_box_px": 6,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 0,
+      "weapon_no_gun_yolo": 1,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 8 --classifier_device cpu --cuda_empty_cache",
+      "weapon_extra_args": "--yolo_classes 0",
       "weapon_yolo_model": "yolov8n.pt"
     }
   }

@@ -45,7 +45,7 @@ def _infer_main_callable():
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Webcam live infer for Layer 8 UI.", allow_abbrev=False)
-    p.add_argument("--webcam-device", type=int, default=0)
+    p.add_argument("--webcam-device", type=str, default="0")
     p.add_argument("--capture-width", type=int, default=1920)
     p.add_argument("--capture-height", type=int, default=1080)
     p.add_argument(
@@ -57,8 +57,8 @@ def main() -> None:
     p.add_argument(
         "--live-frame",
         type=str,
-        required=True,
-        help="JPEG path updated every frame (MJPEG source for UI).",
+        default="",
+        help="Optional JPEG path updated every frame (legacy MJPEG source for UI).",
     )
     p.add_argument(
         "--video",
@@ -79,6 +79,12 @@ def main() -> None:
         help="Optional JSON path for Layer 8 dashboard threat metrics.",
     )
     p.add_argument(
+        "--live-ipc-frame",
+        type=str,
+        default="",
+        help="Optional mmap latest-frame path for dashboard low-latency preview.",
+    )
+    p.add_argument(
         "--weapon-extra-args",
         type=str,
         default="",
@@ -91,21 +97,23 @@ def main() -> None:
         "--checkpoint",
         args.checkpoint,
         "--source",
-        str(int(args.webcam_device)),
+        str(args.webcam_device).strip(),
         "--capture_width",
         str(int(args.capture_width)),
         "--capture_height",
         str(int(args.capture_height)),
         "--no_imshow",
-        "--live_jpg",
-        args.live_frame,
     ]
+    if args.live_frame.strip():
+        forward.extend(["--live_jpg", args.live_frame.strip()])
     if args.video.strip():
         forward.extend(["--output", args.video.strip()])
     if int(args.frames) > 0:
         forward.extend(["--max_frames", str(int(args.frames))])
     if args.metrics_json.strip():
         forward.extend(["--live_metrics_json", args.metrics_json.strip()])
+    if args.live_ipc_frame.strip():
+        forward.extend(["--live_ipc_frame", args.live_ipc_frame.strip()])
     extra = args.weapon_extra_args.strip()
     if extra:
         forward.extend(shlex.split(extra))
