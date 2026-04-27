@@ -21,9 +21,9 @@
       "weapon_gun_imgsz": 768,
       "weapon_gun_min_box_px": 8,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -35,8 +35,8 @@
       "webcam_auto_detect": 1,
       "webcam_detect_max_index": 8,
       "webcam_detect_retry_s": 8,
-      "webcam_width": 2560,
-      "webcam_height": 1440,
+      "webcam_width": 1920,
+      "webcam_height": 1080,
       "metrics_json": "layer8_ui/artifacts/live_threat_metrics.json",
       "person_detection_model": "yolov8n.pt",
       "weapon_conf": 0.22,
@@ -49,9 +49,9 @@
       "weapon_gun_imgsz": 960,
       "weapon_gun_min_box_px": 10,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -77,9 +77,9 @@
       "weapon_gun_imgsz": 512,
       "weapon_gun_min_box_px": 6,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -98,16 +98,16 @@
       "weapon_conf": 0.25,
       "weapon_min_box_px": 24,
       "weapon_show_yolo_name": 0,
-      "weapon_unsafe_threshold": 0.75,
+      "weapon_unsafe_threshold": 1.75,
       "weapon_gun_threshold": 0,
       "weapon_image_size": 224,
-      "weapon_gun_conf": 0.25,
+      "weapon_gun_conf": 3.25,
       "weapon_gun_imgsz": 768,
       "weapon_gun_min_box_px": 8,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   }

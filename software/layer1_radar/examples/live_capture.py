@@ -165,8 +165,8 @@ def main():
                         help="Path to FULL radar config file")
     parser.add_argument("--cli-port", required=True)
     parser.add_argument("--data-port", required=True)
-    parser.add_argument("--video", "-vout", default="radar_output.mp4",
-                        help="Output video file")
+    parser.add_argument("--video", "-vout", default="",
+                        help="Optional output video file (empty = live preview only)")
     parser.add_argument("--output", "-o", default=None,
                         help="Optional JSON output")
     parser.add_argument("--verbose", "-v", action="store_true")
@@ -308,8 +308,9 @@ def main():
 
         print("Radar running")
 
-        # 3. Video pipeline (after mmWave is running — see sensorStop in `finally` for clean reruns)
-        print("\n[3/4] Initializing video writer...")
+        # 3. Rendering pipeline (after mmWave is running — see sensorStop in `finally` for clean reruns)
+        save_video = bool(str(args.video or "").strip())
+        print("\n[3/4] Initializing render pipeline...")
         fig, ax = plt.subplots(figsize=(6.4, 4.8), dpi=100)
 
         # Base scatter for person-shape style view.
@@ -362,10 +363,11 @@ def main():
             panels = 3 if inf_provider is not None else 2
         out_w = radar_w * panels
         out_h = radar_h
-        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-        video_writer = cv2.VideoWriter(args.video, fourcc, fps, (out_w, out_h))
-        if not video_writer.isOpened():
-            raise RuntimeError(f"Could not open output video writer: {args.video}")
+        if save_video:
+            fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+            video_writer = cv2.VideoWriter(args.video, fourcc, fps, (out_w, out_h))
+            if not video_writer.isOpened():
+                raise RuntimeError(f"Could not open output video writer: {args.video}")
 
         # Keep default flow strict: config file already issues sensorStart.
         # Extra restart cycles are opt-in because some firmware/demo builds do not
@@ -390,11 +392,12 @@ def main():
         recovery_threshold_s = 2.5
 
         # 4. Capture loop
-        print("\n[4/4] Recording video...\n")
+        print("\n[4/4] Capturing frames...\n")
 
         try:
             i = 0
-            while i < args.frames:
+            infinite = int(args.frames) <= 0
+            while infinite or i < int(args.frames):
                 raw_frame = uart_source.read_frame(timeout_ms=300)
                 if not raw_frame:
                     # Heartbeat + fail-fast when the data stream is dead.
@@ -528,13 +531,15 @@ def main():
                 elif not args.mmwave_only:
                     combined = np.hstack((thermal_bgr, radar_bgr))
                 _write_live_frame(args.live_frame, combined)
-                video_writer.write(combined)
+                if video_writer is not None:
+                    video_writer.write(combined)
 
                 # Console output
                 elapsed = time.time() - start_time
                 fps_live = (i + 1) / elapsed if elapsed > 0 else 0
 
-                print(f"\rFrame {i+1}/{args.frames} | "
+                total = "inf" if infinite else str(int(args.frames))
+                print(f"\rFrame {i+1}/{total} | "
                       f"Objects: {num_objects} | "
                       f"Points: {len(parsed.points)} | "
                       f"FPS: {fps_live:.1f}", end="")
@@ -564,19 +569,21 @@ def main():
             print("\nStopped by user")
 
         # Finish video
-        video_writer.release()
-        video_writer = None
+        if video_writer is not None:
+            video_writer.release()
+            video_writer = None
         if thermal is not None:
             thermal.close()
             thermal = None
         plt.close(fig)
         fig = None
 
-        print(f"\n\nVideo saved to: {args.video}")
-        if not args.no_reencode:
-            from mp4_web_preview import reencode_mp4_for_web
+        if save_video:
+            print(f"\n\nVideo saved to: {args.video}")
+            if not args.no_reencode:
+                from mp4_web_preview import reencode_mp4_for_web
 
-            reencode_mp4_for_web(args.video)
+                reencode_mp4_for_web(args.video)
 
         # Save JSON
         if args.output:

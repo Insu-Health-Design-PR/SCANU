@@ -21,9 +21,9 @@
       "weapon_gun_imgsz": 768,
       "weapon_gun_min_box_px": 8,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -49,9 +49,9 @@
       "weapon_gun_imgsz": 960,
       "weapon_gun_min_box_px": 10,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   },
@@ -77,9 +77,9 @@
       "weapon_gun_imgsz": 512,
       "weapon_gun_min_box_px": 6,
       "weapon_gun_thermal": 1,
-      "weapon_no_gun_yolo": 1,
+      "weapon_no_gun_yolo": 0,
       "weapon_gun_yolo_model": "gun_enhanced_cctv_apr17.pt",
-      "weapon_extra_args": "--yolo_classes 0",
+      "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12",
       "weapon_yolo_model": "yolov8n.pt"
     }
   }

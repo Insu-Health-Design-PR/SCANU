@@ -42,7 +42,7 @@ def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[s
     py = _os.environ.get("PYTHON", sys.executable)
     t = settings.get("thermal") or {}
     script = thermal_capture_script(sw)
-    video = (t.get("video") or "thermal_only.mp4").strip()
+    video = (t.get("video") or "").strip()
     live = (t.get("live_frame") or "").strip()
     out = (t.get("output") or "").strip()
     thermal_device = int(t.get("thermal_device", 0))
@@ -65,8 +65,6 @@ def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[s
         str(int(t.get("frames", 300))),
         "--fps",
         str(float(t.get("fps", 10))),
-        "--video",
-        video,
         "--thermal-device",
         str(int(thermal_device)),
         "--thermal-width",
@@ -80,6 +78,8 @@ def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[s
         "--panel-h",
         str(int(t.get("panel_h", 480))),
     ]
+    if video:
+        cmd.extend(["--video", video])
     if out:
         cmd.extend(["--output", out])
     if live:

@@ -46,7 +46,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Thermal heatmap only → MP4")
     parser.add_argument("--frames", "-n", type=int, default=300)
     parser.add_argument("--fps", type=float, default=10.0)
-    parser.add_argument("--video", "-v", default="thermal_only.mp4")
+    parser.add_argument("--video", "-v", default="")
     parser.add_argument("--output", "-o", default=None, help="Optional JSON metrics")
     parser.add_argument("--thermal-device", type=int, default=0)
     parser.add_argument("--thermal-width", type=int, default=640)
@@ -82,12 +82,15 @@ def main() -> None:
     info = thermal.info()
     print(f"Thermal: {info.width}x{info.height} @ {info.fps:.1f} FPS")
 
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    writer = cv2.VideoWriter(args.video, fourcc, float(args.fps), (W, H))
-    if not writer.isOpened():
-        thermal.close()
-        print(f"ERROR: could not open video writer: {args.video}")
-        sys.exit(1)
+    writer: cv2.VideoWriter | None = None
+    video_path = str(args.video or "").strip()
+    if video_path:
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+        writer = cv2.VideoWriter(video_path, fourcc, float(args.fps), (W, H))
+        if not writer.isOpened():
+            thermal.close()
+            print(f"ERROR: could not open video writer: {video_path}")
+            sys.exit(1)
 
     frames_out: list[dict] = []
     t0 = time.time()
@@ -96,7 +99,9 @@ def main() -> None:
     miss_count = 0
 
     try:
-        for i in range(args.frames):
+        i = 0
+        infinite = int(args.frames) <= 0
+        while infinite or i < int(args.frames):
             heat = thermal.read_colormap_bgr()
             if heat is None:
                 miss_count += 1
@@ -154,7 +159,8 @@ def main() -> None:
                 2,
             )
             _write_live_frame(args.live_frame, heat)
-            writer.write(heat)
+            if writer is not None:
+                writer.write(heat)
             if args.output:
                 gray = cv2.cvtColor(heat, cv2.COLOR_BGR2GRAY)
                 frames_out.append(
@@ -165,22 +171,26 @@ def main() -> None:
                 )
             dt = time.time() - t0
             fps_live = (i + 1) / dt if dt > 0 else 0.0
-            print(f"\rFrame {i + 1}/{args.frames} | FPS: {fps_live:.1f}", end="")
+            total = "inf" if infinite else str(int(args.frames))
+            print(f"\rFrame {i + 1}/{total} | FPS: {fps_live:.1f}", end="")
+            i += 1
 
-        print(f"\nSaved: {args.video}")
+        if writer is not None:
+            print(f"\nSaved: {video_path}")
         if args.output:
             with open(args.output, "w") as f:
                 json.dump(frames_out, f, indent=2)
             print(f"JSON: {args.output}")
         wrote_ok = True
     finally:
-        writer.release()
+        if writer is not None:
+            writer.release()
         thermal.close()
 
-    if wrote_ok and not args.no_reencode:
+    if wrote_ok and writer is not None and not args.no_reencode:
         from mp4_web_preview import reencode_mp4_for_web
 
-        reencode_mp4_for_web(args.video)
+        reencode_mp4_for_web(video_path)
 
 
 if __name__ == "__main__":

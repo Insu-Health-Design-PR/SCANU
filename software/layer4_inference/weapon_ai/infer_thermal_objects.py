@@ -40,16 +40,14 @@ import torch
 
 from .live_frame_ipc import LiveFrameWriter
 
-from .modeling import build_model
-
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _DEFAULT_FIREARM_YOLO = _REPO_ROOT / "trained_models" / "gun_detection" / "firearm_yolov8n_best.pt"
 _FIREARM_HF_URL = (
     "https://huggingface.co/Subh775/Firearm_Detection_Yolov8n/resolve/main/weights/best.pt"
 )
 
-_SAFE_MAX = 0.20
-_UNSAFE_MIN = 0.75
+_SAFE_MAX = 0.01
+_UNSAFE_MIN = 0.60
 
 
 def _threat_bucket(score: float) -> str:
@@ -656,10 +654,6 @@ def main() -> None:
     if infer_config_path is not None:
         print(f"Loaded infer config: {infer_config_path.resolve()}")
 
-    if args.checkpoint is None:
-        raise SystemExit(
-            "Missing --checkpoint. Add it to your config file or pass it on the command line."
-        )
     if args.source is None:
         raise SystemExit(
             "Missing --source. Add it to your config file or pass it on the command line."
@@ -683,7 +677,6 @@ def main() -> None:
             _UL_LOGGER.setLevel(logging.ERROR)
         except Exception:
             pass
-    from torchvision import transforms
     # Import after warning filters so startup compatibility warnings can be muted.
     from ultralytics import YOLO
 
@@ -718,43 +711,9 @@ def main() -> None:
             return torch.device("cuda")
         return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    clf_device = _resolve_torch_device(args.classifier_device)
     yolo_torch = _resolve_torch_device(args.yolo_device)
     det_device: int | str = 0 if yolo_torch.type == "cuda" else "cpu"
-
-    ck = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
-    if not isinstance(ck, Mapping):
-        raise SystemExit(f"Checkpoint is not a dict: {args.checkpoint}")
-    raw_sd = ck.get("model")
-    if not isinstance(raw_sd, Mapping):
-        raise SystemExit(
-            f"Checkpoint {args.checkpoint} is not a gun/safe classifier save: "
-            f"'model' must be a state_dict (got {type(raw_sd).__name__}). "
-            "Do not pass a YOLO .pt as --checkpoint."
-        )
-    arch = ck.get("arch", "mobilenet_v3_small")
-    is_gun_prob = (
-        ck.get("objective") == "gun_prob_bce"
-        or ck.get("video_mode") == "gun_prob"
-        or int(ck.get("num_classes", 2)) == 1
-    )
-    score_name = "p(gun)" if is_gun_prob else "p(unsafe)"
-    clf = build_model(arch, num_classes=1 if is_gun_prob else 2).to(clf_device)
-    clf.load_state_dict(raw_sd)
-    clf.eval()
-    infer_gray3 = str(ck.get("preprocess", "")).startswith("gray3ch")
-
-    tf = transforms.Compose(
-        [
-            transforms.ToPILImage(),
-            transforms.Resize((args.image_size, args.image_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(
-                mean=[0.485, 0.456, 0.406],
-                std=[0.229, 0.224, 0.225],
-            ),
-        ]
-    )
+    score_name = "gun_conf"
 
     yolo_classes = _parse_yolo_classes(args.yolo_classes)
     person_only = yolo_classes is not None and yolo_classes == [0]
@@ -808,8 +767,8 @@ def main() -> None:
 
     det_mode = "person only" if person_only else ("all YOLO classes" if yolo_classes is None else str(yolo_classes))
     print(
-        f"q=quit | YOLO ({det_mode}) device={det_device} | classifier={clf_device} | "
-        f"label = safe/UNSAFE + {score_name} | UNSAFE = colored border (not filled)"
+        f"q=quit | YOLO ({det_mode}) device={det_device} | "
+        f"label = SAFE/SUSPICIOUS/UNSAFE + {score_name} | UNSAFE = colored border (not filled)"
     )
     if args.cuda_empty_cache and torch.cuda.is_available():
         print(
@@ -907,35 +866,14 @@ def main() -> None:
                 if boxes is not None and len(boxes) > 0:
                     xyxy = boxes.xyxy.cpu().numpy()
                     cls_ids = boxes.cls.cpu().numpy().astype(int) if boxes.cls is not None else None
-                    row_meta: list[tuple[int, int, int, int, int | None, str]] = []
-                    batch_tensors: list[torch.Tensor] = []
                     for i, row in enumerate(xyxy):
                         x1, y1, x2, y2 = _clamp_box(row, w, h)
                         if (x2 - x1) < args.min_box_px or (y2 - y1) < args.min_box_px:
                             continue
-                        crop_bgr = thermal[y1:y2, x1:x2]
-                        if crop_bgr.size == 0:
-                            continue
-                        if crop_bgr.ndim == 2:
-                            crop_bgr = cv2.cvtColor(crop_bgr, cv2.COLOR_GRAY2BGR)
-                        if infer_gray3:
-                            gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
-                            in_rgb = cv2.cvtColor(gray, cv2.COLOR_GRAY2RGB)
-                        else:
-                            in_rgb = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2RGB)
                         cid = int(cls_ids[i]) if cls_ids is not None and i < len(cls_ids) else None
                         yolo_tag = id_to_name.get(cid, str(cid)) if cid is not None else "obj"
-                        row_meta.append((x1, y1, x2, y2, cid, yolo_tag))
-                        batch_tensors.append(tf(in_rgb))
-                    if batch_tensors:
-                        x_batch = torch.stack(batch_tensors, dim=0).to(clf_device)
-                        logits_batch = clf(x_batch)
-                        if is_gun_prob:
-                            probs = torch.sigmoid(logits_batch.reshape(-1)).detach().cpu().tolist()
-                        else:
-                            probs = torch.softmax(logits_batch, dim=1)[:, 1].detach().cpu().tolist()
-                        for (x1, y1, x2, y2, cid, yolo_tag), prob in zip(row_meta, probs):
-                            rows.append((x1, y1, x2, y2, float(prob), cid, yolo_tag))
+                        # Risk score now comes from gun detector confidence only.
+                        rows.append((x1, y1, x2, y2, 0.0, cid, yolo_tag))
 
                 gun_count = 0
                 frame_gun_best_conf = 0.0
@@ -1118,18 +1056,11 @@ def main() -> None:
                                 person_gun_best_conf[ridx] = max(person_gun_best_conf.get(ridx, 0.0), best_gc)
                             _draw_gun_from_candidates(candidates_roi, pr, pb)
 
-                if args.fuse_gun_to_prob and rows:
-                    fused_rows: list[tuple[int, int, int, int, float, int | None, str]] = []
-                    for ridx, (x1, y1, x2, y2, prob, cid, ytag) in enumerate(rows):
-                        gc = person_gun_best_conf.get(ridx, 0.0)
-                        if gc > 0.0:
-                            gun_boost = max(
-                                float(args.gun_prob_floor),
-                                min(0.99, float(gc) * float(args.gun_conf_scale)),
-                            )
-                            prob = max(prob, gun_boost)
-                        fused_rows.append((x1, y1, x2, y2, prob, cid, ytag))
-                    rows = fused_rows
+                if rows:
+                    rows = [
+                        (x1, y1, x2, y2, float(person_gun_best_conf.get(ridx, 0.0)), cid, ytag)
+                        for ridx, (x1, y1, x2, y2, _prob, cid, ytag) in enumerate(rows)
+                    ]
 
                 if rows:
                     probs = [r[4] for r in rows]
