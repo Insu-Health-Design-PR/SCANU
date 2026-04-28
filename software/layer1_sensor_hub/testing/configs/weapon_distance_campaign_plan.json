@@ -1,0 +1,68 @@
+{
+  "scenarios": [
+    {
+      "id": "baseline_empty_scene",
+      "name": "Baseline empty scene",
+      "notes": "No person or objects",
+      "expected": "no_threat",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "person_no_threat",
+      "name": "Person no threat",
+      "notes": "Normal walk-through",
+      "expected": "no_threat",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "threat_on_body",
+      "name": "Threat on body",
+      "notes": "Replica at waist or back",
+      "expected": "threat_detected",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "threat_in_bag",
+      "name": "Threat in bag",
+      "notes": "Replica in backpack",
+      "expected": "threat_detected",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "metal_clutter_non_threat",
+      "name": "Metal clutter non-threat",
+      "notes": "Keys, phone, laptop",
+      "expected": "no_threat",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "motion_trigger_test",
+      "name": "Motion trigger test",
+      "notes": "Approach and stop",
+      "expected": "trigger_only",
+      "distances_ft": []
+    },
+    {
+      "id": "thermal_radar_fusion",
+      "name": "Thermal radar fusion",
+      "notes": "Warm object plus metal",
+      "expected": "threat_detected",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "two_people_no_threat",
+      "name": "Two people no threat",
+      "notes": "Two subjects together",
+      "expected": "no_threat",
+      "distances_ft": [5, 10, 20]
+    },
+    {
+      "id": "two_people_one_threat",
+      "name": "Two people one threat",
+      "notes": "One subject has replica",
+      "expected": "threat_detected",
+      "distances_ft": [5, 10, 20]
+    }
+  ]
+}
+

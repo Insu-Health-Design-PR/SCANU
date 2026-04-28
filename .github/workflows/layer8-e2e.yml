@@ -1,0 +1,42 @@
+name: Layer8 Frontend E2E
+
+on:
+  pull_request:
+    paths:
+      - 'software/layer8_ui/frontend/**'
+      - '.github/workflows/layer8-e2e.yml'
+  push:
+    branches: [dev_adrian]
+    paths:
+      - 'software/layer8_ui/frontend/**'
+      - '.github/workflows/layer8-e2e.yml'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: software/layer8_ui/frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: software/layer8_ui/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E
+        env:
+          VITE_LAYER8_API_BASE: http://127.0.0.1:8080
+          VITE_LAYER8_WS_URL: ws://127.0.0.1:8080/ws/events
+        run: npm run test:e2e

@@ -1,0 +1,14 @@
+# Example infer config (copy/rename and edit paths). CLI flags override these keys.
+#   python -m weapon_ai.infer_thermal_objects --config weapon_ai/infer_thermal.example.yaml
+
+checkpoint: trained_models/gun_detection/gun_prob_best.pt
+source: data/collecting_data/safe/person_unarmed/safe_person_unarmed_5ft_r01_20260406T150221_thermal.mp4
+output: trained_models/outputs/thermal_previews/safe_preview.mp4
+
+show_yolo_name: true
+no_imshow: true
+unsafe_threshold: 0.5
+conf: 0.25
+yolo_model: yolov8n.pt
+yolo_classes: "0"
+# Optional: gun_yolo_model, gun_thermal, gun_roi_pad_px, composite_mode, max_frames, etc. (see --help)

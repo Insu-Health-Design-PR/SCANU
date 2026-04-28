@@ -1,0 +1,9 @@
+# Example commands (Jetson / Linux paths under layer4_inference/)
+
+# trained_models/gun_detection/gun_prob_best.pt
+
+python -m scripts.weapon_tools.train --data_root data --video_mode gun_prob --cpd_split data/datasets/gun/cpd_split --epochs 50 --arch mobilenet_v3_small --output_dir trained_models/gun_detection
+
+python -m weapon_ai.infer_thermal_objects --checkpoint trained_models/gun_detection/gun_prob_best.pt --source "data/collecting_data/unsafe/armed_on_body/unsafe_armed_on_body_5ft_r01_20260406T155425_thermal.mp4" --show_yolo_name --gun_threshold 0.50 --output trained_models/outputs/thermal_previews/unsafe_armed_on_body_5ft_preview.mp4
+
+python -m weapon_ai.infer_thermal_objects --checkpoint trained_models/gun_detection/gun_prob_best.pt --source "data/collecting_data/safe/person_unarmed/safe_person_unarmed_5ft_r01_20260406T150221_thermal.mp4" --show_yolo_name --gun_threshold 0.50 --output trained_models/outputs/thermal_previews/safe_person_unarmed_5ft_preview.mp4
