@@ -6,7 +6,7 @@ This document is stored in the `dev_adrian` branch on purpose, but it describes 
 dev_kpr-layer8
 ```
 
-Use this when the Jetson has both branches/repo states available and you want to run the KPR Layer 8 demo, not the newer `dev_adrian` Vercel/Cloudflare setup.
+Use this when the Jetson has both branches/repo states available and you want to run the KPR Layer 8 demo, not the newer Vercel/Cloudflare setup.
 
 ## Important Difference
 
@@ -28,20 +28,20 @@ VITE_LAYER8_API_BASE
 VITE_LAYER8_WS_URL
 ```
 
-The Vercel frontend belongs to the newer `dev_adrian` flow. For `dev_kpr-layer8`, open the backend-served dashboard directly.
+The Vercel frontend belongs to the newer standalone UI flow. For `dev_kpr-layer8`, open the backend-served dashboard directly.
 
 ## Jetson Paths
 
 Expected repo path on Jetson:
 
 ```bash
-~/Desktop/SCANU-dev_adrian
+~/Desktop/SCANU-dev_kpr-layer8
 ```
 
 Layer 8 path:
 
 ```bash
-~/Desktop/SCANU-dev_adrian/software/layer8_ui
+~/Desktop/SCANU-dev_kpr-layer8/software/layer8_ui
 ```
 
 ## 1) Get The Correct Branch
@@ -49,7 +49,7 @@ Layer 8 path:
 If the repo already exists on the Jetson:
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian
+cd ~/Desktop/SCANU-dev_kpr-layer8
 git fetch origin
 git checkout dev_kpr-layer8
 git pull origin dev_kpr-layer8
@@ -59,8 +59,8 @@ If the repo does not exist yet:
 
 ```bash
 cd ~/Desktop
-git clone https://github.com/Insu-Health-Design-PR/SCANU.git SCANU-dev_adrian
-cd ~/Desktop/SCANU-dev_adrian
+git clone https://github.com/Insu-Health-Design-PR/SCANU.git SCANU-dev_kpr-layer8
+cd ~/Desktop/SCANU-dev_kpr-layer8
 git checkout dev_kpr-layer8
 ```
 
@@ -82,7 +82,7 @@ dev_kpr-layer8
 sudo apt update
 sudo apt install -y \
   python3-pip \
-  python3-venv \
+  python3.8-venv \
   git \
   curl \
   v4l-utils \
@@ -106,7 +106,7 @@ ls /dev/ttyUSB*
 ## 3) Create Python Environment
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software
+cd ~/Desktop/SCANU-dev_kpr-layer8/software
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
@@ -157,10 +157,12 @@ If `torch` or `torchvision` fails, install versions compatible with your JetPack
 From the `software` directory:
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian/software
+cd ~/Desktop/SCANU-dev_kpr-layer8/software
 source .venv/bin/activate
 python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8088
 ```
+
+Important: run `uvicorn` from `~/Desktop/SCANU-dev_kpr-layer8/software`, not from the repo root. If you run it from the repo root, Python will not find the `layer8_ui` module.
 
 The backend serves the dashboard at:
 
@@ -269,7 +271,7 @@ software/layer8_ui/ui_settings.json
 Use this after dependencies are installed:
 
 ```bash
-cd ~/Desktop/SCANU-dev_adrian
+cd ~/Desktop/SCANU-dev_kpr-layer8
 git fetch origin
 git checkout dev_kpr-layer8
 git pull origin dev_kpr-layer8
