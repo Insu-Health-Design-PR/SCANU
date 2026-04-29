@@ -555,3 +555,43 @@ Abrir:
 ```text
 http://<JETSON_IP>:8088/
 ```
+
+
+
+
+
+
+
+
+444444444444444
+
+
+insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ v4l2-ctl --list-devices
+NVIDIA Tegra Video Input Device (platform:tegra-camrtc-ca):
+	/dev/media0
+
+PureThermal (fw:v1.3.0): PureTh (usb-3610000.xhci-4.2.2):
+	/dev/video0
+	/dev/video1
+	/dev/media1
+
+NexiGo N950P 4K Webcam: NexiGo  (usb-3610000.xhci-4.2.3):
+	/dev/video2
+	/dev/video3
+	/dev/media2
+
+insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l/dev/4l/by-id/
+ls: invalid option -- '/'
+Try 'ls --help' for more information.
+insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l/dev/4l/by-id
+ls: invalid option -- '/'
+Try 'ls --help' for more information.
+insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l /dev/4l/by-id
+ls: cannot access '/dev/4l/by-id': No such file or directory
+insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l /dev/v4l/by-path/
+total 0
+lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0 -> ../../video0
+lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.2:1.0-video-index1 -> ../../video1
+lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0 -> ../../video2
+lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.3:1.0-video-index1 -> ../../video3
+
