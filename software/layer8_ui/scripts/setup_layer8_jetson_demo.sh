@@ -41,6 +41,21 @@ fi
 # shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
 
+if [[ ! -x "$VENV_DIR/bin/pip" ]]; then
+  echo "[setup] Virtual environment exists but pip/ensurepip is missing."
+  echo "[setup] This usually means python venv packages are incomplete."
+  echo "[setup] Fix with:"
+  echo "  sudo apt update"
+  echo "  sudo apt install -y python3-venv python3-pip"
+  echo "  # if needed, install version-specific package too:"
+  echo "  sudo apt install -y python3.8-venv || true"
+  echo "  sudo apt install -y python3.10-venv || true"
+  echo "  rm -rf \"$VENV_DIR\""
+  echo "  \"$PYTHON_BIN\" -m venv \"$VENV_DIR\""
+  echo "  source \"$VENV_DIR/bin/activate\""
+  exit 2
+fi
+
 echo "[setup] Upgrading pip tooling..."
 python3 -m pip install --upgrade pip setuptools wheel
 
