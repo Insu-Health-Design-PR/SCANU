@@ -565,33 +565,20 @@ http://<JETSON_IP>:8088/
 
 444444444444444
 
+cd ~/Desktop/SCANU-dev_adrian/software
 
-insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ v4l2-ctl --list-devices
-NVIDIA Tegra Video Input Device (platform:tegra-camrtc-ca):
-	/dev/media0
+sudo apt update
+sudo apt install -y python3-venv python3-pip
+sudo apt install -y python3.8-venv || true
+sudo apt install -y python3.10-venv || true
 
-PureThermal (fw:v1.3.0): PureTh (usb-3610000.xhci-4.2.2):
-	/dev/video0
-	/dev/video1
-	/dev/media1
+rm -rf .venv
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install --upgrade pip setuptools wheel
 
-NexiGo N950P 4K Webcam: NexiGo  (usb-3610000.xhci-4.2.3):
-	/dev/video2
-	/dev/video3
-	/dev/media2
 
-insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l/dev/4l/by-id/
-ls: invalid option -- '/'
-Try 'ls --help' for more information.
-insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l/dev/4l/by-id
-ls: invalid option -- '/'
-Try 'ls --help' for more information.
-insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l /dev/4l/by-id
-ls: cannot access '/dev/4l/by-id': No such file or directory
-insu@insu-desktop:~/Desktop/SCANU-dev_kpr-layer8$ ls -l /dev/v4l/by-path/
-total 0
-lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0 -> ../../video0
-lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.2:1.0-video-index1 -> ../../video1
-lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0 -> ../../video2
-lrwxrwxrwx 1 root root 12 Apr 29 09:43 platform-3610000.xhci-usb-0:4.2.3:1.0-video-index1 -> ../../video3
 
+
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+./scripts/setup_layer8_jetson_demo.sh
