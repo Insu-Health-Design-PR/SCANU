@@ -427,3 +427,99 @@ VITE_LAYER8_API_BASE=https://your-cloudflare-url
 VITE_LAYER8_WS_URL=wss://your-cloudflare-url/ws/events
 VITE_LAYER8_API_KEY=change-this-key
 ```
+
+## 17) Stable Camera Mapping After Restart
+
+Use stable `/dev/v4l/by-path/` camera paths instead of temporary `/dev/video0`, `/dev/video1`, etc. The `/dev/videoX` numbers can change after a reboot, but `by-path` stays tied to the physical USB port.
+
+On the Jetson, identify devices:
+
+```bash
+v4l2-ctl --list-devices
+ls -l /dev/v4l/by-path/
+```
+
+Current known mapping for `insu@insu-desktop`:
+
+```text
+PureThermal thermal camera:
+/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0
+
+NexiGo N950P RGB webcam:
+/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0
+```
+
+Confirm where each stable path points today:
+
+```bash
+readlink -f /dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0
+readlink -f /dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0
+```
+
+Preview each camera if needed:
+
+```bash
+ffplay /dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0
+ffplay /dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0
+```
+
+Run the full local stack with fixed cameras:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+source ../.venv/bin/activate
+
+LAYER8_THERMAL_CAMERA_DEVICE="/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0" \
+LAYER8_RGB_CAMERA_DEVICE="/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0" \
+INSTALL_FRONTEND_DEPS=0 \
+./scripts/start_layer8_stack.sh
+```
+
+This prevents RGB and thermal from swapping after restart.
+
+## 18) Backend On Jetson With Cloudflare Tunnel
+
+Use this after local Phase 1 works. The backend runs on the Jetson at port `8088`, Cloudflare exposes it as HTTPS/WSS, and the Vercel frontend consumes that public URL.
+
+Start the backend with API key protection and stable cameras:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+source ../.venv/bin/activate
+
+LAYER8_API_KEY="change-this-key" \
+LAYER8_THERMAL_CAMERA_DEVICE="/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.2:1.0-video-index0" \
+LAYER8_RGB_CAMERA_DEVICE="/dev/v4l/by-path/platform-3610000.xhci-usb-0:4.2.3:1.0-video-index0" \
+./scripts/start_layer8_backend_for_vercel.sh
+```
+
+In another terminal, start the tunnel:
+
+```bash
+cd ~/Desktop/SCANU-dev_adrian/software/layer8_ui
+BACKEND_PORT=8088 ./scripts/start_layer8_cloudflare_tunnel.sh
+```
+
+Cloudflare prints a URL like:
+
+```text
+https://abc-def-123.trycloudflare.com
+```
+
+Validate from another terminal or another machine:
+
+```bash
+BACKEND_URL="https://abc-def-123.trycloudflare.com" \
+LAYER8_API_KEY="change-this-key" \
+./scripts/check_layer8_backend.sh
+```
+
+Set these Vercel environment variables:
+
+```text
+VITE_LAYER8_API_BASE=https://abc-def-123.trycloudflare.com
+VITE_LAYER8_WS_URL=wss://abc-def-123.trycloudflare.com/ws/events
+VITE_LAYER8_API_KEY=change-this-key
+```
+
+Then redeploy the Vercel frontend.

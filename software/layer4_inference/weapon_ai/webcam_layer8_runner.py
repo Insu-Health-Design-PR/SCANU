@@ -45,7 +45,7 @@ def _infer_main_callable():
 
 def main() -> None:
     p = argparse.ArgumentParser(description="Webcam live infer for Layer 8 UI.", allow_abbrev=False)
-    p.add_argument("--webcam-device", type=int, default=0)
+    p.add_argument("--webcam-device", type=str, default="0")
     p.add_argument("--capture-width", type=int, default=1920)
     p.add_argument("--capture-height", type=int, default=1080)
     p.add_argument(
@@ -91,7 +91,7 @@ def main() -> None:
         "--checkpoint",
         args.checkpoint,
         "--source",
-        str(int(args.webcam_device)),
+        args.webcam_device.strip(),
         "--capture_width",
         str(int(args.capture_width)),
         "--capture_height",

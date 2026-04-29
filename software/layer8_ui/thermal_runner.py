@@ -20,6 +20,7 @@ import cv2
 import numpy as np
 
 from layer8_ui.artifact_paths import software_root_from_settings
+from layer8_ui.camera_device import device_from_env_or_settings, is_numeric_device, open_v4l2_capture
 from layer8_ui.thermal_device import detect_working_thermal_device
 
 _THERMAL_CAM_CFG_LEN = 9
@@ -45,18 +46,18 @@ def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[s
     video = (t.get("video") or "thermal_only.mp4").strip()
     live = (t.get("live_frame") or "").strip()
     out = (t.get("output") or "").strip()
-    thermal_device = int(t.get("thermal_device", 0))
+    thermal_device = device_from_env_or_settings("LAYER8_THERMAL_CAMERA_DEVICE", t.get("thermal_device", 0))
     thermal_auto_detect = bool(int(t.get("thermal_auto_detect", 1)))
-    if thermal_auto_detect:
+    if thermal_auto_detect and is_numeric_device(thermal_device):
         detected = detect_working_thermal_device(
-            preferred=thermal_device,
+            preferred=int(thermal_device),
             width=int(t.get("thermal_width", 640)),
             height=int(t.get("thermal_height", 480)),
             fps=int(t.get("thermal_fps", 30)),
             search_max_index=int(t.get("thermal_detect_max_index", 6)),
         )
         if detected is not None:
-            thermal_device = detected
+            thermal_device = str(detected)
 
     cmd = [
         py,
@@ -68,7 +69,7 @@ def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[s
         "--video",
         video,
         "--thermal-device",
-        str(int(thermal_device)),
+        str(thermal_device),
         "--thermal-width",
         str(int(t.get("thermal_width", 640))),
         "--thermal-height",
@@ -103,7 +104,7 @@ class ThermalSharedStream:
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         self._clients = 0
-        self._resolved_device: int | None = None
+        self._resolved_device: str | None = None
         self._next_detect_retry_ts = 0.0
 
     @property
@@ -113,7 +114,7 @@ class ThermalSharedStream:
     @staticmethod
     def _cfg_from_settings(settings: dict[str, Any]) -> tuple[Any, ...]:
         t = settings.get("thermal") or {}
-        requested_device = int(t.get("thermal_device", 0))
+        requested_device = device_from_env_or_settings("LAYER8_THERMAL_CAMERA_DEVICE", t.get("thermal_device", 0))
         thermal_auto_detect = int(t.get("thermal_auto_detect", 1))
         thermal_detect_max_index = int(t.get("thermal_detect_max_index", 6))
         thermal_detect_retry_s = float(t.get("thermal_detect_retry_s", 12.0))
@@ -224,12 +225,12 @@ class ThermalSharedStream:
                     preferred_device, width, height, fps, _, _, thermal_auto_detect, detect_max_index, detect_retry_s = (
                         settings_cam_cfg
                     )
-                    device = self._resolved_device if self._resolved_device is not None else int(preferred_device)
-                    cap = cv2.VideoCapture(int(device), cv2.CAP_V4L2)
+                    device = self._resolved_device if self._resolved_device is not None else str(preferred_device)
+                    cap = open_v4l2_capture(device)
                     if not cap.isOpened():
                         cap.release()
                         cap = None
-                        if thermal_auto_detect:
+                        if thermal_auto_detect and is_numeric_device(preferred_device):
                             fallback_device = None
                             if now_ts >= self._next_detect_retry_ts:
                                 fallback_device = detect_working_thermal_device(
@@ -240,16 +241,16 @@ class ThermalSharedStream:
                                     search_max_index=int(detect_max_index),
                                 )
                                 self._next_detect_retry_ts = now_ts + max(0.5, float(detect_retry_s))
-                            if fallback_device is not None and fallback_device != int(device):
-                                cap = cv2.VideoCapture(int(fallback_device), cv2.CAP_V4L2)
+                            if fallback_device is not None and str(fallback_device) != str(device):
+                                cap = open_v4l2_capture(fallback_device)
                                 if cap.isOpened():
-                                    device = int(fallback_device)
-                                    self._resolved_device = int(fallback_device)
+                                    device = str(fallback_device)
+                                    self._resolved_device = str(fallback_device)
                                 else:
                                     cap.release()
                                     cap = None
                             elif fallback_device is not None:
-                                self._resolved_device = int(fallback_device)
+                                self._resolved_device = str(fallback_device)
                         if cap is not None and cap.isOpened():
                             active_camera_cfg = settings_cam_cfg
                             next_open_retry_ts = 0.0
@@ -269,7 +270,7 @@ class ThermalSharedStream:
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
                     cap.set(cv2.CAP_PROP_FPS, fps)
                     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
-                    self._resolved_device = int(device)
+                    self._resolved_device = str(device)
                     active_camera_cfg = settings_cam_cfg
                     next_open_retry_ts = 0.0
 

@@ -20,6 +20,7 @@ import cv2
 import numpy as np
 
 from layer8_ui.artifact_paths import abs_software_path, software_root_from_settings
+from layer8_ui.camera_device import device_from_env_or_settings, open_v4l2_capture
 
 _WEBCAM_CAM_CFG_LEN = 3
 _DEFAULT_WEAPON_CHECKPOINT = "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
@@ -132,7 +133,7 @@ def build_webcam_command(settings: dict[str, Any], layer8_dir: Path) -> list[str
         "-m",
         "weapon_ai.webcam_layer8_runner",
         "--webcam-device",
-        str(int(w.get("webcam_device", 0))),
+        device_from_env_or_settings("LAYER8_RGB_CAMERA_DEVICE", w.get("webcam_device", 0)),
         "--capture-width",
         str(int(w.get("webcam_width", 1920))),
         "--capture-height",
@@ -180,7 +181,7 @@ class WebcamSharedStream:
     def _cfg_from_settings(settings: dict[str, Any]) -> tuple[Any, ...]:
         w = settings.get("webcam") or {}
         return (
-            int(w.get("webcam_device", 0)),
+            device_from_env_or_settings("LAYER8_RGB_CAMERA_DEVICE", w.get("webcam_device", 0)),
             int(w.get("webcam_width", 1920)),
             int(w.get("webcam_height", 1080)),
         )
@@ -271,7 +272,7 @@ class WebcamSharedStream:
                         cap.release()
                         cap = None
                     device, width, height = settings_cam_cfg
-                    cap = cv2.VideoCapture(int(device), cv2.CAP_V4L2)
+                    cap = open_v4l2_capture(device)
                     if not cap.isOpened():
                         if cap is not None:
                             cap.release()

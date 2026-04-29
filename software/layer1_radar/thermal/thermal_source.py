@@ -19,6 +19,27 @@ import cv2
 import numpy as np
 
 
+def _is_numeric_device(device: int | str) -> bool:
+    val = str(device).strip()
+    return val.isdigit() or (val.startswith("-") and val[1:].isdigit())
+
+
+def _open_capture(device: int | str) -> cv2.VideoCapture:
+    val = str(device).strip()
+    if _is_numeric_device(val):
+        return cv2.VideoCapture(int(val), cv2.CAP_V4L2)
+    cap = cv2.VideoCapture(val, cv2.CAP_V4L2)
+    if not cap.isOpened():
+        cap.release()
+        cap = cv2.VideoCapture(val)
+    return cap
+
+
+def _display_device(device: int | str) -> str:
+    val = str(device).strip()
+    return f"/dev/video{val}" if _is_numeric_device(val) else val
+
+
 def normalize_thermal_frame(frame: np.ndarray) -> np.ndarray:
     """Normalize 16-bit/8-bit thermal frame to uint8 grayscale."""
 
@@ -51,7 +72,7 @@ class ThermalCameraSource:
 
     def __init__(
         self,
-        device: int = 0,
+        device: int | str = 0,
         width: int = 640,
         height: int = 480,
         fps: int = 30,
@@ -62,7 +83,7 @@ class ThermalCameraSource:
         self._cap = None
         cap: cv2.VideoCapture | None = None
         for attempt in range(max(1, int(open_retries))):
-            cap = cv2.VideoCapture(int(device), cv2.CAP_V4L2)
+            cap = _open_capture(device)
             if cap.isOpened():
                 self._cap = cap
                 break
@@ -77,7 +98,7 @@ class ThermalCameraSource:
                 "then retry. (2) Wrong index — set thermal_device or enable thermal_auto_detect. "
                 "(3) USB/cable or permissions (user in group 'video')."
             )
-            raise RuntimeError(f"Cannot open thermal camera /dev/video{int(device)} after {open_retries} tries.{hint}")
+            raise RuntimeError(f"Cannot open thermal camera {_display_device(device)} after {open_retries} tries.{hint}")
 
         # Thermal sensors on V4L2 often expose grayscale/Y16 streams; forcing
         # a compatible path reduces blank/timeout frames.
@@ -113,4 +134,3 @@ class ThermalCameraSource:
     def close(self) -> None:
         if self._cap is not None:
             self._cap.release()
-

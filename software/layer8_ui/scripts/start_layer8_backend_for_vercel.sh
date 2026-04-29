@@ -18,5 +18,7 @@ echo "[layer8-vercel] Backend host: ${BACKEND_HOST}"
 echo "[layer8-vercel] Backend port: ${BACKEND_PORT}"
 echo "[layer8-vercel] CORS origins: ${LAYER8_CORS_ORIGINS}"
 echo "[layer8-vercel] API key: configured"
+echo "[layer8-vercel] RGB camera: ${LAYER8_RGB_CAMERA_DEVICE:-<settings/default>}"
+echo "[layer8-vercel] Thermal camera: ${LAYER8_THERMAL_CAMERA_DEVICE:-<settings/default>}"
 
 exec "$SCRIPT_DIR/start_layer8_backend_only.sh"

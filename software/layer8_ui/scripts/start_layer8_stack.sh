@@ -56,6 +56,9 @@ echo "[layer8] Starting frontend on ${FRONTEND_HOST}:${FRONTEND_PORT}"
   if [[ -n "${VITE_LAYER8_WS_URL:-}" ]]; then
     export VITE_LAYER8_WS_URL
   fi
+  if [[ -n "${VITE_LAYER8_API_KEY:-}" ]]; then
+    export VITE_LAYER8_API_KEY
+  fi
   npm run dev -- --host "$FRONTEND_HOST" --port "$FRONTEND_PORT" --strictPort
 ) >"$FRONTEND_LOG" 2>&1 &
 FRONTEND_PID=$!
@@ -67,6 +70,10 @@ echo "[layer8] Backend URL:  http://127.0.0.1:${BACKEND_PORT}"
 echo "[layer8] API/WS override:"
 echo "  - VITE_LAYER8_API_BASE=${VITE_LAYER8_API_BASE:-<auto>}"
 echo "  - VITE_LAYER8_WS_URL=${VITE_LAYER8_WS_URL:-<auto>}"
+echo "  - VITE_LAYER8_API_KEY=${VITE_LAYER8_API_KEY:+<configured>}"
+echo "[layer8] Camera override:"
+echo "  - LAYER8_RGB_CAMERA_DEVICE=${LAYER8_RGB_CAMERA_DEVICE:-<settings/default>}"
+echo "  - LAYER8_THERMAL_CAMERA_DEVICE=${LAYER8_THERMAL_CAMERA_DEVICE:-<settings/default>}"
 echo "[layer8] Logs:"
 echo "  - ${BACKEND_LOG}"
 echo "  - ${FRONTEND_LOG}"

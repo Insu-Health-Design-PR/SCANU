@@ -48,7 +48,7 @@ def main() -> None:
     parser.add_argument("--fps", type=float, default=10.0)
     parser.add_argument("--video", "-v", default="thermal_only.mp4")
     parser.add_argument("--output", "-o", default=None, help="Optional JSON metrics")
-    parser.add_argument("--thermal-device", type=int, default=0)
+    parser.add_argument("--thermal-device", type=str, default="0")
     parser.add_argument("--thermal-width", type=int, default=640)
     parser.add_argument("--thermal-height", type=int, default=480)
     parser.add_argument("--thermal-fps", type=int, default=30)
