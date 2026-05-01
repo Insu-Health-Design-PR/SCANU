@@ -29,6 +29,7 @@ from layer8_ui.preview_media import (
     mjpeg_placeholder_jpeg,
 )
 from layer8_ui.settings_store import DEFAULT_SETTINGS, load, reset_webcam_weapon_defaults, save
+from layer8_ui.thermal_device import detect_working_thermal_device
 from layer8_ui import v4l2_tools
 
 SensorName = Literal["thermal", "webcam", "mmwave"]
@@ -357,6 +358,91 @@ def build_router(layer8_dir: Path) -> APIRouter:
         """Reset weapon / verbose keys only (stored under ``webcam`` in JSON)."""
         return reset_webcam_weapon_defaults(layer8_dir)
 
+    @router.get("/api/thermal/config")
+    def get_thermal_config() -> dict[str, Any]:
+        s = load(layer8_dir)
+        return {"thermal": dict(s.get("thermal") or {})}
+
+    @router.put("/api/thermal/config")
+    def put_thermal_config(body: dict[str, Any]) -> dict[str, Any]:
+        if not isinstance(body, dict):
+            raise HTTPException(400, "body must be an object")
+        patch = body.get("thermal")
+        if patch is None or not isinstance(patch, dict):
+            raise HTTPException(400, "body must include a thermal object")
+        current = load(layer8_dir)
+        current["thermal"] = {**(current.get("thermal") or {}), **patch}
+        save(layer8_dir, current)
+        return load(layer8_dir)
+
+    @router.post("/api/thermal/auto_configure")
+    def thermal_auto_configure() -> Any:
+        current = load(layer8_dir)
+        t = dict(current.get("thermal") or {})
+        width = int(t.get("thermal_width", 160))
+        height = int(t.get("thermal_height", 120))
+        fps = int(t.get("thermal_fps", 9))
+        preferred = int(t.get("thermal_device", 0))
+        max_idx = int(t.get("thermal_detect_max_index", 6))
+        detected = detect_working_thermal_device(
+            preferred=preferred,
+            width=width,
+            height=height,
+            fps=fps,
+            search_max_index=max_idx,
+        )
+        if detected is None:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "ok": False,
+                    "error": "No working thermal V4L2 device found",
+                    "thermal": t,
+                },
+            )
+        t["thermal_device"] = int(detected)
+        t["thermal_auto_detect"] = 1
+        current["thermal"] = t
+        save(layer8_dir, current)
+        out = load(layer8_dir)
+        return {
+            "ok": True,
+            "thermal": dict(out.get("thermal") or {}),
+            "detected_device": int(detected),
+        }
+
+    @router.get("/api/thermal/status")
+    def thermal_status() -> dict[str, Any]:
+        return sensor_runner.status("thermal", layer8_dir)
+
+    @router.post("/api/thermal/run")
+    def thermal_run() -> Any:
+        s = load(layer8_dir)
+        thermal_stream.pause_for_thermal_subprocess()
+        try:
+            result = sensor_runner.start("thermal", s, layer8_dir)
+        finally:
+            thermal_stream.resume_after_thermal_subprocess_attempt()
+        if not result.get("ok"):
+            return JSONResponse(result, status_code=409)
+        return result
+
+    @router.post("/api/thermal/stop")
+    def thermal_stop() -> dict[str, Any]:
+        return sensor_runner.stop("thermal", layer8_dir)
+
+    @router.post("/api/thermal/restart")
+    def thermal_restart() -> Any:
+        s = load(layer8_dir)
+        thermal_stream.pause_for_thermal_subprocess()
+        try:
+            result = sensor_runner.restart("thermal", s, layer8_dir)
+        finally:
+            thermal_stream.resume_after_thermal_subprocess_attempt()
+        if not result.get("ok"):
+            return JSONResponse(result, status_code=409)
+        return result
+
     @router.get("/api/model/options")
     def model_options() -> dict[str, Any]:
         s = load(layer8_dir)
@@ -620,14 +706,57 @@ def build_router(layer8_dir: Path) -> APIRouter:
             headers=mjpeg_headers(),
         )
 
+    async def thermal_live_mjpeg_response() -> StreamingResponse:
+        """Thermal MJPEG from ``thermal.live_frame`` (same stream as ``/api/preview/live/thermal``)."""
+        s = load(layer8_dir)
+        rel = (s.get("thermal") or {}).get("live_frame") or ""
+        rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        missing = mjpeg_placeholder_jpeg(
+            "Thermal: no live JPEG yet",
+            f"Expected file: {rpath.name if rpath else 'configure thermal.live_frame'}",
+            "Start thermal runner or fix live_frame in settings.",
+        )
+
+        async def mjpeg_stream():
+            boundary = "frame"
+            try:
+                while True:
+                    payload: bytes | None = None
+                    if rpath is not None and rpath.is_file():
+                        try:
+                            raw = rpath.read_bytes()
+                            if raw:
+                                payload = raw
+                        except OSError:
+                            payload = None
+                    if not payload:
+                        payload = missing
+                    chunk = (
+                        f"--{boundary}\r\n"
+                        "Content-Type: image/jpeg\r\n"
+                        f"Content-Length: {len(payload)}\r\n\r\n"
+                    ).encode("utf-8") + payload + b"\r\n"
+                    yield chunk
+                    await asyncio.sleep(0.2)
+            except asyncio.CancelledError:
+                return
+
+        return StreamingResponse(
+            mjpeg_stream(),
+            media_type="multipart/x-mixed-replace; boundary=frame",
+            headers=mjpeg_headers(),
+        )
+
     @router.get("/api/preview/live/{sensor}")
     async def preview_live(sensor: SensorName) -> StreamingResponse:
         if sensor == "webcam":
             return await ai_camera_live_mjpeg()
+        if sensor == "thermal":
+            return await thermal_live_mjpeg_response()
         s = load(layer8_dir)
         rel = (s.get(sensor) or {}).get("live_frame") or ""
         rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-        label = {"thermal": "Thermal", "mmwave": "mmWave"}.get(sensor, str(sensor))
+        label = "mmWave"
         missing = mjpeg_placeholder_jpeg(
             f"{label}: no live JPEG yet",
             f"Expected file: {rpath.name if rpath else f'configure {sensor}.live_frame'}",
@@ -667,6 +796,11 @@ def build_router(layer8_dir: Path) -> APIRouter:
     @router.get("/api/ai_camera/preview/live")
     async def ai_camera_preview_live() -> StreamingResponse:
         return await ai_camera_live_mjpeg()
+
+    @router.get("/api/thermal/preview/live")
+    @router.get("/api/preview/live_direct/thermal")
+    async def thermal_preview_live_aliases() -> StreamingResponse:
+        return await thermal_live_mjpeg_response()
 
     @router.websocket("/ws/thermal")
     async def websocket_thermal(websocket: WebSocket) -> None:
