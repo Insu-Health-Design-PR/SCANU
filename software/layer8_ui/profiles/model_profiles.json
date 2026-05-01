@@ -31,7 +31,7 @@
     "label": "High resolution",
     "description": "1440p-class capture; larger gun YOLO input \u2014 heavier on Jetson VRAM.",
     "values": {
-      "webcam_device": 2,
+      "webcam_device": 0,
       "webcam_auto_detect": 1,
       "webcam_detect_max_index": 8,
       "webcam_detect_retry_s": 8,

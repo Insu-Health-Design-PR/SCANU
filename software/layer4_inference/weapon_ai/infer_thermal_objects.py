@@ -50,6 +50,28 @@ _FIREARM_HF_URL = (
 _SAFE_MAX = 0.01
 _UNSAFE_MIN = 0.60
 
+_OVERLAY_FONT = cv2.FONT_HERSHEY_SIMPLEX
+_OVERLAY_SCALE_PERSON = 0.72
+_OVERLAY_SCALE_GUN = 0.82
+_OVERLAY_THICK = 2
+_COLOR_GUN_OBJECT_BGR = (0, 140, 255)
+_COLOR_GUN_WEAPON_BGR = (0, 0, 255)
+
+
+def _draw_label_above_box(
+    vis: np.ndarray,
+    x1: int,
+    y1: int,
+    text: str,
+    color: tuple[int, int, int],
+    *,
+    scale: float,
+    thickness: int,
+) -> None:
+    (_tw, th), baseline = cv2.getTextSize(text, _OVERLAY_FONT, scale, thickness)
+    ty = int(max(y1 - baseline - 6, th + 4))
+    cv2.putText(vis, text, (x1, ty), _OVERLAY_FONT, scale, color, thickness, lineType=cv2.LINE_AA)
+
 
 def _threat_bucket(score: float) -> str:
     if score >= _UNSAFE_MIN:
@@ -915,7 +937,7 @@ def main() -> None:
         thermal_frame: np.ndarray,
     ) -> tuple[
         list[tuple[int, int, int, int, float, int | None, str]],
-        list[tuple[int, int, int, int, str]],
+        list[tuple[int, int, int, int, str, str]],
         int,
         list[float],
     ]:
@@ -945,7 +967,7 @@ def main() -> None:
 
         gun_count = 0
         person_gun_best_conf: dict[int, float] = {}
-        gun_boxes: list[tuple[int, int, int, int, str]] = []
+        gun_boxes: list[tuple[int, int, int, int, str, str]] = []
         if gun_detector is not None:
             if args.gun_thermal_debug:
                 infer_gun_conf = float(args.gun_conf)
@@ -962,7 +984,7 @@ def main() -> None:
                 gun_count += 1
                 kind = "object" if float(gc) < float(args.gun_label_weapon_min) else "weapon"
                 glabel = f"{kind} {gc:.2f}"
-                gun_boxes.append((gx1, gy1, gx2, gy2, glabel))
+                gun_boxes.append((gx1, gy1, gx2, gy2, glabel, kind))
 
             def _draw_gun_from_candidates(
                 candidates: list[tuple[float, int, int, int, int, str]],
@@ -1084,7 +1106,7 @@ def main() -> None:
     infer_every_n = 1
     last_infer_frame = 0
     cached_rows: list[tuple[int, int, int, int, float, int | None, str]] = []
-    cached_gun_boxes: list[tuple[int, int, int, int, str]] = []
+    cached_gun_boxes: list[tuple[int, int, int, int, str, str]] = []
     cached_gun_count = 0
     last_frame_ts: float | None = None
     fps_ema: float | None = None
@@ -1137,18 +1159,18 @@ def main() -> None:
 
                 rows = list(cached_rows)
                 gun_count = int(cached_gun_count)
-                for gx1, gy1, gx2, gy2, glabel in cached_gun_boxes:
-                    orange = (0, 140, 255)
-                    cv2.rectangle(vis, (gx1, gy1), (gx2, gy2), orange, 3)
-                    gty = max(gy1 - 6, 18)
-                    cv2.putText(
+                for gx1, gy1, gx2, gy2, glabel, gkind in cached_gun_boxes:
+                    gcolor = _COLOR_GUN_WEAPON_BGR if gkind == "weapon" else _COLOR_GUN_OBJECT_BGR
+                    gthick = 3 if gkind == "weapon" else 2
+                    cv2.rectangle(vis, (gx1, gy1), (gx2, gy2), gcolor, gthick)
+                    _draw_label_above_box(
                         vis,
+                        gx1,
+                        gy1,
                         glabel,
-                        (gx1, gty),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.55,
-                        orange,
-                        2,
+                        gcolor,
+                        scale=_OVERLAY_SCALE_GUN,
+                        thickness=_OVERLAY_THICK,
                     )
 
                 unsafe_first: list[tuple[int, int, int, int, float, str]] = []
@@ -1166,29 +1188,29 @@ def main() -> None:
                         safe_list.append((x1, y1, x2, y2, prob, label_txt))
 
                 for x1, y1, x2, y2, _prob, label_txt in safe_list:
-                    cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 220, 0), 2)
-                    ty = max(y1 - 6, 18)
-                    cv2.putText(
+                    c = (0, 220, 0)
+                    cv2.rectangle(vis, (x1, y1), (x2, y2), c, 2)
+                    _draw_label_above_box(
                         vis,
+                        x1,
+                        y1,
                         label_txt,
-                        (x1, ty),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (0, 220, 0),
-                        2,
+                        c,
+                        scale=_OVERLAY_SCALE_PERSON,
+                        thickness=_OVERLAY_THICK,
                     )
 
                 for x1, y1, x2, y2, _prob, label_txt in suspicious_list:
-                    cv2.rectangle(vis, (x1, y1), (x2, y2), (0, 165, 255), 2)
-                    ty = max(y1 - 6, 18)
-                    cv2.putText(
+                    c = (0, 165, 255)
+                    cv2.rectangle(vis, (x1, y1), (x2, y2), c, 2)
+                    _draw_label_above_box(
                         vis,
+                        x1,
+                        y1,
                         label_txt,
-                        (x1, ty),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
-                        (0, 165, 255),
-                        2,
+                        c,
+                        scale=_OVERLAY_SCALE_PERSON,
+                        thickness=_OVERLAY_THICK,
                     )
 
                 for x1, y1, x2, y2, _prob, label_txt in unsafe_first:
@@ -1199,15 +1221,14 @@ def main() -> None:
                         _unsafe_bgr,
                         thickness=max(1, args.unsafe_border_thick),
                     )
-                    ty = max(y1 - 6, 18)
-                    cv2.putText(
+                    _draw_label_above_box(
                         vis,
+                        x1,
+                        y1,
                         label_txt,
-                        (x1, ty),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5,
                         _unsafe_text_bgr,
-                        2,
+                        scale=_OVERLAY_SCALE_PERSON,
+                        thickness=_OVERLAY_THICK,
                     )
 
                 if not rows:

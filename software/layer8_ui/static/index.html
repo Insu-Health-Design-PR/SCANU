@@ -948,13 +948,17 @@
           console.warn("WebRTC webcam failed, fallback MJPEG:", e);
           video.style.display = "none";
           img.style.display = "";
-          img.src = `/api/preview/live_direct/webcam?t=${Date.now()}`;
+          img.src = `/api/ai_camera/preview/live?t=${Date.now()}`;
         });
       } else {
         img.style.display = "";
         if (video) video.style.display = "none";
-        // Main preview is served via API streaming (multipart MJPEG).
-        img.src = `/api/preview/live_direct/${mode}?t=${Date.now()}`;
+        // Main preview: webcam uses AI-camera MJPEG (same stream as WebRTC overlay pipeline when runner is on).
+        if (mode === "webcam") {
+          img.src = `/api/ai_camera/preview/live?t=${Date.now()}`;
+        } else {
+          img.src = `/api/preview/live/${mode}?t=${Date.now()}`;
+        }
       }
     }
 
@@ -964,7 +968,11 @@
       const title = el("secondary-title");
       if (title) title.textContent = mode === "thermal" ? "Thermal" : "Webcam";
       if (!img) return;
-      img.src = `/api/preview/live_direct/${mode}?t=${Date.now()}`;
+      if (mode === "webcam") {
+        img.src = `/api/ai_camera/preview/live?t=${Date.now()}`;
+      } else {
+        img.src = `/api/preview/live/${mode}?t=${Date.now()}`;
+      }
     }
 
     function refreshMmwaveThumb() {

@@ -67,6 +67,10 @@ class ApplyModelProfileBody(BaseModel):
     id: str
 
 
+class ApplyModelProfileByNameBody(BaseModel):
+    name: str
+
+
 class SnapshotModelProfileBody(BaseModel):
     """Save under a file key derived from ``name``. ``id`` is optional (legacy / overwrite by key)."""
     id: str = ""
@@ -208,6 +212,36 @@ def _get_model_profiles_normalized(layer8_dir: Path) -> dict[str, dict[str, Any]
     return _normalize_profiles_document(_load_model_profiles_raw(layer8_dir))
 
 
+def _ai_camera_profiles_public_list(layer8_dir: Path) -> list[dict[str, Any]]:
+    """Profiles as a sorted list with ``id`` / ``name`` / ``description`` / ``values``."""
+    norm = _get_model_profiles_normalized(layer8_dir)
+    rows: list[dict[str, Any]] = []
+    for pid, entry in norm.items():
+        rows.append(
+            {
+                "id": pid,
+                "name": str(entry.get("label") or pid),
+                "description": str(entry.get("description") or ""),
+                "values": dict(entry.get("values") or {}),
+            }
+        )
+    rows.sort(key=lambda r: (r["name"].lower(), r["id"]))
+    return rows
+
+
+def _profile_ids_matching_name(norm: dict[str, dict[str, Any]], name: str) -> list[str]:
+    want = name.strip().casefold()
+    if not want:
+        return []
+    matches: list[str] = []
+    for pid, entry in norm.items():
+        label = str(entry.get("label") or pid).strip().casefold()
+        if label == want:
+            matches.append(pid)
+    matches.sort()
+    return matches
+
+
 def _save_model_profiles(layer8_dir: Path, data: dict[str, Any]) -> None:
     p = _model_profiles_path(layer8_dir)
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -239,6 +273,41 @@ def build_router(layer8_dir: Path) -> APIRouter:
         if arr.size == 0:
             return None
         return cv2.imdecode(arr, cv2.IMREAD_COLOR)
+
+    _WEBCAM_LIVE_JPEG_Q = 85
+
+    def _runner_frame_jpeg_same_as_webrtc(rpath: Path | None) -> bytes | None:
+        """
+        Pick the same frame bytes the WebRTC track uses (``WebcamJpegTrack.recv``):
+        BGR IPC → JPEG IPC → ``webcam.live_frame`` on disk.
+        MJPEG cannot ship raw BGR, so BGR IPC is JPEG-encoded with the same quality
+        as ``infer_thermal_objects`` live output.
+        """
+        bgr_payload = webcam_ipc_bgr_reader.read_latest()
+        if bgr_payload is not None:
+            raw, height, width, channels = bgr_payload
+            expected = int(height) * int(width) * int(channels)
+            if channels == 3 and len(raw) == expected:
+                arr = np.frombuffer(raw, dtype=np.uint8)
+                bgr = arr.reshape((int(height), int(width), 3))
+                ok, buf = cv2.imencode(
+                    ".jpg",
+                    bgr,
+                    [int(cv2.IMWRITE_JPEG_QUALITY), int(_WEBCAM_LIVE_JPEG_Q)],
+                )
+                if ok:
+                    return buf.tobytes()
+        jpg = webcam_ipc_reader.read_latest()
+        if jpg:
+            return jpg
+        if rpath is not None and rpath.is_file():
+            try:
+                disk = rpath.read_bytes()
+                if disk:
+                    return disk
+            except OSError:
+                pass
+        return None
 
     @router.get("/api/system/metrics")
     def get_system_metrics() -> dict[str, Any]:
@@ -308,6 +377,10 @@ def build_router(layer8_dir: Path) -> APIRouter:
     def get_model_profiles() -> dict[str, Any]:
         return {"profiles": _get_model_profiles_normalized(layer8_dir)}
 
+    @router.get("/api/ai_camera/profiles")
+    def get_ai_camera_profiles() -> dict[str, Any]:
+        return {"profiles": _ai_camera_profiles_public_list(layer8_dir)}
+
     @router.put("/api/model/profiles")
     def put_model_profiles(body: dict[str, Any]) -> dict[str, Any]:
         if not isinstance(body, dict):
@@ -342,6 +415,38 @@ def build_router(layer8_dir: Path) -> APIRouter:
         current["webcam"] = w
         save(layer8_dir, current)
         return load(layer8_dir)
+
+    @router.post("/api/ai_camera/profiles/apply_by_name")
+    def apply_ai_camera_profile_by_name(body: ApplyModelProfileByNameBody) -> dict[str, Any]:
+        raw_name = body.name.strip()
+        if not raw_name:
+            raise HTTPException(400, "name is required")
+        norm = _get_model_profiles_normalized(layer8_dir)
+        matches = _profile_ids_matching_name(norm, raw_name)
+        if not matches:
+            raise HTTPException(404, "no profile with this name")
+        if len(matches) > 1:
+            raise HTTPException(
+                status_code=409,
+                detail={"message": "multiple profiles share this name", "matching_ids": matches},
+            )
+        pid = matches[0]
+        prof = norm.get(pid) or {}
+        values = prof.get("values") or {}
+        if not isinstance(values, dict):
+            raise HTTPException(400, "profile.values must be an object")
+        current = load(layer8_dir)
+        w = _apply_values_to_webcam({**(current.get("webcam") or {})}, values)
+        w["active_model_profile_id"] = pid
+        current["webcam"] = w
+        save(layer8_dir, current)
+        applied = load(layer8_dir)
+        return {
+            "ok": True,
+            "applied_profile_id": pid,
+            "applied_profile_name": str(prof.get("label") or pid),
+            "settings": applied,
+        }
 
     @router.post("/api/model/profiles/snapshot")
     def snapshot_model_profile(body: SnapshotModelProfileBody) -> dict[str, Any]:
@@ -410,6 +515,23 @@ def build_router(layer8_dir: Path) -> APIRouter:
             "mmwave_tab": "layer8_ui.sensor_runner (mmWave CLI)",
         }
 
+    @router.get("/api/ai_camera/config")
+    def get_ai_camera_config() -> dict[str, Any]:
+        return load(layer8_dir)
+
+    @router.put("/api/ai_camera/config")
+    def put_ai_camera_config(body: dict[str, Any]) -> dict[str, Any]:
+        if not isinstance(body, dict):
+            raise HTTPException(400, "body must be an object")
+        current = load(layer8_dir)
+        patch = body.get("webcam")
+        if patch is not None:
+            if not isinstance(patch, dict):
+                raise HTTPException(400, "webcam must be an object when provided")
+            current["webcam"] = {**(current.get("webcam") or {}), **patch}
+        save(layer8_dir, current)
+        return load(layer8_dir)
+
     @router.get("/api/command/{sensor}")
     def preview_command(sensor: SensorName) -> dict[str, Any]:
         if sensor not in ("thermal", "webcam", "mmwave"):
@@ -437,60 +559,79 @@ def build_router(layer8_dir: Path) -> APIRouter:
             )
         return FileResponse(path, media_type="video/mp4", filename=path.name)
 
-    @router.get("/api/preview/live/{sensor}")
-    async def preview_live(sensor: SensorName) -> StreamingResponse:
+    async def ai_camera_live_mjpeg() -> StreamingResponse:
+        """AI webcam MJPEG: same frame selection as ``vid-main-webrtc`` / ``WebcamJpegTrack``."""
+        st = sensor_runner.status("webcam", layer8_dir)
         s = load(layer8_dir)
-        rel = (s.get(sensor) or {}).get("live_frame") or ""
-        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-        if path is None:
-            raise HTTPException(404, "live frame path not configured")
 
-        label = {"thermal": "Thermal", "webcam": "Webcam", "mmwave": "mmWave"}.get(sensor, sensor)
-        missing = mjpeg_placeholder_jpeg(
-            f"{label}: no live JPEG yet",
-            f"Expected file: {path.name}",
-            "Start the sensor runner or fix live_frame in settings.",
-        )
+        if bool(st.get("running")):
+            rel = (s.get("webcam") or {}).get("live_frame") or ""
+            rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+            runner_missing = mjpeg_placeholder_jpeg(
+                "Webcam runner is ON (subprocess holds the camera).",
+                "Waiting for BGR/JPEG IPC or webcam.live_frame (same order as WebRTC).",
+                (rpath.name if rpath else "configure webcam.live_frame"),
+            )
 
-        async def mjpeg_stream():
+            async def mjpeg_runner_file():
+                boundary = "frame"
+                try:
+                    while True:
+                        jpg = _runner_frame_jpeg_same_as_webrtc(rpath)
+                        if not jpg:
+                            jpg = runner_missing
+                        chunk = (
+                            f"--{boundary}\r\n"
+                            "Content-Type: image/jpeg\r\n"
+                            f"Content-Length: {len(jpg)}\r\n\r\n"
+                        ).encode("utf-8") + jpg + b"\r\n"
+                        yield chunk
+                        await asyncio.sleep(0.02)
+                except asyncio.CancelledError:
+                    return
+
+            return StreamingResponse(
+                mjpeg_runner_file(),
+                media_type="multipart/x-mixed-replace; boundary=frame",
+                headers=mjpeg_headers(),
+            )
+
+        async def mjpeg_stream_shared():
             boundary = "frame"
+            webcam_stream.add_client(s)
             try:
                 while True:
-                    jpg: bytes | None = None
-                    if path.is_file():
-                        try:
-                            raw = path.read_bytes()
-                            if raw:
-                                jpg = raw
-                        except OSError:
-                            jpg = None
-                    if not jpg:
-                        jpg = missing
+                    payload = webcam_stream.latest_jpg() or WEBCAM_JPEG_WAITING
                     chunk = (
                         f"--{boundary}\r\n"
                         "Content-Type: image/jpeg\r\n"
-                        f"Content-Length: {len(jpg)}\r\n\r\n"
-                    ).encode("utf-8") + jpg + b"\r\n"
+                        f"Content-Length: {len(payload)}\r\n\r\n"
+                    ).encode("utf-8") + payload + b"\r\n"
                     yield chunk
-                    await asyncio.sleep(0.2)
+                    await asyncio.sleep(0.03)
             except asyncio.CancelledError:
                 return
+            finally:
+                webcam_stream.remove_client()
 
         return StreamingResponse(
-            mjpeg_stream(),
+            mjpeg_stream_shared(),
             media_type="multipart/x-mixed-replace; boundary=frame",
             headers=mjpeg_headers(),
         )
 
-    @router.get("/api/preview/live_direct/thermal")
-    async def preview_live_direct_thermal() -> StreamingResponse:
+    @router.get("/api/preview/live/{sensor}")
+    async def preview_live(sensor: SensorName) -> StreamingResponse:
+        if sensor == "webcam":
+            return await ai_camera_live_mjpeg()
         s = load(layer8_dir)
-        rel = (s.get("thermal") or {}).get("live_frame") or ""
+        rel = (s.get(sensor) or {}).get("live_frame") or ""
         rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        label = {"thermal": "Thermal", "mmwave": "mmWave"}.get(sensor, str(sensor))
         missing = mjpeg_placeholder_jpeg(
-            "Thermal: no live JPEG yet",
-            f"Expected file: {rpath.name if rpath else 'configure thermal.live_frame'}",
-            "Start thermal runner or fix live_frame in settings.",
+            f"{label}: no live JPEG yet",
+            f"Expected file: {rpath.name if rpath else f'configure {sensor}.live_frame'}",
+            "Start the sensor runner or fix live_frame in settings.",
         )
 
         async def mjpeg_stream():
@@ -523,74 +664,9 @@ def build_router(layer8_dir: Path) -> APIRouter:
             headers=mjpeg_headers(),
         )
 
-    @router.get("/api/preview/live_direct/webcam")
-    async def preview_live_direct_webcam() -> StreamingResponse:
-        st = sensor_runner.status("webcam", layer8_dir)
-        s = load(layer8_dir)
-
-        if bool(st.get("running")):
-            rel = (s.get("webcam") or {}).get("live_frame") or ""
-            rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-            runner_missing = mjpeg_placeholder_jpeg(
-                "Webcam runner is ON (subprocess holds the camera).",
-                "Showing JPEG from webcam.live_frame if the runner is writing it.",
-                (rpath.name if rpath else "configure webcam.live_frame"),
-            )
-
-            async def mjpeg_runner_file():
-                boundary = "frame"
-                try:
-                    while True:
-                        jpg: bytes | None = webcam_ipc_reader.read_latest()
-                        if rpath is not None and rpath.is_file():
-                            try:
-                                raw = rpath.read_bytes()
-                                if raw:
-                                    jpg = raw
-                            except OSError:
-                                jpg = None
-                        if not jpg:
-                            jpg = runner_missing
-                        chunk = (
-                            f"--{boundary}\r\n"
-                            "Content-Type: image/jpeg\r\n"
-                            f"Content-Length: {len(jpg)}\r\n\r\n"
-                        ).encode("utf-8") + jpg + b"\r\n"
-                        yield chunk
-                        # Poll faster so display cadence is less likely to be the bottleneck.
-                        await asyncio.sleep(0.02)
-                except asyncio.CancelledError:
-                    return
-
-            return StreamingResponse(
-                mjpeg_runner_file(),
-                media_type="multipart/x-mixed-replace; boundary=frame",
-                headers=mjpeg_headers(),
-            )
-
-        async def mjpeg_stream():
-            boundary = "frame"
-            webcam_stream.add_client(s)
-            try:
-                while True:
-                    payload = webcam_stream.latest_jpg() or WEBCAM_JPEG_WAITING
-                    chunk = (
-                        f"--{boundary}\r\n"
-                        "Content-Type: image/jpeg\r\n"
-                        f"Content-Length: {len(payload)}\r\n\r\n"
-                    ).encode("utf-8") + payload + b"\r\n"
-                    yield chunk
-                    await asyncio.sleep(0.03)
-            except asyncio.CancelledError:
-                return
-            finally:
-                webcam_stream.remove_client()
-
-        return StreamingResponse(
-            mjpeg_stream(),
-            media_type="multipart/x-mixed-replace; boundary=frame",
-            headers=mjpeg_headers(),
-        )
+    @router.get("/api/ai_camera/preview/live")
+    async def ai_camera_preview_live() -> StreamingResponse:
+        return await ai_camera_live_mjpeg()
 
     @router.websocket("/ws/thermal")
     async def websocket_thermal(websocket: WebSocket) -> None:
@@ -667,6 +743,8 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 webcam_stream.remove_client()
 
     @router.post("/api/webrtc/webcam/offer")
+    @router.post("/api/ai_camera/webrtc/offer")
+    @router.post("/api/webrtc/ai_camera/offer")
     async def webrtc_webcam_offer(body: WebRTCOfferBody) -> dict[str, str]:
         try:
             from aiortc import RTCPeerConnection, RTCSessionDescription, VideoStreamTrack
@@ -705,12 +783,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 if self._last_bgr is None:
                     jpg = webcam_ipc_reader.read_latest()
                 if not jpg and self._last_bgr is None:
-                    st = sensor_runner.status("webcam", layer8_dir)
-                    if not bool(st.get("running")):
-                        s = load(layer8_dir)
-                        webcam_stream.add_client(s)
-                        jpg = webcam_stream.latest_jpg()
-                        webcam_stream.remove_client()
+                    jpg = webcam_stream.latest_jpg()
                 if jpg and jpg != self._last_jpg:
                     decoded = _jpeg_to_bgr(jpg)
                     if decoded is not None:
@@ -727,18 +800,33 @@ def build_router(layer8_dir: Path) -> APIRouter:
 
         pc = RTCPeerConnection()
         webrtc_peers.add(pc)
+        hold_shared_webcam_preview: list[bool] = [False]
+
+        def _release_shared_webcam_preview() -> None:
+            if not hold_shared_webcam_preview[0]:
+                return
+            webcam_stream.remove_client()
+            hold_shared_webcam_preview[0] = False
 
         @pc.on("connectionstatechange")
         async def _on_state_change() -> None:
             if pc.connectionState in ("failed", "closed", "disconnected"):
+                _release_shared_webcam_preview()
                 webrtc_peers.discard(pc)
                 await pc.close()
 
-        pc.addTrack(WebcamJpegTrack())
-        await pc.setRemoteDescription(RTCSessionDescription(sdp=body.sdp, type=body.type))
-        answer = await pc.createAnswer()
-        await pc.setLocalDescription(answer)
-        return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+        try:
+            if not bool(sensor_runner.status("webcam", layer8_dir).get("running")):
+                webcam_stream.add_client(load(layer8_dir))
+                hold_shared_webcam_preview[0] = True
+            pc.addTrack(WebcamJpegTrack())
+            await pc.setRemoteDescription(RTCSessionDescription(sdp=body.sdp, type=body.type))
+            answer = await pc.createAnswer()
+            await pc.setLocalDescription(answer)
+            return {"sdp": pc.localDescription.sdp, "type": pc.localDescription.type}
+        except Exception:
+            _release_shared_webcam_preview()
+            raise
 
     @router.get("/embed/thermal")
     def embed_thermal_page() -> FileResponse:
@@ -754,6 +842,14 @@ def build_router(layer8_dir: Path) -> APIRouter:
         p = layer8_dir / "static" / "embed_webcam.html"
         if not p.is_file():
             raise HTTPException(404, "static/embed_webcam.html missing")
+        return FileResponse(p, media_type="text/html")
+
+    @router.get("/embed/webcam_mjpeg")
+    def embed_webcam_mjpeg_page() -> FileResponse:
+        """Webcam preview via ``/api/ai_camera/preview/live`` (MJPEG); handy for second screens / Tailscale."""
+        p = layer8_dir / "static" / "embed_webcam_mjpeg.html"
+        if not p.is_file():
+            raise HTTPException(404, "static/embed_webcam_mjpeg.html missing")
         return FileResponse(p, media_type="text/html")
 
     @router.get("/api/preview/output/mmwave")
@@ -834,6 +930,10 @@ def build_router(layer8_dir: Path) -> APIRouter:
     def one_status(sensor: SensorName) -> dict[str, Any]:
         return sensor_runner.status(sensor, layer8_dir)
 
+    @router.get("/api/ai_camera/status")
+    def ai_camera_status() -> dict[str, Any]:
+        return sensor_runner.status("webcam", layer8_dir)
+
     @router.post("/api/run/{sensor}")
     def run_sensor(sensor: SensorName) -> dict[str, Any]:
         s = load(layer8_dir)
@@ -852,9 +952,17 @@ def build_router(layer8_dir: Path) -> APIRouter:
             return JSONResponse(result, status_code=409)
         return result
 
+    @router.post("/api/ai_camera/run")
+    def ai_camera_run() -> Any:
+        return run_sensor("webcam")
+
     @router.post("/api/stop/{sensor}")
     def stop_sensor(sensor: SensorName) -> dict[str, Any]:
         return sensor_runner.stop(sensor, layer8_dir)
+
+    @router.post("/api/ai_camera/stop")
+    def ai_camera_stop() -> dict[str, Any]:
+        return sensor_runner.stop("webcam", layer8_dir)
 
     @router.post("/api/restart/{sensor}")
     def restart_sensor(sensor: SensorName) -> dict[str, Any]:
@@ -873,6 +981,10 @@ def build_router(layer8_dir: Path) -> APIRouter:
         if not result.get("ok"):
             return JSONResponse(result, status_code=409)
         return result
+
+    @router.post("/api/ai_camera/restart")
+    def ai_camera_restart() -> Any:
+        return restart_sensor("webcam")
 
     @router.post("/api/run_all")
     def run_all_sensors() -> dict[str, Any]:

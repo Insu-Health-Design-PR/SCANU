@@ -22,7 +22,7 @@
     "video": "",
     "live_frame": "layer8_ui/artifacts/live_webcam.jpg",
     "output": "",
-    "webcam_device": 2,
+    "webcam_device": 0,
     "webcam_auto_detect": 1,
     "webcam_detect_max_index": 8,
     "webcam_detect_retry_s": 8,

@@ -10,9 +10,11 @@ import cv2
 import numpy as np
 
 _MJPEG_HEADERS = {
-    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+    "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, no-transform",
     "Pragma": "no-cache",
     "Expires": "0",
+    # Allow chunked multipart streams through reverse proxies (nginx, etc.).
+    "X-Accel-Buffering": "no",
 }
 
 
