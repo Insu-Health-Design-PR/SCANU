@@ -5,6 +5,9 @@ Parses the TLV data structures from IWR6843 frames to extract:
 - Detected points (x, y, z, doppler)
 - Range profile
 - Noise profile
+- Azimuth static heatmap (range-azimuth 2D)
+- Range-doppler heatmap (range-doppler 2D)
+- Azimuth-elevation heatmap (3D)
 - Statistics
 - Side info (SNR, noise per point)
 """
@@ -80,6 +83,9 @@ class ParsedFrame:
     points: List[DetectedPoint] = field(default_factory=list)
     range_profile: Optional[np.ndarray] = None
     noise_profile: Optional[np.ndarray] = None
+    azimuth_static_heatmap: Optional[np.ndarray] = None
+    range_doppler_heatmap: Optional[np.ndarray] = None
+    azimuth_elevation_heatmap: Optional[np.ndarray] = None
     stats: Dict[str, Any] = field(default_factory=dict)
     raw_tlvs: Dict[int, bytes] = field(default_factory=dict)
 
@@ -103,7 +109,9 @@ class ParsedFrame:
         return (
             f"Frame #{self.frame_number}: "
             f"{len(self.points)} points, "
-            f"range_profile={'yes' if self.range_profile is not None else 'no'}"
+            f"range_profile={'yes' if self.range_profile is not None else 'no'}, "
+            f"range_doppler={'yes' if self.range_doppler_heatmap is not None else 'no'}, "
+            f"azimuth_static={'yes' if self.azimuth_static_heatmap is not None else 'no'}"
         )
 
 
@@ -168,6 +176,12 @@ class TLVParser:
             self._parse_side_info(data, result)
         elif tlv_type == TLVType.STATS:
             self._parse_stats(data, result)
+        elif tlv_type == TLVType.AZIMUTH_STATIC_HEATMAP:
+            self._parse_azimuth_static_heatmap(data, result)
+        elif tlv_type == TLVType.RANGE_DOPPLER_HEATMAP:
+            self._parse_range_doppler_heatmap(data, result)
+        elif tlv_type == TLVType.AZIMUTH_ELEVATION_HEATMAP:
+            self._parse_azimuth_elevation_heatmap(data, result)
         else:
             logger.debug(f"Unhandled TLV type {tlv_type} ({len(data)} bytes)")
 
@@ -212,6 +226,24 @@ class TLVParser:
                 "inter_frame_cpu_load": inter_frame_cpu_load,
             }
         )
+
+    def _parse_azimuth_static_heatmap(self, data: bytes, result: ParsedFrame) -> None:
+        heatmap = np.frombuffer(data, dtype=np.uint16).astype(np.float32)
+        heatmap = heatmap / 2.0
+        result.azimuth_static_heatmap = heatmap
+        logger.debug(f"Parsed azimuth static heatmap: {heatmap.shape}")
+
+    def _parse_range_doppler_heatmap(self, data: bytes, result: ParsedFrame) -> None:
+        heatmap = np.frombuffer(data, dtype=np.uint16).astype(np.float32)
+        heatmap = heatmap / 2.0
+        result.range_doppler_heatmap = heatmap
+        logger.debug(f"Parsed range-doppler heatmap: {heatmap.shape}")
+
+    def _parse_azimuth_elevation_heatmap(self, data: bytes, result: ParsedFrame) -> None:
+        heatmap = np.frombuffer(data, dtype=np.uint16).astype(np.float32)
+        heatmap = heatmap / 2.0
+        result.azimuth_elevation_heatmap = heatmap
+        logger.debug(f"Parsed azimuth-elevation heatmap: {heatmap.shape}")
 
 
 def parse_frame(frame: bytes) -> ParsedFrame:

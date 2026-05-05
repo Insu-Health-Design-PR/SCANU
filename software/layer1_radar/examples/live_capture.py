@@ -35,6 +35,8 @@ from layer1_radar import (
     RadarConfigurator,
     UARTSource,
     TLVParser,
+    WPN_CONFIG,
+    WPN_FIRST_START,
 )
 from layer1_radar import ThermalCameraSource
 
@@ -161,8 +163,8 @@ def main():
 
     parser.add_argument("--frames", "-n", type=int, default=300,
                         help="Number of frames (~300 = 30 sec @10FPS)")
-    parser.add_argument("--config", "-c", required=True,
-                        help="Path to FULL radar config file")
+    parser.add_argument("--config", "-c", default=None,
+                        help="Path to FULL radar config file (ignored when --wpn is set)")
     parser.add_argument("--cli-port", required=True)
     parser.add_argument("--data-port", required=True)
     parser.add_argument("--video", "-vout", default="radar_output.mp4",
@@ -191,6 +193,15 @@ def main():
         help=(
             "Overlay high-motion points in red as a coarse cue. "
             "This is NOT true weapon detection."
+        ),
+    )
+    parser.add_argument(
+        "--wpn",
+        action="store_true",
+        help=(
+            "Apply weapon-optimised radar config (192 chirps, CFAR 6 dB, "
+            "clutter removal). Enables real Range-Doppler + azimuth-static "
+            "heatmap TLVs for micro-Doppler weapon detection."
         ),
     )
     parser.add_argument(
@@ -296,9 +307,18 @@ def main():
         serial_mgr.flush_data_port()
 
         # 2. Configure
-        print("\n[2/4] Sending FULL config...")
+        print("\n[2/4] Sending config...")
         configurator = RadarConfigurator(serial_mgr)
-        result = configurator.configure_from_file(Path(args.config))
+
+        if args.wpn:
+            print("Using weapon-optimised config (192 chirps, CFAR 6 dB)")
+            result = configurator.configure_weapon()
+        elif args.config:
+            print(f"Using file config: {args.config}")
+            result = configurator.configure_from_file(Path(args.config))
+        else:
+            print("ERROR: either --config <path> or --wpn must be specified")
+            return
 
         if not result.success:
             print("\nConfig FAILED:")
@@ -377,6 +397,21 @@ def main():
         uart_source = UARTSource(serial_mgr)
         tlv_parser = TLVParser()
 
+        wpn_tracker = None
+        wpn_processor = None
+        if args.wpn:
+            from software.layer2_signal_processing import WeaponTracker, SignalProcessor
+            wpn_tracker = WeaponTracker()
+            wpn_processor = SignalProcessor(
+                doppler_bins=16,
+                cfar_guard=1,
+                cfar_train=2,
+                cfar_threshold_scale=1.8,
+                weapon_cfar_threshold_scale=1.2,
+                num_range_bins=256,
+            )
+            print("Weapon tracker + processor initialised")
+
         inf_presence_hist: "deque[float]" = deque(maxlen=int(fps * 30))
         inf_motion_hist: "deque[float]" = deque(maxlen=int(fps * 30))
 
@@ -435,6 +470,12 @@ def main():
                 recoveries = 0
                 parsed = tlv_parser.parse(raw_frame)
 
+                if args.wpn and wpn_processor is not None:
+                    try:
+                        processed = wpn_processor.process(parsed)
+                    except Exception:
+                        processed = None
+
                 x = [p.x for p in parsed.points]
                 y = [p.y for p in parsed.points]
                 doppler = [p.doppler for p in parsed.points]
@@ -467,6 +508,19 @@ def main():
                             overlay_scatter.set_offsets(points_xy[moving_idx])
                         else:
                             overlay_scatter.set_offsets(np.empty((0, 2)))
+                    elif args.wpn:
+                        pc_arr = parsed.get_point_cloud_with_snr()
+                        tracks = wpn_tracker.update(pc_arr)
+                        threats = [t for t in tracks if t.weapon_confidence > 0.3]
+                        if threats:
+                            threat_xy = np.array([t.centroid[:2] for t in threats])
+                            overlay_scatter.set_offsets(threat_xy)
+                            overlay_scatter.set_sizes([80 + t.weapon_confidence * 120 for t in threats])
+                        else:
+                            overlay_scatter.set_offsets(np.empty((0, 2)))
+                        top = wpn_tracker.top_threat()
+                        if top:
+                            ax.set_title(f"WPN conf: {top.weapon_confidence:.2f} | doppler var: {top.doppler_variance:.3f} | size: {top.spatial_extent:.2f}m")
                     else:
                         overlay_scatter.set_offsets(np.empty((0, 2)))
                 else:
@@ -551,12 +605,20 @@ def main():
                             "width": int(thermal_bgr.shape[1]),
                             "height": int(thermal_bgr.shape[0]),
                         }
-                    frames_data.append({
+                    frame_entry = {
                         "frame": parsed.frame_number,
                         "points": [p.to_dict() for p in parsed.points],
                         "thermal": thermal_payload,
                         "infineon": inf_sample,
-                    })
+                    }
+                    if args.wpn and wpn_tracker is not None:
+                        top = wpn_tracker.top_threat()
+                        frame_entry["weapon_track"] = top.to_dict() if top else None
+                        if processed is not None:
+                            frame_entry["micro_doppler_bw"] = processed.micro_doppler_bandwidth
+                            frame_entry["doppler_centroid"] = processed.doppler_centroid
+                            frame_entry["azimuth_static_peak"] = processed.azimuth_static_peak
+                    frames_data.append(frame_entry)
 
                 i += 1
 

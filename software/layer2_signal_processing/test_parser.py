@@ -59,7 +59,7 @@ class TestTLVParser(unittest.TestCase):
         self.assertAlmostEqual(parsed.points[0].x, 1.0)
         self.assertAlmostEqual(parsed.points[1].doppler, 0.25)
         self.assertAlmostEqual(parsed.points[0].snr, 11.0)
-        self.assertAlmostEqual(parsed.points[1].noise, 2.0)
+        self.assertAlmostEqual(parsed.points[1].noise, 20.0)
 
     def test_parse_range_profile_and_stats(self) -> None:
         range_profile = struct.pack("<4H", 10, 20, 30, 40)

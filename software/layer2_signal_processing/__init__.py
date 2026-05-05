@@ -4,6 +4,7 @@ from .calibration import BackgroundModel
 from .feature_extractor import FeatureExtractor, HeatmapFeatures
 from .frame_buffer import FrameBuffer
 from .signal_processor import ProcessedFrame, SignalProcessor
+from .weapon_tracker import WeaponTracker, TrackedCluster
 
 __all__ = [
     "BackgroundModel",
@@ -12,4 +13,6 @@ __all__ = [
     "HeatmapFeatures",
     "ProcessedFrame",
     "SignalProcessor",
+    "WeaponTracker",
+    "TrackedCluster",
 ]
