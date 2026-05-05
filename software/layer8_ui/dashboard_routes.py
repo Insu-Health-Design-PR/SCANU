@@ -28,16 +28,21 @@ from layer8_ui.preview_media import (
 from layer8_ui.settings_store import DEFAULT_SETTINGS, load, reset_webcam_weapon_defaults, save
 
 try:
-    from layer6_state_machine.models import SystemHealth
+    from layer6_state_machine.models import SystemHealth, WeaponStateMachineConfig
     from layer6_state_machine.orchestrator import Layer6Orchestrator
+    from layer6_state_machine.state_machine import StateMachine
 except Exception:  # pragma: no cover
     Layer6Orchestrator = None  # type: ignore[assignment]
     SystemHealth = None  # type: ignore[assignment]
+    WeaponStateMachineConfig = None  # type: ignore[assignment]
+    StateMachine = None  # type: ignore[assignment]
 
 try:
     from layer7_alerts.integration import L6ToL7Bridge
+    from layer7_alerts.event_logger import EventLogger
 except Exception:  # pragma: no cover
     L6ToL7Bridge = None  # type: ignore[assignment]
+    EventLogger = None  # type: ignore[assignment]
 
 SensorName = Literal["thermal", "webcam", "mmwave"]
 
@@ -267,8 +272,8 @@ def build_router(layer8_dir: Path) -> APIRouter:
     thermal_stream = thermal_runner.get_thermal_shared_stream(layer8_dir)
     webcam_stream = webcam_runner.get_webcam_shared_stream(layer8_dir)
     router = APIRouter()
-    layer6_orchestrator = Layer6Orchestrator() if Layer6Orchestrator is not None else None
-    layer7_bridge = L6ToL7Bridge() if L6ToL7Bridge is not None else None
+    layer6_orchestrator = Layer6Orchestrator(state_machine=StateMachine(config=WeaponStateMachineConfig())) if Layer6Orchestrator is not None else None
+    layer7_bridge = L6ToL7Bridge(logger=EventLogger(file_path=layer8_dir / "artifacts" / "alerts.jsonl")) if L6ToL7Bridge is not None else None
     layer7_recent_alerts: deque[dict[str, Any]] = deque(maxlen=200)
     layer6_cache: dict[str, Any] = {
         "ts_ms": 0.0,
@@ -349,6 +354,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
         online_count = sum(1 for s in statuses.values() if bool(s.get("running")))
         metrics = _read_metrics()
         point_cloud = _read_point_cloud()
+        mmwave_frame = _read_last_mmwave_frame()
         confidence = 0.0
         if isinstance(metrics.get("unsafe_score"), (int, float)):
             confidence = float(metrics["unsafe_score"])
@@ -359,7 +365,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
         fused_score = confidence
         active_radars: list[str] = ["radar_main"] if bool(statuses.get("mmwave", {}).get("running")) else []
 
-        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud)
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud, mmwave_frame=mmwave_frame)
         snapshot = l6.get("snapshot")
         if snapshot is not None:
             snap_state = getattr(snapshot, "state", state)
@@ -420,18 +426,9 @@ def build_router(layer8_dir: Path) -> APIRouter:
         return base64.b64encode(raw).decode("ascii")
 
     def _read_point_cloud() -> list[dict[str, float]]:
-        s = load(layer8_dir)
-        rel = (s.get("mmwave") or {}).get("output") or "layer8_ui/artifacts/mmwave_frames.json"
-        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-        if path is None or not path.is_file():
+        frame = _read_last_mmwave_frame()
+        if frame is None:
             return []
-        try:
-            payload = json.loads(path.read_text())
-        except (OSError, json.JSONDecodeError):
-            return []
-        if not isinstance(payload, list) or not payload:
-            return []
-        frame = payload[-1]
         points = frame.get("points") if isinstance(frame, dict) else []
         if not isinstance(points, list):
             return []
@@ -448,11 +445,26 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 continue
         return out
 
+    def _read_last_mmwave_frame() -> dict[str, Any] | None:
+        s = load(layer8_dir)
+        rel = (s.get("mmwave") or {}).get("output") or "layer8_ui/artifacts/mmwave_frames.json"
+        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        if path is None or not path.is_file():
+            return None
+        try:
+            payload = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, list) or not payload:
+            return None
+        return payload[-1] if isinstance(payload[-1], dict) else None
+
     def _layer6_tick(
         *,
         statuses: dict[str, dict[str, Any]],
         metrics: dict[str, Any],
         point_cloud: list[dict[str, float]],
+        mmwave_frame: dict[str, Any] | None = None,
         force: bool = False,
     ) -> dict[str, Any]:
         if layer6_orchestrator is None or SystemHealth is None:
@@ -467,17 +479,34 @@ def build_router(layer8_dir: Path) -> APIRouter:
             confidence = _to_float(metrics.get("unsafe_score"), 0.0)
         elif isinstance(metrics.get("unsafe_pct"), (int, float)):
             confidence = max(0.0, min(1.0, _to_float(metrics.get("unsafe_pct"), 0.0) / 100.0))
+
+        mmwave_payload: dict[str, Any] = {"points": point_cloud}
+        if mmwave_frame is not None:
+            wt = mmwave_frame.get("weapon_track")
+            if wt is not None:
+                mmwave_payload["weapon_track"] = wt
+            for field in (
+                "micro_doppler_bw",
+                "doppler_centroid",
+                "azimuth_static_peak",
+                "rcs_proxy_mean",
+            ):
+                if field in mmwave_frame:
+                    mmwave_payload[field] = mmwave_frame[field]
+
         raw_inputs = {
             "frame_number": _to_int(metrics.get("frame"), int(now_ms) % 1_000_000),
             "timestamp_ms": now_ms,
             "radar_id": "radar_main",
-            "mmwave_frame": {"points": point_cloud},
+            "mmwave_frame": mmwave_payload,
             "presence_frame": {
                 "presence_raw": confidence,
                 "motion_raw": confidence,
             },
             "thermal_presence": confidence,
             "fused_score": confidence,
+            "gun_detected": bool(metrics.get("gun_detected")),
+            "unsafe_score_l4": _to_float(metrics.get("unsafe_score"), 0.0),
         }
         health = SystemHealth(
             has_fault=(online_count == 0),
@@ -534,7 +563,8 @@ def build_router(layer8_dir: Path) -> APIRouter:
         metrics = _read_metrics()
         statuses = _sensor_statuses()
         point_cloud = _read_point_cloud()
-        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud, force=True)
+        mmwave_frame = _read_last_mmwave_frame()
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud, mmwave_frame=mmwave_frame, force=True)
         event = l6.get("event")
         snapshot = l6.get("snapshot")
         action_request = l6.get("action_request")
@@ -569,14 +599,18 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 }
             )
         if bool(metrics.get("gun_detected")):
-            alerts.append(
-                {
-                    "event_id": f"warn-{uuid.uuid4().hex[:8]}",
-                    "level": "warning",
-                    "timestamp_utc": _iso_now(),
-                    "message": "Gun-like object detected by webcam inference.",
-                }
-            )
+            gun_alert = _build_l7_gun_alert(metrics)
+            if gun_alert is not None:
+                alerts.append(gun_alert)
+            else:
+                alerts.append(
+                    {
+                        "event_id": f"warn-{uuid.uuid4().hex[:8]}",
+                        "level": "warning",
+                        "timestamp_utc": _iso_now(),
+                        "message": "Gun-like object detected by webcam inference.",
+                    }
+                )
         if isinstance(metrics.get("note"), str) and metrics["note"]:
             alerts.append(
                 {
@@ -597,13 +631,43 @@ def build_router(layer8_dir: Path) -> APIRouter:
             )
         return {"alerts": alerts[: max(1, int(limit))]}
 
+    def _build_l7_gun_alert(metrics: dict[str, Any]) -> dict[str, Any] | None:
+        if layer7_bridge is None:
+            return None
+        try:
+            from layer6_state_machine.models import StateEvent, SystemState
+            gun_conf = float(metrics.get("unsafe_score") or metrics.get("gun_confidence") or 0.75)
+            event = StateEvent(
+                previous_state=SystemState.IDLE,
+                current_state=SystemState.ANOMALY_DETECTED,
+                reason="gun_detected_l4",
+                frame_number=int(metrics.get("frame", 0)),
+                timestamp_ms=float(time.time() * 1000.0),
+                radar_id="camera_main",
+                scores={"unsafe_score": gun_conf, "gun_detected": 1.0},
+            )
+            payload = layer7_bridge.ingest(event)
+            return {
+                "event_id": payload.event_id,
+                "level": str(payload.level.value),
+                "timestamp_utc": payload.timestamp_utc,
+                "message": payload.message,
+                "state": payload.state,
+                "radar_id": payload.radar_id,
+                "scores": payload.scores,
+                "metadata": payload.metadata,
+            }
+        except Exception:
+            return None
+
     def _layers_summary_payload() -> dict[str, Any]:
         settings = load(layer8_dir)
         sw = software_root_from_settings(settings)
         statuses = _sensor_statuses()
         metrics = _read_metrics()
         point_cloud = _read_point_cloud()
-        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud)
+        mmwave_frame = _read_last_mmwave_frame()
+        l6 = _layer6_tick(statuses=statuses, metrics=metrics, point_cloud=point_cloud, mmwave_frame=mmwave_frame)
         snapshot = l6.get("snapshot")
 
         layer2_features = sw / "layer2_signal_processing" / "layer2_features.json"
@@ -1126,8 +1190,31 @@ def build_router(layer8_dir: Path) -> APIRouter:
             while True:
                 status_payload = _status_payload()
                 visual_payload = _visual_payload()
+                metrics = _read_metrics()
+                mmwave_frame = _read_last_mmwave_frame()
                 await websocket.send_json({"event_type": "status_update", "payload": status_payload})
                 await websocket.send_json({"event_type": "visual_update", "payload": visual_payload})
+
+                weapon_payload = {
+                    "state": status_payload.get("state", "IDLE"),
+                    "fused_score": status_payload.get("fused_score", 0.0),
+                    "gun_detected": bool(metrics.get("gun_detected")),
+                    "unsafe_score": float(metrics.get("unsafe_score") or 0.0),
+                }
+                if mmwave_frame is not None:
+                    wt = mmwave_frame.get("weapon_track")
+                    weapon_payload["weapon_confidence"] = wt.get("weapon_confidence", 0.0) if wt else 0.0
+                    weapon_payload["micro_doppler_bw"] = float(mmwave_frame.get("micro_doppler_bw", 0.0) or 0.0)
+                    weapon_payload["doppler_centroid"] = float(mmwave_frame.get("doppler_centroid", 0.0) or 0.0)
+                    weapon_payload["azimuth_static_peak"] = float(mmwave_frame.get("azimuth_static_peak", 0.0) or 0.0)
+                else:
+                    weapon_payload["weapon_confidence"] = 0.0
+                    weapon_payload["micro_doppler_bw"] = 0.0
+                    weapon_payload["doppler_centroid"] = 0.0
+                    weapon_payload["azimuth_static_peak"] = 0.0
+
+                await websocket.send_json({"event_type": "weapon_update", "payload": weapon_payload})
+
                 if bool(status_payload.get("health", {}).get("has_fault")):
                     await websocket.send_json(
                         {
@@ -1170,6 +1257,21 @@ def build_router(layer8_dir: Path) -> APIRouter:
             )
         return FileResponse(path, media_type="application/json", filename=path.name)
 
+    @router.get("/api/mmwave/output/stream")
+    async def stream_mmwave_output() -> StreamingResponse:
+        async def event_generator():
+            last_frame_number = 0
+            while True:
+                frame = _read_last_mmwave_frame()
+                if frame is not None:
+                    fn = frame.get("frame", 0)
+                    if fn != last_frame_number:
+                        last_frame_number = fn
+                        points = frame.get("points", []) if isinstance(frame, dict) else []
+                        yield f"data: {json.dumps({'frame': fn, 'points': points, 'ts': time.time(), 'presence': len(points) > 0 if points else False, 'num_objects': len(points) if points else 0})}\n\n"
+                await asyncio.sleep(0.08)
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+
     @router.get("/api/dashboard/metrics")
     def dashboard_metrics() -> dict[str, Any]:
         return _read_metrics()
@@ -1186,9 +1288,59 @@ def build_router(layer8_dir: Path) -> APIRouter:
     def get_recent_alerts(limit: int = 50) -> dict[str, Any]:
         return _alerts_payload(limit=limit)
 
+    @router.get("/api/alerts/history")
+    def get_alerts_history(from_iso: str = "", to_iso: str = "") -> dict[str, Any]:
+        if layer7_bridge is None:
+            return {"alerts": [], "total": 0}
+        all_alerts = layer7_bridge.logger.recent(limit=5000)
+        filtered = []
+        for a in all_alerts:
+            ts = a.timestamp_utc
+            if from_iso and ts < from_iso:
+                continue
+            if to_iso and ts > to_iso:
+                continue
+            filtered.append({
+                "event_id": a.event_id,
+                "level": str(a.level.value),
+                "timestamp_utc": ts,
+                "message": a.message,
+                "state": a.state,
+                "radar_id": a.radar_id,
+                "scores": a.scores,
+                "metadata": a.metadata,
+            })
+        return {"alerts": filtered, "total": len(filtered)}
+
     @router.get("/api/layers/summary")
     def get_layers_summary() -> dict[str, Any]:
         return _layers_summary_payload()
+
+    @router.get("/api/layer3/features/latest")
+    def get_layer3_features_latest() -> dict[str, Any]:
+        s = load(layer8_dir)
+        rel = (s.get("mmwave") or {}).get("layer3_output") or "layer8_ui/artifacts/layer3_features.json"
+        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        if path is None or not path.is_file():
+            return {"available": False, "features": None}
+        try:
+            frames = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            return {"available": False, "features": None}
+        if not isinstance(frames, list) or not frames:
+            return {"available": False, "features": None}
+        latest = frames[-1]
+        vector = latest.get("vector", []) if isinstance(latest, dict) else []
+        return {
+            "available": True,
+            "frame_count": len(frames),
+            "features": {
+                "frame_number": latest.get("frame_number"),
+                "timestamp_ms": latest.get("timestamp_ms"),
+                "vector": vector if isinstance(vector, list) else [],
+                "details": latest.get("features"),
+            },
+        }
 
     @router.get("/api/visual/latest")
     def get_visual_latest() -> dict[str, Any]:

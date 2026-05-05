@@ -54,6 +54,22 @@ def _write_live_frame(path_str: str | None, frame_bgr: np.ndarray) -> None:
     tmp.replace(p)
 
 
+def _append_json_line(path_str: str, entry: dict) -> None:
+    p = Path(path_str)
+    try:
+        existing = json.loads(p.read_text())
+    except (OSError, json.JSONDecodeError):
+        existing = []
+    if not isinstance(existing, list):
+        existing = []
+    existing.append(entry)
+    if len(existing) > 5000:
+        existing = existing[-5000:]
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    tmp.write_text(json.dumps(existing))
+    tmp.replace(p)
+
+
 def setup_logging(verbose=False):
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
@@ -162,7 +178,7 @@ def main():
     parser = argparse.ArgumentParser(description="Radar capture with video output")
 
     parser.add_argument("--frames", "-n", type=int, default=300,
-                        help="Number of frames (~300 = 30 sec @10FPS)")
+                        help="Number of frames (0 = run until SIGTERM)")
     parser.add_argument("--config", "-c", default=None,
                         help="Path to FULL radar config file (ignored when --wpn is set)")
     parser.add_argument("--cli-port", required=True)
@@ -203,6 +219,11 @@ def main():
             "clutter removal). Enables real Range-Doppler + azimuth-static "
             "heatmap TLVs for micro-Doppler weapon detection."
         ),
+    )
+    parser.add_argument(
+        "--layer3-output",
+        default="",
+        help="Optional JSON path to write Layer 3 feature vectors per frame.",
     )
     parser.add_argument(
         "--weapon-doppler-thresh",
@@ -399,8 +420,9 @@ def main():
 
         wpn_tracker = None
         wpn_processor = None
+        wpn_feature_extractor = None
         if args.wpn:
-            from software.layer2_signal_processing import WeaponTracker, SignalProcessor
+            from software.layer2_signal_processing import WeaponTracker, SignalProcessor, FeatureExtractor
             wpn_tracker = WeaponTracker()
             wpn_processor = SignalProcessor(
                 doppler_bins=16,
@@ -410,7 +432,12 @@ def main():
                 weapon_cfar_threshold_scale=1.2,
                 num_range_bins=256,
             )
-            print("Weapon tracker + processor initialised")
+            wpn_feature_extractor = FeatureExtractor()
+            if args.layer3_output:
+                _layer3_path = Path(args.layer3_output)
+                _layer3_path.parent.mkdir(parents=True, exist_ok=True)
+                _layer3_path.write_text("[]")
+            print("Weapon tracker + processor + feature extractor initialised")
 
         inf_presence_hist: "deque[float]" = deque(maxlen=int(fps * 30))
         inf_motion_hist: "deque[float]" = deque(maxlen=int(fps * 30))
@@ -429,7 +456,8 @@ def main():
 
         try:
             i = 0
-            while i < args.frames:
+            infinite = args.frames == 0
+            while infinite or i < args.frames:
                 raw_frame = uart_source.read_frame(timeout_ms=300)
                 if not raw_frame:
                     # Heartbeat + fail-fast when the data stream is dead.
@@ -588,10 +616,16 @@ def main():
                 elapsed = time.time() - start_time
                 fps_live = (i + 1) / elapsed if elapsed > 0 else 0
 
-                print(f"\rFrame {i+1}/{args.frames} | "
-                      f"Objects: {num_objects} | "
-                      f"Points: {len(parsed.points)} | "
-                      f"FPS: {fps_live:.1f}", end="")
+                if infinite:
+                    print(f"\rFrame {i+1} | "
+                          f"Objects: {num_objects} | "
+                          f"Points: {len(parsed.points)} | "
+                          f"FPS: {fps_live:.1f}", end="")
+                else:
+                    print(f"\rFrame {i+1}/{args.frames} | "
+                          f"Objects: {num_objects} | "
+                          f"Points: {len(parsed.points)} | "
+                          f"FPS: {fps_live:.1f}", end="")
 
                 # Optional JSON
                 if args.output:
@@ -619,6 +653,29 @@ def main():
                             frame_entry["doppler_centroid"] = processed.doppler_centroid
                             frame_entry["azimuth_static_peak"] = processed.azimuth_static_peak
                     frames_data.append(frame_entry)
+
+                    if args.wpn and wpn_feature_extractor is not None and processed is not None and args.layer3_output:
+                        try:
+                            l3_features = wpn_feature_extractor.extract(processed)
+                            l3_entry = {
+                                "frame_number": l3_features.frame_number,
+                                "timestamp_ms": l3_features.timestamp_ms,
+                                "vector": l3_features.vector.tolist(),
+                                "features": {
+                                    "point_count": l3_features.point_count,
+                                    "mean_snr": l3_features.mean_snr,
+                                    "max_snr": l3_features.max_snr,
+                                    "spatial_extent_m": l3_features.spatial_extent_m,
+                                    "rcs_proxy_mean": l3_features.rcs_proxy_mean,
+                                    "micro_doppler_bandwidth": l3_features.micro_doppler_bandwidth,
+                                    "doppler_centroid": l3_features.doppler_centroid,
+                                    "doppler_spread": l3_features.doppler_spread,
+                                    "azimuth_static_peak": l3_features.azimuth_static_peak,
+                                },
+                            }
+                            _append_json_line(args.layer3_output, l3_entry)
+                        except Exception:
+                            pass
 
                 i += 1
 

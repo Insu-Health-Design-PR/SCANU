@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from typing import Any
 
-from .fusion_adapter import L1L2FusionAdapter
+from .fusion_adapter import L1L2FusionAdapter  # deprecated — use layer5_fusion
 from .models import ActionRequest, ControlResult, StateEvent, StateSnapshot, SystemHealth, SystemState
 from .sensor_control import SensorControlManager
 from .state_machine import StateMachine

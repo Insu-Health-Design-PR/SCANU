@@ -13,7 +13,7 @@ from typing import Any
 
 import numpy as np
 
-from layer5_fusion.models import FusionInputContract
+from .models import FusionInputContract
 
 
 class L1L2FusionAdapter:

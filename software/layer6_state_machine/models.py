@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
 
+from layer5_fusion.models import FusionInputContract  # noqa: F401 — re-exported
+
 
 class SystemState(str, Enum):
     IDLE = "IDLE"
@@ -29,16 +31,12 @@ class StateMachineConfig:
 
 
 @dataclass(frozen=True, slots=True)
-class FusionInputContract:
-    frame_number: int
-    timestamp_ms: float
-    radar_id: str
-    fused_score: float
-    confidence: float
-    trigger_score: float
-    anomaly_score: float
-    source_mode: str = "provisional_l1_l2"
-    evidence: dict[str, float] = field(default_factory=dict)
+class WeaponStateMachineConfig(StateMachineConfig):
+    trigger_threshold: float = 0.25
+    scan_threshold: float = 0.35
+    anomaly_threshold: float = 0.55
+    anomaly_exit_threshold: float = 0.38
+    minimum_confidence: float = 0.25
 
 
 @dataclass(frozen=True, slots=True)

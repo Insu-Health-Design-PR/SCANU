@@ -1,6 +1,6 @@
 import numpy as np
 
-from software.layer6_state_machine.fusion_adapter import L1L2FusionAdapter
+from software.layer5_fusion import L1L2FusionAdapter
 
 
 class _Presence:

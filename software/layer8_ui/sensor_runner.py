@@ -84,12 +84,15 @@ def build_mmwave_command(settings: dict[str, Any], layer8_dir: Path) -> list[str
     py = os.environ.get("PYTHON", sys.executable)
     m = settings.get("mmwave") or {}
     script = mmwave_capture_script(sw)
-    cmd = [py, str(script), "--frames", str(int(m.get("frames", 100)))]
+    cmd = [py, str(script), "--frames", str(int(m.get("frames", 0)))]
     if bool(int(m.get("mmwave_only", 1))):
         cmd.append("--mmwave-only")
-    cfg = (m.get("config") or "").strip()
-    if cfg:
-        cmd.extend(["--config", cfg])
+    if m.get("wpn"):
+        cmd.append("--wpn")
+    else:
+        cfg = (m.get("config") or "").strip()
+        if cfg:
+            cmd.extend(["--config", cfg])
     cli = (m.get("cli_port") or "").strip()
     if cli:
         cmd.extend(["--cli-port", cli])
@@ -105,6 +108,9 @@ def build_mmwave_command(settings: dict[str, Any], layer8_dir: Path) -> list[str
     live = (m.get("live_frame") or "").strip()
     if live:
         cmd.extend(["--live-frame", live])
+    layer3 = (m.get("layer3_output") or "").strip()
+    if layer3:
+        cmd.extend(["--layer3-output", layer3])
     timeout = m.get("no_frame_timeout_s")
     if timeout is not None and float(timeout) > 0:
         cmd.extend(["--no-frame-timeout-s", str(float(timeout))])
