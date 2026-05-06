@@ -5,7 +5,7 @@ SCANU Control Panel — terminal menu for sensors, cameras, recording & JSON exp
 Usage:
     cd ~/Desktop/SCANU-dev_adrian/software
     source .venv/bin/activate
-    python3 run.py
+    python3 layer8_ui/scripts/run.py
 
 The script starts the Layer 8 backend, detects the Tailscale IP, and presents
 a menu to start/stop sensors, record video, dump JSON, and view live metrics.
@@ -15,37 +15,47 @@ from __future__ import annotations
 
 import json
 import os
-import signal
 import subprocess
 import sys
 import time
 import urllib.request
-import urllib.error
 from pathlib import Path
+from typing import Any, Dict, Optional
 
-SOFTWARE_DIR = Path(__file__).resolve().parent
+SCRIPT_PATH = Path(__file__).resolve()
+SCRIPT_DIR = SCRIPT_PATH.parent
+LAYER8_DIR = SCRIPT_DIR.parent
+SOFTWARE_DIR = LAYER8_DIR.parent
 PROJECT_DIR = SOFTWARE_DIR.parent
+ARTIFACTS_DIR = LAYER8_DIR / "artifacts"
+LOG_DIR = LAYER8_DIR / "logs"
 BACKEND_HOST = os.environ.get("BACKEND_HOST", "0.0.0.0")
 BACKEND_PORT = int(os.environ.get("BACKEND_PORT", "8088"))
+API_KEY = os.environ.get("LAYER8_API_KEY", "").strip()
 BASE_URL = f"http://127.0.0.1:{BACKEND_PORT}"
+BACKEND_LOG = LOG_DIR / "backend.menu.log"
 
 
 # ── helpers ──────────────────────────────────────────────────────────
 
-def _req(method: str, path: str, data: bytes | None = None, timeout: float = 5.0) -> dict | None:
+def _req(method: str, path: str, data: Optional[bytes] = None, timeout: float = 5.0) -> Optional[Dict[str, Any]]:
     try:
-        req = urllib.request.Request(f"{BASE_URL}{path}", data=data, method=method)
+        headers = {}
+        if API_KEY:
+            headers["X-Layer8-Api-Key"] = API_KEY
+        req = urllib.request.Request(f"{BASE_URL}{path}", data=data, headers=headers, method=method)
         with urllib.request.urlopen(req, timeout=timeout) as r:
-            return json.loads(r.read())
+            raw = r.read()
+            return json.loads(raw) if raw else {}
     except Exception:
         return None
 
 
-def api_get(path: str) -> dict | None:
+def api_get(path: str) -> Optional[Dict[str, Any]]:
     return _req("GET", path)
 
 
-def api_post(path: str) -> dict | None:
+def api_post(path: str) -> Optional[Dict[str, Any]]:
     return _req("POST", path)
 
 
@@ -61,7 +71,7 @@ bold = lambda t: color(t, 1)
 dim = lambda t: color(t, 2)
 
 
-def sensor_icon(st: dict | None) -> str:
+def sensor_icon(st: Optional[Dict[str, Any]]) -> str:
     if st is None:
         return red("● OFFLINE")
     if st.get("running"):
@@ -69,7 +79,7 @@ def sensor_icon(st: dict | None) -> str:
     return yellow("○ STOPPED")
 
 
-def weapon_badge(metrics: dict | None) -> str:
+def weapon_badge(metrics: Optional[Dict[str, Any]]) -> str:
     if not metrics:
         return dim("—")
     if metrics.get("gun_detected"):
@@ -100,15 +110,19 @@ def press_enter():
 # ── backend subprocess ───────────────────────────────────────────────
 
 def start_backend() -> subprocess.Popen:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
-    env["PYTHONPATH"] = f"{PROJECT_DIR}{os.pathsep}{SOFTWARE_DIR}"
+    env["PYTHONPATH"] = f"{PROJECT_DIR}{os.pathsep}{SOFTWARE_DIR}{os.pathsep}{env.get('PYTHONPATH', '')}"
+    if API_KEY:
+        env["LAYER8_API_KEY"] = API_KEY
+    log = BACKEND_LOG.open("ab")
     return subprocess.Popen(
         [sys.executable, "-m", "uvicorn", "layer8_ui.app:app",
          "--host", BACKEND_HOST, "--port", str(BACKEND_PORT)],
         cwd=str(SOFTWARE_DIR),
         env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+        stdout=log,
+        stderr=subprocess.STDOUT,
     )
 
 
@@ -121,10 +135,19 @@ def wait_for_backend(timeout: float = 15.0) -> bool:
     return False
 
 
+def print_backend_log_tail() -> None:
+    if not BACKEND_LOG.is_file():
+        print(dim(f"No backend log found at {BACKEND_LOG}"))
+        return
+    tail = BACKEND_LOG.read_text(errors="replace")[-3000:]
+    print(bold(f"\nBackend log tail: {BACKEND_LOG}\n"))
+    print(tail)
+
+
 # ── JSON dump ────────────────────────────────────────────────────────
 
 def dump_json():
-    out_dir = SOFTWARE_DIR / "layer8_ui" / "artifacts"
+    out_dir = ARTIFACTS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     ts = time.strftime("%Y%m%d_%H%M%S")
     path = out_dir / f"snapshot_{ts}.json"
@@ -211,8 +234,8 @@ def live_metrics():
 # ── view logs ────────────────────────────────────────────────────────
 
 def view_logs():
-    log_dir = SOFTWARE_DIR / "layer8_ui" / "logs"
-    sensors = ["mmwave", "webcam", "thermal", "backend"]
+    log_dir = LOG_DIR
+    sensors = ["mmwave", "webcam", "thermal", "backend", "backend.menu"]
     for name in sensors:
         path = log_dir / f"{name}.log"
         if path.is_file():
@@ -228,22 +251,29 @@ def view_logs():
 def main():
     ts_ip = get_tailscale_ip()
 
-    print(bold("\nStarting SCANU backend..."), end=" ", flush=True)
-    backend = start_backend()
-    if not wait_for_backend():
-        print(red("FAILED"))
-        backend.kill()
-        sys.exit(1)
-    print(green("OK"))
+    backend: Optional[subprocess.Popen] = None
+    if api_get("/api/health"):
+        print(green("\nSCANU backend already running."))
+    else:
+        print(bold("\nStarting SCANU backend..."), end=" ", flush=True)
+        backend = start_backend()
+        if not wait_for_backend():
+            print(red("FAILED"))
+            if backend.poll() is None:
+                backend.kill()
+            print_backend_log_tail()
+            sys.exit(1)
+        print(green("OK"))
 
     def cleanup():
         print("\nShutting down...")
         api_post("/api/stop_all")
-        backend.terminate()
-        try:
-            backend.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            backend.kill()
+        if backend is not None and backend.poll() is None:
+            backend.terminate()
+            try:
+                backend.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                backend.kill()
         print("Done.")
 
     try:
