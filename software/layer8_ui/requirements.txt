@@ -1,4 +1,5 @@
 fastapi>=0.109.0
 uvicorn[standard]>=0.27.0
+eval-type-backport>=0.2.0; python_version < "3.10"
 # Webcam weapon preview uses ../layer4_inference (torch, ultralytics, opencv).
 # See ../layer4_inference/requirements.txt on Jetson / PC.
