@@ -40,7 +40,7 @@ git checkout dev_adrian
 ### 1.4 Entorno virtual Python
 
 ```bash
-cd ~/Desktop/SCANU
+cd ~/Desktop/SCANU/software
 python3 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip setuptools wheel
@@ -50,17 +50,17 @@ pip install --upgrade pip setuptools wheel
 
 ```bash
 # Capa 1 — Radar + sensores
-pip install -r software/layer1_radar/requirements.txt
+pip install -r layer1_radar/requirements.txt
 
 # Capa 4 — Inferencia AI (PyTorch, YOLOv8, OpenCV)
 # En Jetson: usar wheels oficiales de NVIDIA para PyTorch
 # Ver https://forums.developer.nvidia.com/t/pytorch-for-jetson/72048
 # Ejemplo para JetPack 6 / L4T R36:
 # wget https://developer.download.nvidia.com/compute/redist/jp/v61/pytorch/...
-pip install -r software/layer4_inference/requirements.txt
+pip install -r layer4_inference/requirements.txt
 
 # Capa 8 — Dashboard backend (FastAPI)
-pip install -r software/layer8_ui/requirements.txt
+pip install -r layer8_ui/requirements.txt
 ```
 
 ### 1.6 Infineon Radar SDK (sensor de presencia LTR11)
@@ -87,9 +87,9 @@ sudo tailscale up
 ### 1.8 Verificar instalación
 
 ```bash
-cd ~/Desktop/SCANU
+cd ~/Desktop/SCANU/software
 source .venv/bin/activate
-PYTHONPATH="$PWD:$PWD/software" python3 -c "
+PYTHONPATH="$PWD" python3 -c "
 from layer5_fusion import L1L2FusionAdapter
 from layer6_state_machine.orchestrator import Layer6Orchestrator
 from layer6_state_machine.models import WeaponStateMachineConfig
@@ -194,9 +194,8 @@ Editar `software/layer8_ui/ui_settings.json` en el Jetson:
 ### 4.1 En el Jetson
 
 ```bash
-cd ~/Desktop/SCANU
-source .venv/bin/activate
-python3 -m uvicorn layer8_ui.app:app --host 0.0.0.0 --port 8088
+cd ~/Desktop/SCANU/software/layer8_ui
+./scripts/layer8.sh start
 ```
 
 El dashboard quedará en `http://<JETSON_IP>:8088/` (HTML estático incluido en el backend).
