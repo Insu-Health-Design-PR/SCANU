@@ -1,0 +1,102 @@
+{
+  "exported_at": "20260506_123822",
+  "tailscale_ip": "100.92.1.128",
+  "status": {
+    "state": "IDLE",
+    "fused_score": 0.0,
+    "confidence": 0.0,
+    "health": {
+      "has_fault": true,
+      "sensor_online_count": 0
+    },
+    "active_radars": []
+  },
+  "metrics": {
+    "unsafe_pct": null,
+    "unsafe_score": null,
+    "gun_detected": null,
+    "persons_with_gun": null,
+    "persons_total": null,
+    "prediction": null,
+    "mmwave_torso_score": null,
+    "frame": null,
+    "ts": null,
+    "note": "Start the webcam runner; infer_thermal_objects writes webcam.metrics_json each frame."
+  },
+  "alerts": [
+    {
+      "event_id": "fault-737ce3bf",
+      "level": "fault",
+      "timestamp_utc": "2026-05-06T16:38:22Z",
+      "message": "No sensors are currently running."
+    },
+    {
+      "event_id": "info-d3485da0",
+      "level": "info",
+      "timestamp_utc": "2026-05-06T16:38:22Z",
+      "message": "Start the webcam runner; infer_thermal_objects writes webcam.metrics_json each frame."
+    }
+  ],
+  "mmwave_last_10_frames": [
+    {
+      "frame": 291,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 292,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 293,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 294,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 295,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 296,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 297,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 298,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 299,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    },
+    {
+      "frame": 300,
+      "points": [],
+      "thermal": null,
+      "infineon": null
+    }
+  ]
+}
