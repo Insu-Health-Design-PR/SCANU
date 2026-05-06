@@ -152,7 +152,6 @@ LAYER8_API_KEY="change-this-key" ./scripts/layer8.sh check
 | Problem | Fix |
 |---------|-----|
 | `ensurepip` / venv failure | `sudo apt install -y python3-venv python3-pip`, then rerun setup. |
-| `Unable to evaluate type annotation 'dict[str, Any]'` on Python 3.8 | Install Layer 8 requirements again: `pip install -r ~/Desktop/SCANU/software/layer8_ui/requirements.txt`. This installs `eval-type-backport`. |
 | `ModuleNotFoundError: layer8_ui` | Run commands from `software/layer8_ui` through `./scripts/layer8.sh`. |
 | Port `8088` busy | `BACKEND_PORT=8089 ./scripts/layer8.sh start`. |
 | Radar missing | Check `ls /dev/ttyUSB*` and `software/layer8_ui/ui_settings.json`. |
