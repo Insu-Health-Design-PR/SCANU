@@ -27,7 +27,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     },
     "webcam": {
         "frames": 0,
-        "fps": 10.0,
+        "fps": 30.0,
         "video": "",
         "live_frame": "layer8_ui/artifacts/live_webcam.jpg",
         "output": "",
@@ -41,7 +41,7 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "active_model_profile_id": "",
         "weapon_checkpoint": "layer4_inference/trained_models/gun_detection/gun_prob_best.pt",
         "person_detection_model": "yolov8n.pt",
-        "weapon_unsafe_threshold": 0.5,
+        "weapon_unsafe_threshold": 0.92,
         "weapon_gun_threshold": 0.0,
         "weapon_yolo_model": "yolov8n.pt",
         "weapon_conf": 0.25,
@@ -53,8 +53,8 @@ DEFAULT_SETTINGS: dict[str, Any] = {
         "weapon_gun_thermal": 0,
         "weapon_no_gun_yolo": 0,
         "weapon_show_yolo_name": 0,
-        "weapon_gun_yolo_model": "",
-        "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_px 12 --yolo_device cuda --classifier_device cuda",
+        "weapon_gun_yolo_model": "gun_detection_5gb.pt",
+        "weapon_extra_args": "--yolo_classes 0 --gun_roi_pad_frac 0.12 --gun_roi_pad_px 48 --yolo_device cuda --classifier_device cuda",
         "verbose": False,
     },
     "mmwave": {

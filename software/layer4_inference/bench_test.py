@@ -62,13 +62,26 @@ def main() -> None:
         default="*.mp4",
         help='Glob under dual_camera, e.g. "*_pseudo_thermal.mp4" or "*.mp4".',
     )
+    parser.add_argument(
+        "--source",
+        type=Path,
+        default=None,
+        help="Run on this single .mp4 (absolute or cwd path). Ignores dual_camera glob when set.",
+    )
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parent
     source_dir = repo_root / "data" / "collecting_data" / "dual_camera"
     previews_root = repo_root / "trained_models" / "outputs" / "thermal_previews"
 
-    videos = sorted(source_dir.glob(args.video_pattern))
+    if args.source is not None:
+        one = args.source.expanduser().resolve()
+        if not one.is_file():
+            print(f"Not a file: {one}")
+            return
+        videos = [one]
+    else:
+        videos = sorted(source_dir.glob(args.video_pattern))
     if args.max_videos > 0:
         videos = videos[: args.max_videos]
     if not videos:

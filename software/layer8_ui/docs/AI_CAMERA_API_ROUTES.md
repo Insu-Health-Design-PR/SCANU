@@ -152,7 +152,7 @@ curl -sS -X POST "$BASE/api/ai_camera/restart"
 
 `GET /api/ai_camera/preview/live`
 
-When the webcam runner is on, this route uses the **same frame source order** as the dashboard WebRTC track (`vid-main-webrtc`): **BGR IPC** (`scanu_webcam_live_bgr_frame.bin`, re-encoded as JPEG for multipart), then **JPEG IPC**, then **`webcam.live_frame`**. Runner off: shared V4L2 `WebcamSharedStream` (same as WebRTC’s non-runner fallback).
+When the webcam runner is on, MJPEG matches WebRTC sources **without** reading `webcam.live_frame` from disk (avoids stale-file flashes): **BGR IPC** → re-encode as JPEG, else **JPEG IPC**. Runner off: shared V4L2 `WebcamSharedStream` (same as WebRTC’s non-runner fallback).
 
 ```bash
 curl -sS --max-time 2 "$BASE/api/ai_camera/preview/live" -o /tmp/ai_camera_preview_mjpeg.bin

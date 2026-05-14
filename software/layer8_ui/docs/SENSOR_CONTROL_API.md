@@ -182,49 +182,56 @@ More detail: [AI_CAMERA_API_ROUTES.md](./AI_CAMERA_API_ROUTES.md)
 
 ---
 
-## 4) mmWave API (generic routes + config)
+## 4) mmWave-first API
 
-There is no `/api/mmwave/*` namespace; use generic sensor routes and global config.
-
-### mmWave config via global settings
+### Config
 
 ```bash
-curl -sS "$BASE/api/config"
+curl -sS "$BASE/api/mmwave/config"
 
-curl -sS -X PUT "$BASE/api/config" \
+curl -sS -X PUT "$BASE/api/mmwave/config" \
   -H "Content-Type: application/json" \
   -d '{
-    "settings": {
-      "mmwave": {
-        "config": "layer1_radar/examples/configs/stable_tracking_indoor2_low_uart.cfg",
-        "cli_port": "/dev/ttyUSB0",
-        "data_port": "/dev/ttyUSB1",
-        "output": "layer8_ui/artifacts/mmwave_frames.json"
-      }
+    "mmwave": {
+      "cli_port": "/dev/ttyUSB0",
+      "data_port": "/dev/ttyUSB1",
+      "output": "layer8_ui/artifacts/mmwave_frames.json"
     }
   }'
 ```
 
+`PUT` returns the full updated `ui_settings` document (same as `GET /api/config` after save). You can still use **`GET/PUT /api/config`** for whole-document edits.
+
+### Auto-detect serial ports (CLI / data)
+
+```bash
+curl -sS -X POST "$BASE/api/mmwave/auto_configure"
+```
+
+Same heuristics as **`GET /api/devices/serial`** and the dashboard mmWave **Auto-detect** button.
+
 ### mmWave run / stop / restart / status
 
 ```bash
-curl -sS "$BASE/api/status/mmwave"
-curl -sS -X POST "$BASE/api/run/mmwave"
-curl -sS -X POST "$BASE/api/stop/mmwave"
-curl -sS -X POST "$BASE/api/restart/mmwave"
+curl -sS "$BASE/api/mmwave/status"
+curl -sS -X POST "$BASE/api/mmwave/run"
+curl -sS -X POST "$BASE/api/mmwave/stop"
+curl -sS -X POST "$BASE/api/mmwave/restart"
 ```
 
-### mmWave output preview
+(Equivalent to `POST /api/run/mmwave`, `stop/mmwave`, `restart/mmwave`, and `GET /api/status/mmwave`.)
 
-`GET /api/preview/output/mmwave` — serves the JSON file configured under `mmwave.output` when it exists.
+### mmWave live preview and JSON output
+
+- **MJPEG:** `GET /api/mmwave/preview/live` (same stream as `GET /api/preview/live/mmwave` and legacy `GET /api/preview/live_direct/mmwave`)
+- **JSON:** `GET /api/mmwave/preview/output` (same file as `GET /api/preview/output/mmwave`)
 
 ```bash
-curl -sS "$BASE/api/preview/output/mmwave"
+curl -sS --max-time 2 "$BASE/api/mmwave/preview/live" -o /tmp/mmwave_preview_mjpeg.bin
+curl -sS "$BASE/api/mmwave/preview/output"
 ```
 
-### mmWave live MJPEG thumb (dashboard)
-
-`GET /api/preview/live/mmwave` — multipart JPEG from `mmwave.live_frame` when configured.
+More detail: [MMWAVE_API_ROUTES.md](./MMWAVE_API_ROUTES.md)
 
 ---
 

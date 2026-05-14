@@ -87,7 +87,7 @@ class LiveFrameReader:
             return None
         assert self._mm is not None
         try:
-            for _ in range(2):
+            for _ in range(12):
                 self._mm.seek(0)
                 seq1, size = _JPEG_HEADER_STRUCT.unpack(self._mm.read(_JPEG_HEADER_SIZE))
                 if (seq1 & 1) != 0:
@@ -189,7 +189,7 @@ class LiveBgrFrameReader:
             return None
         assert self._mm is not None
         try:
-            for _ in range(2):
+            for _ in range(12):
                 self._mm.seek(0)
                 seq1, size, height, width, channels = _BGR_HEADER_STRUCT.unpack(
                     self._mm.read(_BGR_HEADER_SIZE)

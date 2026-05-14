@@ -31,6 +31,7 @@ import logging
 import sys
 import warnings
 from collections.abc import Mapping
+from typing import Any
 import urllib.request
 from pathlib import Path
 from time import sleep, time
@@ -73,8 +74,8 @@ def _draw_label_above_box(
     cv2.putText(vis, text, (x1, ty), _OVERLAY_FONT, scale, color, thickness, lineType=cv2.LINE_AA)
 
 
-def _threat_bucket(score: float) -> str:
-    if score >= _UNSAFE_MIN:
+def _threat_bucket(score: float, *, unsafe_min: float = _UNSAFE_MIN) -> str:
+    if score >= float(unsafe_min):
         return "unsafe"
     if score >= _SAFE_MAX:
         return "suspicious"
@@ -128,6 +129,19 @@ def _clamp_box(xyxy: np.ndarray, w: int, h: int) -> tuple[int, int, int, int]:
     if y2 <= y1:
         y2 = min(y1 + 1, h)
     return x1, y1, x2, y2
+
+
+def _is_batch_video_file_source(src: object) -> bool:
+    """True when ``--source`` is a pre-recorded file (not a webcam index or ``/dev/video*``)."""
+    if isinstance(src, int):
+        return False
+    raw = str(src).strip()
+    if raw.startswith("/dev/video") or raw.isdigit():
+        return False
+    try:
+        return Path(raw).expanduser().resolve().is_file()
+    except OSError:
+        return False
 
 
 def _gun_detection_valid(
@@ -215,6 +229,8 @@ def _print_run_summary(
     frame_max_probs: list[float],
     unsafe_threshold: float,
     score_name: str,
+    *,
+    person_unsafe_cut: float,
 ) -> None:
     print()
     print("=" * 60)
@@ -233,11 +249,11 @@ def _print_run_summary(
             f"Per-frame max {score_name} — mean: {fm.mean():.4f}  peak (worst frame): {fm.max():.4f}"
         )
     peak = float(arr.max())
-    verdict = _threat_bucket(peak).upper()
+    verdict = _threat_bucket(peak, unsafe_min=person_unsafe_cut).upper()
     print(
         f"FINAL (clip): {verdict}  |  peak {score_name}={peak:.4f}  "
-        f"(safe<{_SAFE_MAX}, suspicious<{_UNSAFE_MIN}, unsafe>={_UNSAFE_MIN}; "
-        f"legacy border threshold={unsafe_threshold})"
+        f"(safe<{_SAFE_MAX}, suspicious<{person_unsafe_cut:.2f}, unsafe>={person_unsafe_cut:.2f}; "
+        f"CLI --unsafe-threshold={unsafe_threshold:.2f}, effective person UNSAFE cut=max({_UNSAFE_MIN:.2f}, that))"
     )
     print("=" * 60)
 
@@ -309,6 +325,7 @@ _INFER_CONFIG_KEYS = frozenset(
         "gun_yolo_model",
         "no_gun_yolo",
         "gun_conf",
+        "gun_infer_conf",
         "gun_max_area_frac",
         "gun_max_side_frac",
         "gun_full_frame",
@@ -335,6 +352,9 @@ _INFER_CONFIG_KEYS = frozenset(
         "yolo_device",
         "cuda_empty_cache",
         "cuda_empty_cache_every",
+        "batch_warmup_passes",
+        "batch_async_infer",
+        "output_fps",
     }
 )
 
@@ -492,6 +512,15 @@ def main() -> None:
         default=30.0,
         help="Requested capture FPS when source is a webcam index.",
     )
+    p.add_argument(
+        "--output_fps",
+        type=float,
+        default=0.0,
+        metavar="FPS",
+        help="Output video FPS for --output. For pre-recorded files, subsamples decoded frames "
+        "(stride ≈ round(source_fps / FPS)) so duration matches the source while running fewer infers. "
+        "0 = use source FPS (default). Webcam: sets writer FPS only; no subsampling.",
+    )
     p.add_argument("--image_size", type=int, default=224)
     p.add_argument("--yolo_model", type=str, default="yolov8n.pt")
     p.add_argument("--conf", type=float, default=0.25)
@@ -507,7 +536,7 @@ def main() -> None:
         "--unsafe_threshold",
         type=float,
         default=0.5,
-        help="Threat score threshold at or above this draws the unsafe border.",
+        help="Person gun_conf score at or above max(0.60, this) draws the red UNSAFE border (below that: orange suspicious / green safe bands unchanged).",
     )
     p.add_argument(
         "--gun_threshold",
@@ -618,7 +647,16 @@ def main() -> None:
         "--gun_conf",
         type=float,
         default=0.25,
-        help="With --gun-take-best (default): Ultralytics conf=min(this, 0.01). With --no-gun-take-best: conf is this value only.",
+        help="With --gun-take-best (default): Ultralytics conf=min(this, cap); cap is --gun-infer-conf if set, else 0.01. "
+        "With --no-gun-take-best: conf is this value only.",
+    )
+    p.add_argument(
+        "--gun_infer_conf",
+        type=float,
+        default=None,
+        metavar="CONF",
+        help="With --gun-take-best: use min(--gun-conf, this) as firearm YOLO conf (default cap 0.01 if omitted). "
+        "Higher values (e.g. 0.08–0.2) = stricter gun proposals. Ignored with --no-gun-take-best.",
     )
     p.add_argument(
         "--gun_min_box_px",
@@ -709,6 +747,20 @@ def main() -> None:
         default=30,
         metavar="N",
         help="With --cuda-empty-cache, run empty_cache every N frames (default: 30). Use 1 for legacy per-frame behavior.",
+    )
+    p.add_argument(
+        "--batch_warmup_passes",
+        type=int,
+        default=2,
+        metavar="N",
+        help="Video files only: run N full infer passes on the first good frame, rewind, then process. "
+        "Warms CUDA/kernels before the written output. 0 disables (default 2).",
+    )
+    p.add_argument(
+        "--batch_async_infer",
+        action="store_true",
+        help="Video files only: legacy threaded infer (overlap decode with next infer; first frames may lack overlays). "
+        "Default for files is synchronous infer per frame (no startup overlay lag).",
     )
     _add_bool_optional_arg(
         p,
@@ -910,8 +962,14 @@ def main() -> None:
         if args.gun_thermal:
             print("Preset --gun_thermal: take-best firearm box, relaxed size limits, larger imgsz.")
         if args.gun_take_best:
+            tb_cap = 0.01
+            if getattr(args, "gun_infer_conf", None) is not None:
+                tb_cap = max(0.001, float(args.gun_infer_conf))
+            tb_used = min(float(args.gun_conf), tb_cap)
             print(
-                "Firearm YOLO take-best: infer conf=min(your --gun_conf, 0.01); draw one best valid box per person."
+                f"Firearm YOLO take-best: infer conf={tb_used:g} "
+                f"(min(--gun-conf, {tb_cap:g} cap)); draw one best valid box per person.",
+                flush=True,
             )
     if args.output is not None:
         args.output = args.output.resolve()
@@ -972,7 +1030,10 @@ def main() -> None:
             if args.gun_thermal_debug:
                 infer_gun_conf = float(args.gun_conf)
             elif args.gun_take_best:
-                infer_gun_conf = min(float(args.gun_conf), 0.01)
+                cap = 0.01
+                if getattr(args, "gun_infer_conf", None) is not None:
+                    cap = max(0.001, float(args.gun_infer_conf))
+                infer_gun_conf = min(float(args.gun_conf), cap)
             else:
                 infer_gun_conf = float(args.gun_conf)
             gnames: dict = {}
@@ -1097,7 +1158,49 @@ def main() -> None:
         probs = [r[4] for r in rows] if rows else []
         return rows, gun_boxes, int(gun_count), probs
 
+    is_batch_file = _is_batch_video_file_source(src)
+    if is_batch_file and int(args.batch_warmup_passes) > 0:
+        wp = max(0, int(args.batch_warmup_passes))
+        t_warm = time()
+        try:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        except Exception:
+            pass
+        warm_np: np.ndarray | None = None
+        for _ in range(400):
+            ok_w, bgr_w = cap.read()
+            if not ok_w:
+                break
+            if args.composite_mode:
+                tr_w = _extract_thermal_column(bgr_w, args.thermal_panel)
+            else:
+                tr_w = bgr_w
+            warm_np = _frame_to_bgr_for_infer(tr_w)
+            if warm_np is not None:
+                break
+        if warm_np is not None:
+            for _ in range(wp):
+                _ = _infer_annotations(warm_np.copy())
+            if torch.cuda.is_available():
+                torch.cuda.synchronize()
+            print(
+                f"Batch warmup: {wp} full infer pass(es) on first good frame in {time() - t_warm:.2f}s",
+                flush=True,
+            )
+        else:
+            print("Batch warmup: skipped (no decodable BGR frame at start).", flush=True)
+        try:
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        except Exception:
+            pass
+
+    use_infer_pool = not (is_batch_file and not args.batch_async_infer)
+    infer_pool: concurrent.futures.ThreadPoolExecutor | None = None
+    if use_infer_pool:
+        infer_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+
     print("Summary prints when the video ends or you press q.")
+    person_unsafe_cut = max(_UNSAFE_MIN, float(args.unsafe_threshold))
     all_probs: list[float] = []
     frame_max_probs: list[float] = []
     frame_count = 0
@@ -1110,14 +1213,36 @@ def main() -> None:
     cached_gun_count = 0
     last_frame_ts: float | None = None
     fps_ema: float | None = None
-    infer_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
     infer_future: concurrent.futures.Future | None = None
+    out_fps_tgt = float(getattr(args, "output_fps", 0) or 0)
+    writer_fps_override: float | None = None
+    decode_stride = 1
+    if out_fps_tgt > 0:
+        writer_fps_override = out_fps_tgt
+        if is_batch_file:
+            src_fps_b = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
+            if src_fps_b >= 1.0:
+                decode_stride = max(1, int(round(src_fps_b / out_fps_tgt)))
+            print(
+                f"Output target {out_fps_tgt:g} fps: writer {writer_fps_override:g} fps, "
+                f"decode stride {decode_stride} (source reports {src_fps_b:.2f} fps).",
+                flush=True,
+            )
+        else:
+            print(
+                f"Output writer fps set to {out_fps_tgt:g} (live capture; no decode subsampling).",
+                flush=True,
+            )
     try:
         with torch.no_grad():
             while True:
                 ok, bgr_full = cap.read()
                 if not ok:
                     break
+                if decode_stride > 1:
+                    for _ in range(decode_stride - 1):
+                        if not cap.grab():
+                            break
                 frame_count += 1
                 if args.max_frames and frame_count > args.max_frames:
                     break
@@ -1140,9 +1265,26 @@ def main() -> None:
 
                 vis = thermal.copy()
                 h, w = vis.shape[:2]
-                if infer_future is not None and infer_future.done():
+                if infer_pool is not None:
+                    if infer_future is not None and infer_future.done():
+                        try:
+                            rows_new, gun_boxes_new, gun_count_new, probs = infer_future.result()
+                            cached_rows = list(rows_new)
+                            cached_gun_boxes = list(gun_boxes_new)
+                            cached_gun_count = int(gun_count_new)
+                            if probs:
+                                all_probs.extend(probs)
+                                frame_max_probs.append(max(probs))
+                            last_infer_frame = frame_count
+                        except Exception as exc:
+                            print(f"Warning: async inference failed on frame {frame_count}: {exc}", flush=True)
+                        infer_future = None
+
+                    if infer_future is None:
+                        infer_future = infer_pool.submit(_infer_annotations, thermal.copy())
+                else:
                     try:
-                        rows_new, gun_boxes_new, gun_count_new, probs = infer_future.result()
+                        rows_new, gun_boxes_new, gun_count_new, probs = _infer_annotations(thermal.copy())
                         cached_rows = list(rows_new)
                         cached_gun_boxes = list(gun_boxes_new)
                         cached_gun_count = int(gun_count_new)
@@ -1151,11 +1293,7 @@ def main() -> None:
                             frame_max_probs.append(max(probs))
                         last_infer_frame = frame_count
                     except Exception as exc:
-                        print(f"Warning: async inference failed on frame {frame_count}: {exc}", flush=True)
-                    infer_future = None
-
-                if infer_future is None:
-                    infer_future = infer_pool.submit(_infer_annotations, thermal.copy())
+                        print(f"Warning: sync inference failed on frame {frame_count}: {exc}", flush=True)
 
                 rows = list(cached_rows)
                 gun_count = int(cached_gun_count)
@@ -1178,7 +1316,7 @@ def main() -> None:
                 safe_list: list[tuple[int, int, int, int, float, str]] = []
                 for x1, y1, x2, y2, prob, _cid, ytag in rows:
                     prefix = f"{ytag} " if args.show_yolo_name else ""
-                    bucket = _threat_bucket(float(prob))
+                    bucket = _threat_bucket(float(prob), unsafe_min=person_unsafe_cut)
                     label_txt = f"{prefix}{bucket.upper()} {prob:.2f}"
                     if bucket == "unsafe":
                         unsafe_first.append((x1, y1, x2, y2, prob, label_txt))
@@ -1281,9 +1419,12 @@ def main() -> None:
 
                 if args.output is not None:
                     if writer is None:
-                        fps = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
-                        if fps < 1.0:
-                            fps = 30.0
+                        if writer_fps_override is not None:
+                            fps = float(writer_fps_override)
+                        else:
+                            fps = float(cap.get(cv2.CAP_PROP_FPS) or 0.0)
+                            if fps < 1.0:
+                                fps = 30.0
                         hh, ww = vis.shape[:2]
                         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
                         writer = cv2.VideoWriter(str(args.output), fourcc, fps, (ww, hh))
@@ -1313,7 +1454,7 @@ def main() -> None:
                 if args.live_metrics_json is not None:
                     person_rows = [r for r in rows if r[5] in (None, 0)]
                     persons_total = int(len(person_rows))
-                    persons_with_gun = int(sum(1 for r in person_rows if float(r[4]) >= _UNSAFE_MIN))
+                    persons_with_gun = int(sum(1 for r in person_rows if float(r[4]) >= person_unsafe_cut))
                     gun_detected = bool(persons_with_gun > 0 or gun_count > 0)
                     person_peak = max((float(r[4]) for r in person_rows), default=0.0)
                     risk_score = person_peak
@@ -1325,7 +1466,7 @@ def main() -> None:
                     if persons_total <= 0:
                         prediction = "no_person"
                     else:
-                        prediction = _threat_bucket(risk_score)
+                        prediction = _threat_bucket(risk_score, unsafe_min=person_unsafe_cut)
                     payload = {
                         "ts": time(),
                         "frame": int(frame_count),
@@ -1349,12 +1490,13 @@ def main() -> None:
                     if cv2.waitKey(1) & 0xFF == ord("q"):
                         break
     finally:
-        if infer_future is not None:
+        if infer_future is not None and infer_pool is not None:
             try:
                 infer_future.cancel()
             except Exception:
                 pass
-        infer_pool.shutdown(wait=False)
+        if infer_pool is not None:
+            infer_pool.shutdown(wait=False)
         if live_ipc_writer is not None:
             live_ipc_writer.close()
         if live_ipc_bgr_writer is not None:
@@ -1370,6 +1512,7 @@ def main() -> None:
             frame_max_probs,
             args.unsafe_threshold,
             score_name,
+            person_unsafe_cut=person_unsafe_cut,
         )
 
 

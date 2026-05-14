@@ -277,12 +277,17 @@ def build_router(layer8_dir: Path) -> APIRouter:
 
     _WEBCAM_LIVE_JPEG_Q = 85
 
-    def _runner_frame_jpeg_same_as_webrtc(rpath: Path | None) -> bytes | None:
+    def _runner_frame_jpeg_same_as_webrtc(
+        rpath: Path | None,
+        *,
+        allow_disk_fallback: bool,
+    ) -> bytes | None:
         """
-        Pick the same frame bytes the WebRTC track uses (``WebcamJpegTrack.recv``):
-        BGR IPC → JPEG IPC → ``webcam.live_frame`` on disk.
-        MJPEG cannot ship raw BGR, so BGR IPC is JPEG-encoded with the same quality
-        as ``infer_thermal_objects`` live output.
+        Same sources as ``WebcamJpegTrack.recv`` when the runner is on: BGR IPC → JPEG IPC.
+
+        When ``allow_disk_fallback`` is False (live infer), **do not** read ``webcam.live_frame``
+        from disk: that file can lag behind mmap IPC or hold an old session frame and causes
+        occasional “ancient frame” flashes in MJPEG.
         """
         bgr_payload = webcam_ipc_bgr_reader.read_latest()
         if bgr_payload is not None:
@@ -301,7 +306,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
         jpg = webcam_ipc_reader.read_latest()
         if jpg:
             return jpg
-        if rpath is not None and rpath.is_file():
+        if allow_disk_fallback and rpath is not None and rpath.is_file():
             try:
                 disk = rpath.read_bytes()
                 if disk:
@@ -439,6 +444,79 @@ def build_router(layer8_dir: Path) -> APIRouter:
             result = sensor_runner.restart("thermal", s, layer8_dir)
         finally:
             thermal_stream.resume_after_thermal_subprocess_attempt()
+        if not result.get("ok"):
+            return JSONResponse(result, status_code=409)
+        return result
+
+    @router.get("/api/mmwave/config")
+    def get_mmwave_config() -> dict[str, Any]:
+        s = load(layer8_dir)
+        return {"mmwave": dict(s.get("mmwave") or {})}
+
+    @router.put("/api/mmwave/config")
+    def put_mmwave_config(body: dict[str, Any]) -> dict[str, Any]:
+        if not isinstance(body, dict):
+            raise HTTPException(400, "body must be an object")
+        patch = body.get("mmwave")
+        if patch is None or not isinstance(patch, dict):
+            raise HTTPException(400, "body must include a mmwave object")
+        current = load(layer8_dir)
+        current["mmwave"] = {**(current.get("mmwave") or {}), **patch}
+        save(layer8_dir, current)
+        return load(layer8_dir)
+
+    @router.post("/api/mmwave/auto_configure")
+    def mmwave_auto_configure() -> Any:
+        """Set ``cli_port`` / ``data_port`` from ``/api/devices/serial`` heuristics (same as dashboard Auto-detect)."""
+        cand = v4l2_tools.list_serial_port_candidates()
+        if not cand.get("ok"):
+            return JSONResponse(
+                status_code=404,
+                content={
+                    "ok": False,
+                    "error": str(cand.get("error") or "serial discovery failed"),
+                    "mmwave": dict(load(layer8_dir).get("mmwave") or {}),
+                },
+            )
+        current = load(layer8_dir)
+        m = dict(current.get("mmwave") or {})
+        cli = cand.get("suggested_cli")
+        data = cand.get("suggested_data")
+        if cli:
+            m["cli_port"] = str(cli)
+        if data:
+            m["data_port"] = str(data)
+        current["mmwave"] = m
+        save(layer8_dir, current)
+        out = load(layer8_dir)
+        return {
+            "ok": True,
+            "mmwave": dict(out.get("mmwave") or {}),
+            "suggested_cli": cli,
+            "suggested_data": data,
+            "ports": cand.get("ports") or [],
+        }
+
+    @router.get("/api/mmwave/status")
+    def mmwave_status() -> dict[str, Any]:
+        return sensor_runner.status("mmwave", layer8_dir)
+
+    @router.post("/api/mmwave/run")
+    def mmwave_run() -> Any:
+        s = load(layer8_dir)
+        result = sensor_runner.start("mmwave", s, layer8_dir)
+        if not result.get("ok"):
+            return JSONResponse(result, status_code=409)
+        return result
+
+    @router.post("/api/mmwave/stop")
+    def mmwave_stop() -> dict[str, Any]:
+        return sensor_runner.stop("mmwave", layer8_dir)
+
+    @router.post("/api/mmwave/restart")
+    def mmwave_restart() -> Any:
+        s = load(layer8_dir)
+        result = sensor_runner.restart("mmwave", s, layer8_dir)
         if not result.get("ok"):
             return JSONResponse(result, status_code=409)
         return result
@@ -661,10 +739,18 @@ def build_router(layer8_dir: Path) -> APIRouter:
 
             async def mjpeg_runner_file():
                 boundary = "frame"
+                last_good: bytes | None = None
                 try:
                     while True:
-                        jpg = _runner_frame_jpeg_same_as_webrtc(rpath)
-                        if not jpg:
+                        jpg = _runner_frame_jpeg_same_as_webrtc(
+                            rpath,
+                            allow_disk_fallback=False,
+                        )
+                        if jpg:
+                            last_good = jpg
+                        elif last_good:
+                            jpg = last_good
+                        else:
                             jpg = runner_missing
                         chunk = (
                             f"--{boundary}\r\n"
@@ -747,20 +833,15 @@ def build_router(layer8_dir: Path) -> APIRouter:
             headers=mjpeg_headers(),
         )
 
-    @router.get("/api/preview/live/{sensor}")
-    async def preview_live(sensor: SensorName) -> StreamingResponse:
-        if sensor == "webcam":
-            return await ai_camera_live_mjpeg()
-        if sensor == "thermal":
-            return await thermal_live_mjpeg_response()
+    async def mmwave_live_mjpeg_response() -> StreamingResponse:
+        """mmWave MJPEG from ``mmwave.live_frame`` (same stream as ``/api/preview/live/mmwave``)."""
         s = load(layer8_dir)
-        rel = (s.get(sensor) or {}).get("live_frame") or ""
+        rel = (s.get("mmwave") or {}).get("live_frame") or ""
         rpath = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
-        label = "mmWave"
         missing = mjpeg_placeholder_jpeg(
-            f"{label}: no live JPEG yet",
-            f"Expected file: {rpath.name if rpath else f'configure {sensor}.live_frame'}",
-            "Start the sensor runner or fix live_frame in settings.",
+            "mmWave: no live JPEG yet",
+            f"Expected file: {rpath.name if rpath else 'configure mmwave.live_frame'}",
+            "Start the mmWave runner or fix live_frame in settings.",
         )
 
         async def mjpeg_stream():
@@ -793,6 +874,14 @@ def build_router(layer8_dir: Path) -> APIRouter:
             headers=mjpeg_headers(),
         )
 
+    @router.get("/api/preview/live/{sensor}")
+    async def preview_live(sensor: SensorName) -> StreamingResponse:
+        if sensor == "webcam":
+            return await ai_camera_live_mjpeg()
+        if sensor == "thermal":
+            return await thermal_live_mjpeg_response()
+        return await mmwave_live_mjpeg_response()
+
     @router.get("/api/ai_camera/preview/live")
     async def ai_camera_preview_live() -> StreamingResponse:
         return await ai_camera_live_mjpeg()
@@ -801,6 +890,11 @@ def build_router(layer8_dir: Path) -> APIRouter:
     @router.get("/api/preview/live_direct/thermal")
     async def thermal_preview_live_aliases() -> StreamingResponse:
         return await thermal_live_mjpeg_response()
+
+    @router.get("/api/mmwave/preview/live")
+    @router.get("/api/preview/live_direct/mmwave")
+    async def mmwave_preview_live_aliases() -> StreamingResponse:
+        return await mmwave_live_mjpeg_response()
 
     @router.websocket("/ws/thermal")
     async def websocket_thermal(websocket: WebSocket) -> None:
@@ -890,12 +984,15 @@ def build_router(layer8_dir: Path) -> APIRouter:
             )
         _patch_aiortc_h264_encoder_for_jetson()
 
+        _wcam = load(layer8_dir).get("webcam") or {}
+        _webrtc_capture_fps = max(5.0, min(60.0, float(_wcam.get("fps") or 30)))
+
         class WebcamJpegTrack(VideoStreamTrack):
-            def __init__(self) -> None:
+            def __init__(self, fps: float) -> None:
                 super().__init__()
                 self._last_bgr: np.ndarray | None = None
                 self._last_jpg: bytes | None = None
-                self._fps = 30.0
+                self._fps = float(fps)
                 self._next_t = time.time()
                 self._clock_hz = 90000
                 self._pts = 0
@@ -953,7 +1050,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
             if not bool(sensor_runner.status("webcam", layer8_dir).get("running")):
                 webcam_stream.add_client(load(layer8_dir))
                 hold_shared_webcam_preview[0] = True
-            pc.addTrack(WebcamJpegTrack())
+            pc.addTrack(WebcamJpegTrack(_webrtc_capture_fps))
             await pc.setRemoteDescription(RTCSessionDescription(sdp=body.sdp, type=body.type))
             answer = await pc.createAnswer()
             await pc.setLocalDescription(answer)
@@ -986,8 +1083,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
             raise HTTPException(404, "static/embed_webcam_mjpeg.html missing")
         return FileResponse(p, media_type="text/html")
 
-    @router.get("/api/preview/output/mmwave")
-    def preview_mmwave_output() -> FileResponse:
+    def _mmwave_output_file_response() -> FileResponse:
         s = load(layer8_dir)
         sub = (s.get("mmwave") or {}).get("output") or ""
         path = resolved_artifact_path(s, relative_to_software=str(sub), layer8_dir=layer8_dir)
@@ -997,6 +1093,14 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 "Output JSON not found. Run mmWave capture or set output path in settings.",
             )
         return FileResponse(path, media_type="application/json", filename=path.name)
+
+    @router.get("/api/preview/output/mmwave")
+    def preview_mmwave_output() -> FileResponse:
+        return _mmwave_output_file_response()
+
+    @router.get("/api/mmwave/preview/output")
+    def mmwave_preview_output() -> FileResponse:
+        return _mmwave_output_file_response()
 
     @router.get("/api/dashboard/metrics")
     def dashboard_metrics() -> dict[str, Any]:

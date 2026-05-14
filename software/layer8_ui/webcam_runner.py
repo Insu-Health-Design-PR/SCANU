@@ -22,7 +22,13 @@ import numpy as np
 from layer8_ui.artifact_paths import abs_software_path, software_root_from_settings
 from layer8_ui.webcam_device import detect_working_webcam_device
 
-_WEBCAM_CAM_CFG_LEN = 6
+_WEBCAM_CAM_CFG_LEN = 7
+
+
+def _capture_frame_sleep_s(capture_fps: float) -> float:
+    """Rough pacing after each grab+encode; clamp to safe range."""
+    f = max(1.0, min(60.0, float(capture_fps)))
+    return min(0.2, max(0.005, 1.0 / f))
 _DEFAULT_WEAPON_CHECKPOINT = "layer4_inference/trained_models/gun_detection/gun_prob_best.pt"
 _DEFAULT_WEBCAM_LIVE_IPC = Path("/dev/shm/scanu_webcam_live_frame.bin")
 _DEFAULT_WEBCAM_LIVE_BGR_IPC = Path("/dev/shm/scanu_webcam_live_bgr_frame.bin")
@@ -213,6 +219,7 @@ class WebcamSharedStream:
         webcam_auto_detect = int(w.get("webcam_auto_detect", 1))
         webcam_detect_max_index = int(w.get("webcam_detect_max_index", 8))
         webcam_detect_retry_s = float(w.get("webcam_detect_retry_s", 8.0))
+        capture_fps = float(w.get("fps", 30) or 30)
         return (
             requested_device,
             int(w.get("webcam_width", 1920)),
@@ -220,6 +227,7 @@ class WebcamSharedStream:
             webcam_auto_detect,
             webcam_detect_max_index,
             webcam_detect_retry_s,
+            capture_fps,
         )
 
     def sync_settings(self, settings: dict[str, Any]) -> None:
@@ -311,9 +319,15 @@ class WebcamSharedStream:
                     if cap is not None:
                         cap.release()
                         cap = None
-                    preferred_device, width, height, webcam_auto_detect, detect_max_index, detect_retry_s = (
-                        settings_cam_cfg
-                    )
+                    (
+                        preferred_device,
+                        width,
+                        height,
+                        webcam_auto_detect,
+                        detect_max_index,
+                        detect_retry_s,
+                        capture_fps,
+                    ) = settings_cam_cfg
                     device = self._resolved_device if self._resolved_device is not None else int(preferred_device)
                     cap = cv2.VideoCapture(int(device), cv2.CAP_V4L2)
                     if not cap.isOpened():
@@ -327,6 +341,7 @@ class WebcamSharedStream:
                                     width=int(width),
                                     height=int(height),
                                     search_max_index=int(detect_max_index),
+                                    fps=float(capture_fps),
                                 )
                                 self._next_detect_retry_ts = now_ts + max(0.5, float(detect_retry_s))
                             # If detect returns the same index as the failed open, we must open again:
@@ -343,7 +358,7 @@ class WebcamSharedStream:
                             cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)
                             cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(width))
                             cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(height))
-                            cap.set(cv2.CAP_PROP_FPS, 15)
+                            cap.set(cv2.CAP_PROP_FPS, float(capture_fps))
                             cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
                             active_camera_cfg = settings_cam_cfg
                             next_open_retry_ts = 0.0
@@ -354,7 +369,7 @@ class WebcamSharedStream:
                     cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)
                     cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(width))
                     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(height))
-                    cap.set(cv2.CAP_PROP_FPS, 15)
+                    cap.set(cv2.CAP_PROP_FPS, float(capture_fps))
                     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
                     self._resolved_device = int(device)
                     active_camera_cfg = settings_cam_cfg
@@ -374,20 +389,20 @@ class WebcamSharedStream:
 
                 ok, frame = cap.read()
                 if not ok or frame is None:
-                    time.sleep(0.03)
+                    time.sleep(min(0.05, _capture_frame_sleep_s(settings_cam_cfg[6])))
                     continue
 
-                _device, width, height, _a, _b, _c = settings_cam_cfg
+                _device, width, height, _a, _b, _c, capture_fps = settings_cam_cfg
                 bgr = _frame_to_bgr_for_jpeg(frame)
                 if bgr is None:
-                    time.sleep(0.03)
+                    time.sleep(min(0.05, _capture_frame_sleep_s(capture_fps)))
                     continue
                 preview = cv2.resize(bgr, (int(width), int(height)), interpolation=cv2.INTER_LINEAR)
                 ok_enc, jpg = cv2.imencode(".jpg", preview, [int(cv2.IMWRITE_JPEG_QUALITY), 82])
                 if ok_enc:
                     with self._lock:
                         self._latest_jpg = jpg.tobytes()
-                time.sleep(0.03)
+                time.sleep(_capture_frame_sleep_s(capture_fps))
         finally:
             if cap is not None:
                 cap.release()
