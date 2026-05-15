@@ -3,6 +3,7 @@
 Unified Layer 1 entrypoint for three sensors:
 
 - `mmwave`: TI IWR6843 UART + TLV
+- `mmwave_dca`: TI IWR6843/AWR1843 raw ADC capture through DCA1000EVM
 - `infeneon`: 60 GHz LTR11 presence provider
 - `thermal`: thermal camera frame source
 
@@ -56,3 +57,4 @@ serial_mgr.disconnect()
 - `RadarConfigurator.configure()` now accepts `None` and defaults to `DEFAULT_CONFIG`.
 - `mmwave` config commands now fail fast if command response is empty.
 - `UARTSource` includes small idle sleeps to avoid busy-loop CPU usage when no data is available.
+- `mmwave_dca` is for LVDS/DCA1000 raw ADC capture and writes `adc_data.bin`.

@@ -9,6 +9,12 @@ software/layer1_radar/examples/data/*.mp4
 # Local/vendor SDK copies (testing only; not part of product tree)
 software/vendor/
 
+# TI installers and raw radar captures are local lab artifacts
+software/layer1_sensor_hub/mmwave_dca/mmwave_studio_*.exe
+software/layer1_sensor_hub/mmwave_dca/ti_cli/mmwave_studio_extract/
+captures/
+*.bin
+
 # macOS Finder metadata
 .DS_Store
 
