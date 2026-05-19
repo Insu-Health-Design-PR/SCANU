@@ -376,6 +376,90 @@
       margin-top: 0.5rem;
       line-height: 1.35;
     }
+
+    .device-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+      margin-top: 0.65rem;
+    }
+    .device-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0.2rem 0.5rem;
+      padding: 0.55rem 0.65rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+    }
+    .device-card .name { font-weight: 600; font-size: 0.8rem; }
+    .device-card .detail { color: var(--muted); font-size: 0.68rem; font-family: var(--mono); }
+    .badge {
+      align-self: start;
+      border-radius: 999px;
+      padding: 0.13rem 0.45rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(139,149,168,0.15);
+      color: var(--muted);
+    }
+    .badge.online { color: var(--ok); background: rgba(52,199,89,0.14); }
+    .badge.warning { color: var(--warn); background: rgba(255,159,10,0.14); }
+    .badge.fault, .badge.offline { color: var(--danger); background: rgba(255,69,58,0.12); }
+    .alerts-list {
+      display: grid;
+      gap: 0.45rem;
+      margin-top: 0.65rem;
+      max-height: 230px;
+      overflow: auto;
+    }
+    .alert-row {
+      padding: 0.5rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 0.72rem;
+    }
+    .alert-row .meta {
+      margin-top: 0.2rem;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.62rem;
+    }
+    .preview-frame { position: relative; }
+    .radar-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .radar-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--warn);
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 0 12px rgba(255,159,10,0.85);
+    }
+    .radar-dot.unsafe {
+      background: var(--danger);
+      box-shadow: 0 0 14px rgba(255,69,58,0.9);
+    }
+    .radar-label {
+      position: absolute;
+      transform: translate(-50%, calc(-100% - 8px));
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--text);
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 0.08rem 0.28rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
@@ -430,6 +514,12 @@
           <div class="mmwave-slot">
             <img id="vid-mmwave" alt="mmWave" src="/api/preview/live/mmwave" />
           </div>
+
+          <div class="panel-h" style="margin: 0.85rem -1rem 0.5rem; border-top: 1px solid var(--border);">Devices</div>
+          <div class="device-grid" id="device-grid"></div>
+
+          <div class="panel-h" style="margin: 0.85rem -1rem 0.5rem; border-top: 1px solid var(--border);">Alerts</div>
+          <div class="alerts-list" id="alerts-list"></div>
 
           <div class="chrome-tabs" role="tablist">
             <button type="button" class="active" data-tab="camera" id="tabbtn-camera">Camera &amp; model</button>
@@ -498,6 +588,7 @@
       </div>
       <div class="preview-frame">
         <img id="vid-main" alt="Main preview" />
+        <div class="radar-overlay" id="radar-overlay"></div>
       </div>
       <div class="preview-foot">
         <a class="btn" id="link-mp4-thermal" href="/api/preview/video/thermal" target="_blank" rel="noopener">Thermal MP4</a>
@@ -553,7 +644,12 @@
       ],
       mmwave: [
         ["frames", "number"], ["mmwave_only", "number"], ["config", "text"], ["cli_port", "text"], ["data_port", "text"],
-        ["video", "text"], ["live_frame", "text"], ["output", "text"], ["no_frame_timeout_s", "number"], ["extra_args", "textarea"]
+        ["video", "text"], ["live_frame", "text"], ["output", "text"], ["no_frame_timeout_s", "number"],
+        ["projection_width", "number"], ["projection_height", "number"],
+        ["projection_x_scale_px_per_m", "number"], ["projection_y_scale_px_per_m", "number"],
+        ["projection_x_offset_px", "number"], ["projection_y_offset_px", "number"],
+        ["projection_rotation_deg", "number"], ["projection_max_range_m", "number"],
+        ["extra_args", "textarea"]
       ]
     };
 
@@ -586,6 +682,81 @@
 
     function refreshMmwaveThumb() {
       el("vid-mmwave").src = `/api/preview/live/mmwave?t=${Date.now()}`;
+    }
+
+    async function refreshDevices() {
+      try {
+        const r = await fetch("/api/devices");
+        if (!r.ok) return;
+        const payload = await r.json();
+        const root = el("device-grid");
+        root.innerHTML = "";
+        (payload.devices || []).forEach((d) => {
+          const card = document.createElement("div");
+          card.className = "device-card";
+          const name = document.createElement("div");
+          name.className = "name";
+          name.textContent = d.label || d.id;
+          const badge = document.createElement("div");
+          badge.className = `badge ${d.status || "offline"}`;
+          badge.textContent = d.status || "offline";
+          const detail = document.createElement("div");
+          detail.className = "detail";
+          detail.textContent = d.detail || "";
+          card.appendChild(name);
+          card.appendChild(badge);
+          card.appendChild(detail);
+          root.appendChild(card);
+        });
+      } catch (_) {}
+    }
+
+    async function refreshAlerts() {
+      try {
+        const r = await fetch("/api/alerts/recent?limit=6");
+        if (!r.ok) return;
+        const payload = await r.json();
+        const root = el("alerts-list");
+        root.innerHTML = "";
+        (payload.alerts || []).forEach((a) => {
+          const row = document.createElement("div");
+          row.className = "alert-row";
+          const msg = document.createElement("div");
+          msg.textContent = a.message || a.state || "Alert";
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = `${a.level || "info"} · ${a.radar_id || ""}`;
+          row.appendChild(msg);
+          row.appendChild(meta);
+          root.appendChild(row);
+        });
+      } catch (_) {}
+    }
+
+    async function refreshRadarOverlay() {
+      const root = el("radar-overlay");
+      if (!root) return;
+      root.innerHTML = "";
+      if (mainPreviewMode() !== "webcam") return;
+      try {
+        const r = await fetch("/api/mmwave/camera-overlay");
+        if (!r.ok) return;
+        const payload = await r.json();
+        (payload.points || []).slice(0, 64).forEach((p, idx) => {
+          const dot = document.createElement("div");
+          const conf = Number(p.confidence || 0);
+          dot.className = `radar-dot ${conf >= 0.7 ? "unsafe" : ""}`;
+          dot.style.left = `${Math.max(0, Math.min(1, Number(p.x_norm || 0))) * 100}%`;
+          dot.style.top = `${Math.max(0, Math.min(1, Number(p.y_norm || 0))) * 100}%`;
+          const label = document.createElement("div");
+          label.className = "radar-label";
+          label.style.left = dot.style.left;
+          label.style.top = dot.style.top;
+          label.textContent = p.track_id || `R${idx + 1}`;
+          root.appendChild(dot);
+          root.appendChild(label);
+        });
+      } catch (_) {}
     }
 
     function setError(sensor, msg) {
@@ -668,6 +839,7 @@
       SENSORS.forEach(renderFields);
       refreshMmwaveThumb();
       refreshMainPreview();
+      refreshRadarOverlay();
     }
 
     async function saveAllSettings() {
@@ -731,6 +903,8 @@
       });
       refreshMainPreview();
       refreshMmwaveThumb();
+      refreshDevices();
+      refreshRadarOverlay();
     }
 
     async function pollMetrics() {
@@ -754,6 +928,9 @@
         }
         el("metrics-note").textContent = m.note || "";
       } catch (_) { /* ignore */ }
+      refreshDevices();
+      refreshAlerts();
+      refreshRadarOverlay();
     }
 
     async function oneShotStatus() {
@@ -841,6 +1018,7 @@
       startLiveStatus();
       pollMetrics();
       setInterval(pollMetrics, 2500);
+      setInterval(refreshRadarOverlay, 1200);
     });
   </script>
 </body>

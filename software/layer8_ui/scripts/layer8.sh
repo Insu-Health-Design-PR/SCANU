@@ -19,6 +19,7 @@ Usage: ./scripts/layer8.sh <command>
 
 Commands:
   setup     Create/update software/.venv and install Python dependencies
+  frontend  Install/build the React frontend
   start     Start Layer 8 backend + static dashboard
   check     Check /api/health, /api/status, and /api/visual/latest
   run-all   Start all configured sensors through the API
@@ -27,6 +28,7 @@ Commands:
 Environment:
   INSTALL_SYSTEM_DEPS=1   Install apt packages during setup
   INSTALL_LAYER4_FULL=1   Install full layer4_inference/requirements.txt
+  SKIP_FRONTEND=1         Skip React frontend npm install/build during setup
   BACKEND_HOST=0.0.0.0    Backend bind host
   BACKEND_PORT=8088       Backend port
   LAYER8_API_KEY=...      Optional API key for protected endpoints
@@ -83,11 +85,26 @@ setup_cmd() {
     python3 -m pip install opencv-python-headless numpy tqdm scikit-learn onnx ultralytics PyYAML
   fi
 
+  if [[ "${SKIP_FRONTEND:-0}" != "1" ]]; then
+    frontend_cmd
+  fi
+
   echo "[setup] Hardware quick checks:"
   v4l2-ctl --list-devices || true
   ls /dev/ttyUSB* 2>/dev/null || true
   ls /dev/ttyACM* 2>/dev/null || true
   echo "[setup] Done."
+}
+
+frontend_cmd() {
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "[frontend] npm not found. Install Node.js/npm first."
+    exit 2
+  fi
+  cd "$LAYER8_DIR/frontend"
+  npm install
+  npm run build
+  echo "[frontend] React build ready: $LAYER8_DIR/frontend/dist"
 }
 
 start_cmd() {
@@ -120,6 +137,7 @@ post_cmd() {
 cmd="${1:-}"
 case "$cmd" in
   setup) setup_cmd ;;
+  frontend) frontend_cmd ;;
   start) start_cmd ;;
   check) check_cmd ;;
   run-all) post_cmd "/api/run_all" ;;

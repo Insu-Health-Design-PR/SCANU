@@ -58,3 +58,4 @@ serial_mgr.disconnect()
 - `mmwave` config commands now fail fast if command response is empty.
 - `UARTSource` includes small idle sleeps to avoid busy-loop CPU usage when no data is available.
 - `mmwave_dca` is for LVDS/DCA1000 raw ADC capture and writes `adc_data.bin`.
+- `testing/ADRIAN_PHASE2_RUNBOOK.md` lists Adrian's Phase 2 mmWave/UI commands and API checks.

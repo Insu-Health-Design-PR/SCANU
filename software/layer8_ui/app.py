@@ -23,6 +23,7 @@ from layer8_ui.dashboard_routes import build_router, index_handler
 
 LAYER8_DIR = Path(__file__).resolve().parent
 STATIC = LAYER8_DIR / "static"
+FRONTEND_DIST = LAYER8_DIR / "frontend" / "dist"
 ARTIFACTS = LAYER8_DIR / "artifacts"
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
 API_KEY = os.environ.get("LAYER8_API_KEY", "").strip()
@@ -56,6 +57,9 @@ async def api_key_middleware(request: Request, call_next):
     if request.url.path.startswith("/api/") and not _token_is_valid(request.headers.get("X-Layer8-Api-Key")):
         return JSONResponse({"detail": "Invalid or missing Layer 8 API key."}, status_code=401)
     return await call_next(request)
+
+if FRONTEND_DIST.is_dir():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIST / "assets")), name="frontend-assets")
 
 if STATIC.is_dir():
     app.mount("/static", StaticFiles(directory=str(STATIC)), name="static")
@@ -102,4 +106,9 @@ app.include_router(public_router)
 
 @app.get("/")
 def index():
+    react_index = FRONTEND_DIST / "index.html"
+    if react_index.is_file():
+        from fastapi.responses import FileResponse
+
+        return FileResponse(react_index)
     return index_handler(STATIC)

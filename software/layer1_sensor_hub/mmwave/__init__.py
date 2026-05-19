@@ -5,6 +5,16 @@ from .radar_config import DEFAULT_CONFIG, RadarConfigurator
 from .serial_manager import SerialManager
 from .tlv_parser import DetectedPoint, ParsedFrame, TLVParser
 from .uart_source import FrameHeader, UARTSource
+from .normalized import (
+    NormalizedMmwaveFrame,
+    NormalizedMmwaveObject,
+    dump_normalized_mmwave_frames,
+    load_normalized_mmwave_frames,
+    normalize_mmwave_frame,
+    normalize_mmwave_frames,
+    normalize_mmwave_object,
+)
+from .visualization import CameraProjectionConfig, project_frame_to_camera, render_top_down_jpeg
 
 __all__ = [
     "TLVType",
@@ -17,5 +27,14 @@ __all__ = [
     "TLVParser",
     "DetectedPoint",
     "ParsedFrame",
+    "NormalizedMmwaveFrame",
+    "NormalizedMmwaveObject",
+    "normalize_mmwave_object",
+    "normalize_mmwave_frame",
+    "normalize_mmwave_frames",
+    "load_normalized_mmwave_frames",
+    "dump_normalized_mmwave_frames",
+    "CameraProjectionConfig",
+    "project_frame_to_camera",
+    "render_top_down_jpeg",
 ]
-

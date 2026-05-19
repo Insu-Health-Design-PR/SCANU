@@ -27,6 +27,14 @@ from layer8_ui.preview_media import (
 )
 from layer8_ui.settings_store import DEFAULT_SETTINGS, load, reset_webcam_weapon_defaults, save
 
+from layer1_sensor_hub.mmwave import (
+    CameraProjectionConfig,
+    load_normalized_mmwave_frames,
+    normalize_mmwave_frame,
+    project_frame_to_camera,
+    render_top_down_jpeg,
+)
+
 try:
     from layer6_state_machine.models import SystemHealth, WeaponStateMachineConfig
     from layer6_state_machine.orchestrator import Layer6Orchestrator
@@ -429,7 +437,9 @@ def build_router(layer8_dir: Path) -> APIRouter:
         frame = _read_last_mmwave_frame()
         if frame is None:
             return []
-        points = frame.get("points") if isinstance(frame, dict) else []
+        points = frame.get("objects") if isinstance(frame, dict) else []
+        if not isinstance(points, list):
+            points = frame.get("points") if isinstance(frame, dict) else []
         if not isinstance(points, list):
             return []
         out: list[dict[str, float]] = []
@@ -446,9 +456,27 @@ def build_router(layer8_dir: Path) -> APIRouter:
         return out
 
     def _read_last_mmwave_frame() -> dict[str, Any] | None:
+        frames = _read_mmwave_frames_normalized(limit=1)
+        if frames:
+            return frames[-1]
+        return None
+
+    def _mmwave_output_path() -> Path | None:
         s = load(layer8_dir)
         rel = (s.get("mmwave") or {}).get("output") or "layer8_ui/artifacts/mmwave_frames.json"
-        path = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        return resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+
+    def _read_mmwave_frames_normalized(limit: int = 250) -> list[dict[str, Any]]:
+        path = _mmwave_output_path()
+        if path is None or not path.is_file():
+            return []
+        frames = load_normalized_mmwave_frames(path)
+        if limit > 0:
+            frames = frames[-limit:]
+        return [frame.to_dict() for frame in frames]
+
+    def _read_last_mmwave_raw_frame() -> dict[str, Any] | None:
+        path = _mmwave_output_path()
         if path is None or not path.is_file():
             return None
         try:
@@ -458,6 +486,69 @@ def build_router(layer8_dir: Path) -> APIRouter:
         if not isinstance(payload, list) or not payload:
             return None
         return payload[-1] if isinstance(payload[-1], dict) else None
+
+    def _mmwave_projection_config() -> CameraProjectionConfig:
+        s = load(layer8_dir)
+        m = s.get("mmwave") or {}
+        return CameraProjectionConfig.from_mapping(
+            {
+                "width": m.get("projection_width", 1280),
+                "height": m.get("projection_height", 720),
+                "x_scale_px_per_m": m.get("projection_x_scale_px_per_m", 120.0),
+                "y_scale_px_per_m": m.get("projection_y_scale_px_per_m", 90.0),
+                "x_offset_px": m.get("projection_x_offset_px", 0.0),
+                "y_offset_px": m.get("projection_y_offset_px", 0.0),
+                "rotation_deg": m.get("projection_rotation_deg", 0.0),
+                "max_range_m": m.get("projection_max_range_m", 12.0),
+            }
+        )
+
+    def _device_grid_payload() -> dict[str, Any]:
+        statuses = _sensor_statuses()
+        metrics = _read_metrics()
+        mmwave_frames = _read_mmwave_frames_normalized(limit=1)
+        mmwave_last = mmwave_frames[-1] if mmwave_frames else None
+        now_ms = time.time() * 1000.0
+        s = load(layer8_dir)
+        mode = str((s.get("mmwave") or {}).get("mode") or "central")
+        has_fault = all(not bool((statuses.get(sensor) or {}).get("running")) for sensor in ("webcam", "thermal", "mmwave"))
+        recovery_state = "degraded" if has_fault else ("fallback" if mode == "fallback" else "restored")
+
+        devices = []
+        for sensor in ("webcam", "thermal", "mmwave"):
+            st = statuses.get(sensor) or {}
+            running = bool(st.get("running"))
+            health = "online" if running else "offline"
+            detail = "idle"
+            if sensor == "webcam":
+                if bool(metrics.get("gun_detected")):
+                    health = "warning"
+                    detail = "weapon alert"
+                else:
+                    detail = f"persons={_to_int(metrics.get('persons_total'), 0)}"
+            elif sensor == "mmwave":
+                count = int((mmwave_last or {}).get("object_count") or 0)
+                detail = f"objects={count}"
+                if count > 0 and not running:
+                    health = "warning"
+            devices.append(
+                {
+                    "id": sensor,
+                    "label": "mmWave" if sensor == "mmwave" else sensor.title(),
+                    "kind": "radar" if sensor == "mmwave" else "camera",
+                    "status": health,
+                    "running": running,
+                    "pid": st.get("pid") or 0,
+                    "detail": detail,
+                    "last_seen_ms": now_ms if running or sensor == "mmwave" and mmwave_last else None,
+                }
+            )
+        return {
+            "timestamp_ms": int(now_ms),
+            "mode": mode,
+            "recovery_state": recovery_state,
+            "devices": devices,
+        }
 
     def _layer6_tick(
         *,
@@ -1264,13 +1355,71 @@ def build_router(layer8_dir: Path) -> APIRouter:
             while True:
                 frame = _read_last_mmwave_frame()
                 if frame is not None:
-                    fn = frame.get("frame", 0)
+                    fn = frame.get("frame_id", 0)
                     if fn != last_frame_number:
                         last_frame_number = fn
-                        points = frame.get("points", []) if isinstance(frame, dict) else []
-                        yield f"data: {json.dumps({'frame': fn, 'points': points, 'ts': time.time(), 'presence': len(points) > 0 if points else False, 'num_objects': len(points) if points else 0})}\n\n"
+                        objects = frame.get("objects", []) if isinstance(frame, dict) else []
+                        yield f"data: {json.dumps({'frame_id': fn, 'objects': objects, 'ts': time.time(), 'presence': len(objects) > 0, 'num_objects': len(objects)})}\n\n"
                 await asyncio.sleep(0.08)
         return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+    @router.get("/api/mmwave/frames")
+    def get_mmwave_frames(limit: int = 250) -> dict[str, Any]:
+        frames = _read_mmwave_frames_normalized(limit=max(1, min(int(limit), 1000)))
+        return {"available": bool(frames), "frames": frames, "count": len(frames)}
+
+    @router.get("/api/mmwave/latest")
+    def get_mmwave_latest() -> dict[str, Any]:
+        frames = _read_mmwave_frames_normalized(limit=1)
+        if not frames:
+            return normalize_mmwave_frame({}, fallback_frame_id=0).to_dict()
+        return frames[-1]
+
+    @router.get("/api/mmwave/camera-overlay")
+    def get_mmwave_camera_overlay() -> dict[str, Any]:
+        frames = _read_mmwave_frames_normalized(limit=1)
+        frame = normalize_mmwave_frame(frames[-1] if frames else {}, fallback_frame_id=0)
+        return project_frame_to_camera(frame, _mmwave_projection_config())
+
+    @router.post("/api/mmwave/preview/regenerate")
+    def regenerate_mmwave_preview() -> dict[str, Any]:
+        frames = _read_mmwave_frames_normalized(limit=1)
+        if not frames:
+            return {"ok": False, "error": "no_mmwave_frames"}
+        frame = normalize_mmwave_frame(frames[-1])
+        s = load(layer8_dir)
+        rel = (s.get("mmwave") or {}).get("live_frame") or "layer8_ui/artifacts/live_mmwave.jpg"
+        out = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
+        if out is None:
+            return {"ok": False, "error": "invalid_live_frame_path"}
+        render_top_down_jpeg(frame, out, max_range_m=_mmwave_projection_config().max_range_m)
+        return {"ok": True, "path": str(out), "frame_id": frame.frame_id}
+
+    @router.get("/api/devices")
+    def get_devices() -> dict[str, Any]:
+        return _device_grid_payload()
+
+    @router.get("/api/operator/state")
+    def get_operator_state() -> dict[str, Any]:
+        devices = _device_grid_payload()
+        status = _status_payload()
+        return {
+            "timestamp_ms": int(time.time() * 1000),
+            "mode": devices["mode"],
+            "recovery_state": devices["recovery_state"],
+            "has_fault": bool(status.get("health", {}).get("has_fault")),
+            "sensor_online_count": int(status.get("health", {}).get("sensor_online_count") or 0),
+            "reconnect_hint": "auto-refresh active",
+        }
+
+    @router.post("/api/operator/mode/{mode}")
+    def set_operator_mode(mode: Literal["central", "fallback", "local"]) -> dict[str, Any]:
+        s = load(layer8_dir)
+        mmwave = dict(s.get("mmwave") or {})
+        mmwave["mode"] = mode
+        s["mmwave"] = mmwave
+        save(layer8_dir, s)
+        return get_operator_state()
 
     @router.get("/api/dashboard/metrics")
     def dashboard_metrics() -> dict[str, Any]:
