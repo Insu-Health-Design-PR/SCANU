@@ -14,7 +14,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from fastapi import APIRouter, FastAPI, Request, WebSocket
+from fastapi import APIRouter, FastAPI, HTTPException, Request, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -111,4 +111,7 @@ def index():
         from fastapi.responses import FileResponse
 
         return FileResponse(react_index)
-    return index_handler(STATIC)
+    raise HTTPException(
+        503,
+        "React frontend build missing. Run: cd software/layer8_ui/frontend && npm install && npm run build",
+    )

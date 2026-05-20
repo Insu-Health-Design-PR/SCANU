@@ -9,12 +9,13 @@ mmWave data -> normalized objects -> top-down preview -> camera overlay -> React
 ```
 
 The existing FastAPI backend remains the Layer 8 API server. A new React/Vite
-frontend is served from `layer8_ui/frontend/dist` when built, with the legacy
-static dashboard retained only as fallback.
+frontend is served from `layer8_ui/frontend/dist` when built. The legacy static
+dashboard has been removed so React is the only primary operator UI.
 
 ## Main Changes
 
 - Added React/Vite operator UI under `software/layer8_ui/frontend`.
+- Removed the old static `layer8_ui/static/index.html` dashboard.
 - Added mmWave normalization helpers for stable frame/object contracts.
 - Added mmWave top-down preview rendering and camera projection helpers.
 - Added Layer 8 endpoints:

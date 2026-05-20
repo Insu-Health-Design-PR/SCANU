@@ -34,4 +34,5 @@ npm run build
 ```
 
 FastAPI serves `frontend/dist/index.html` automatically when it exists. If the
-React build is missing, Layer 8 falls back to the legacy static dashboard.
+React build is missing, `/` returns a setup error telling the operator to build
+the frontend.

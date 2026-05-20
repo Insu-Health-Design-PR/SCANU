@@ -1,6 +1,12 @@
 from pathlib import Path
+import sys
 
 from fastapi.testclient import TestClient
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+SOFTWARE_ROOT = REPO_ROOT / "software"
+if str(SOFTWARE_ROOT) not in sys.path:
+    sys.path.insert(0, str(SOFTWARE_ROOT))
 
 from layer8_ui.app import FRONTEND_DIST, LAYER8_DIR, app
 from layer8_ui.settings_store import settings_path
