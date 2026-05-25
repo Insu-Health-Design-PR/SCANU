@@ -6,6 +6,11 @@
     "lvdsMode": 2,
     "dataFormatMode": 3,
     "packetDelay_us": 25,
+    "nativeCommandPayloads": {
+      "note": "Optional hex payload overrides for Jetson-native dca1000_control.py if your DCA1000 firmware expects a TI-release-specific payload.",
+      "fpga": "",
+      "packet": ""
+    },
     "ethernetConfig": {
       "DCA1000IPAddress": "192.168.33.180",
       "DCA1000ConfigPort": 4096,
