@@ -12,20 +12,27 @@ The packet framing follows the public DCA1000 command protocol used by TI's
 CLI: 0xA55A header, command code, payload length, payload, 0xEEAA footer.
 The payload values are intentionally configurable from JSON because TI has
 shipped slightly different CLI examples across mmWave Studio releases.
+
+Some DCA1000 firmware versions require the FPGA bitstream to be loaded
+before they accept any commands. The ``load_fpga_bitstream`` helper can
+send the FPGA config file over UDP if needed.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import logging
 import socket
 import struct
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Optional
 
 from .dca1000_udp import Dca1000NetworkConfig
+
+logger = logging.getLogger(__name__)
 
 HEADER = 0xA55A
 FOOTER = 0xEEAA
@@ -62,7 +69,7 @@ COMMAND_NAMES: dict[str, int] = {
 }
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Dca1000CommandResult:
     """Result of a UDP command sent to DCA1000."""
 
@@ -156,46 +163,97 @@ def default_packet_payload(config: dict[str, Any]) -> bytes:
 
 
 class Dca1000NativeClient:
-    """Small UDP command client for DCA1000EVM."""
+    """UDP command client for DCA1000EVM with retry support."""
 
-    def __init__(self, network: Dca1000NetworkConfig | None = None, *, timeout_s: float = 1.0) -> None:
+    def __init__(
+        self,
+        network: Dca1000NetworkConfig | None = None,
+        *,
+        timeout_s: float = 2.0,
+        retries: int = 2,
+    ) -> None:
         self.network = network or Dca1000NetworkConfig()
         self.timeout_s = timeout_s
+        self.retries = retries
 
-    def send_command(self, command: str | int, payload: bytes = b"") -> Dca1000CommandResult:
+    def send_command(
+        self,
+        command: str | int,
+        payload: bytes = b"",
+        *,
+        retries: Optional[int] = None,
+    ) -> Dca1000CommandResult:
         command_name = str(command)
         command_code = COMMAND_NAMES.get(command_name, command if isinstance(command, int) else -1)
         if not isinstance(command_code, int) or command_code < 0:
             raise ValueError(f"unknown DCA1000 command: {command}")
 
         packet = self._build_packet(command_code, payload)
-        start = time.monotonic()
-        response = b""
-        ok = False
+        max_attempts = (retries if retries is not None else self.retries) + 1
+        last_response = b""
+        last_ok = False
 
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind((self.network.pc_ip, 0))
-            sock.settimeout(self.timeout_s)
-            sock.sendto(packet, (self.network.dca_ip, self.network.config_port))
+        start = time.monotonic()
+        for attempt in range(max_attempts):
             try:
-                response, _addr = sock.recvfrom(2048)
-                ok = self._response_ok(response)
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+                    sock.bind((self.network.pc_ip, self.network.config_port))
+                    sock.settimeout(self.timeout_s)
+                    sock.sendto(packet, (self.network.dca_ip, self.network.config_port))
+                    response, _addr = sock.recvfrom(2048)
+                    last_response = response
+                    last_ok = self._response_ok(response)
+                    if last_ok:
+                        break
             except socket.timeout:
-                ok = False
+                last_ok = False
+                if attempt < max_attempts - 1:
+                    logger.warning(
+                        "DCA1000 %r timeout (attempt %d/%d), retrying...",
+                        command_name,
+                        attempt + 1,
+                        max_attempts,
+                    )
+                    time.sleep(0.2)
+                continue
+            except OSError as e:
+                last_ok = False
+                logger.warning("DCA1000 %r socket error: %s", command_name, e)
+                if attempt < max_attempts - 1:
+                    time.sleep(0.5)
+                continue
 
         return Dca1000CommandResult(
             command=command_name,
             command_code=command_code,
-            ok=ok,
-            response_hex=response.hex(" "),
+            ok=last_ok,
+            response_hex=last_response.hex(" "),
             elapsed_s=time.monotonic() - start,
         )
 
-    def configure_from_json(self, config: dict[str, Any], *, reset: bool = True) -> list[Dca1000CommandResult]:
-        """Run the standard SCAN-U DCA1000 setup sequence."""
+    def configure_from_json(
+        self,
+        config: dict[str, Any],
+        *,
+        reset: bool = True,
+        connect_first: bool = False,
+    ) -> list[Dca1000CommandResult]:
+        """Run the standard SCAN-U DCA1000 setup sequence.
 
-        sequence: list[tuple[str, bytes]] = [("connect", b"")]
+        The typical DCA1000 initialization sequence is:
+
+        1. **connect** — establish communication with the board
+        2. **reset_fpga** — reset the FPGA to a known state
+        3. **fpga** — configure FPGA (LVDS mode, data format, etc.)
+        4. **packet** — set packet delay/us parameters
+
+        Some firmware versions need a short delay between commands.
+        """
+
+        sequence: list[tuple[str, bytes]] = []
+        if connect_first:
+            sequence.append(("connect", b""))
         if reset:
             sequence.append(("reset_fpga", b""))
         sequence.extend(
@@ -204,7 +262,13 @@ class Dca1000NativeClient:
                 ("packet", default_packet_payload(config)),
             ]
         )
-        return [self.send_command(name, payload) for name, payload in sequence]
+        results: list[Dca1000CommandResult] = []
+        for name, payload in sequence:
+            results.append(self.send_command(name, payload))
+            if not results[-1].ok:
+                logger.warning("DCA1000 %r failed, continuing sequence anyway", name)
+            time.sleep(0.05)
+        return results
 
     @staticmethod
     def _build_packet(command_code: int, payload: bytes) -> bytes:
@@ -216,10 +280,9 @@ class Dca1000NativeClient:
             return False
         if HEADER.to_bytes(2, "little") not in response[:4]:
             return False
-        # TI responses include a status byte/word. Treat an explicit non-zero
-        # tail as a failure, but allow short ACKs because firmware versions vary.
-        status_region = response[4:-2] if len(response) > 6 else b""
-        return not status_region or all(byte == 0 for byte in status_region[-2:])
+        if len(response) >= 4 and response[-2:] != FOOTER.to_bytes(2, "little"):
+            return False
+        return True
 
 
 def _print_results(results: Iterable[Dca1000CommandResult]) -> bool:
@@ -243,13 +306,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config-port", type=int, default=0)
     parser.add_argument("--data-port", type=int, default=0)
     parser.add_argument("--payload-hex", default="", help="Optional raw payload override for one command")
-    parser.add_argument("--timeout-s", type=float, default=1.0)
+    parser.add_argument("--timeout-s", type=float, default=2.0)
+    parser.add_argument("--retries", type=int, default=2, help="Retry count for each command")
     parser.add_argument("--no-reset", action="store_true")
+    parser.add_argument("--no-connect", action="store_true")
+    parser.add_argument("--inter-delay", type=float, default=0.05, help="Delay (s) between configure steps")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Enable debug logging")
     return parser
 
 
 def main() -> int:
     args = build_parser().parse_args()
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+
     config = load_dca_config(args.config) if args.config else {}
     network = network_from_config(config) if config else Dca1000NetworkConfig()
     network = Dca1000NetworkConfig(
@@ -258,10 +328,10 @@ def main() -> int:
         config_port=args.config_port or network.config_port,
         data_port=args.data_port or network.data_port,
     )
-    client = Dca1000NativeClient(network, timeout_s=args.timeout_s)
+    client = Dca1000NativeClient(network, timeout_s=args.timeout_s, retries=args.retries)
 
     if args.command == "configure":
-        results = client.configure_from_json(config, reset=not args.no_reset)
+        results = client.configure_from_json(config, reset=not args.no_reset, connect_first=not args.no_connect)
         return 0 if _print_results(results) else 2
 
     payload = _payload_from_hex(args.payload_hex) or b""
