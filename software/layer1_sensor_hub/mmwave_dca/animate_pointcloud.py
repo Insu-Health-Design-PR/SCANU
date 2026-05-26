@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Animated 3D point cloud — one frame at a time, saved as MP4.
+"""Animated 3D point cloud video — paper-style, frame by frame.
 
-Typical usage::
+Usage::
 
     python -m layer1_sensor_hub.mmwave_dca.animate_pointcloud \\
         data/point_clouds/weapon_1m.csv \\
@@ -10,16 +10,17 @@ Typical usage::
 
 import argparse
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.animation import FFMpegWriter
-from pathlib import Path
 
 
 def main():
-    p = argparse.ArgumentParser(description="Animate point cloud across frames")
-    p.add_argument("csv", help="Point cloud CSV from mmwave_run_detection")
+    p = argparse.ArgumentParser(description="Animate radar point cloud frames")
+    p.add_argument("csv", help="Point cloud CSV")
     p.add_argument("--output", "-o", default="pointcloud_animation.mp4")
-    p.add_argument("--fps", type=int, default=5)
+    p.add_argument("--fps", type=int, default=8)
     p.add_argument("--max-points", type=int, default=200)
     args = p.parse_args()
 
@@ -28,20 +29,20 @@ def main():
         print(f"error: expected 5+ columns, got shape {data.shape}")
         return 1
 
-    frames = np.unique(data[:, 0]).astype(int)
-    frames.sort()
-    print(f"Loaded {len(data)} points across {len(frames)} frames")
+    frames_u = np.unique(data[:, 0]).astype(int)
+    frames_u.sort()
+    print(f"Loaded {len(data)} points across {len(frames_u)} frames")
 
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection="3d")
+    fig = plt.figure(figsize=(16, 7))
+    fig.suptitle("Radar Point Cloud — mmWave DCA1000 + IWR6843", fontsize=14, y=0.98)
+
+    n_show = min(len(frames_u), 100)
+    step = max(1, len(frames_u) // n_show)
 
     writer = FFMpegWriter(fps=args.fps)
-    n_frames = len(frames)
-    n_show = min(n_frames, 100)
-
     with writer.saving(fig, args.output, dpi=150):
-        for idx in range(0, n_frames, max(1, n_frames // n_show)):
-            f = frames[idx]
+        for idx in range(0, len(frames_u), step):
+            f = frames_u[idx]
             mask = data[:, 0] == f
             pts = data[mask]
             if len(pts) == 0:
@@ -57,16 +58,34 @@ def main():
             ang = pts[:, 3]
             snr = pts[:, 4]
 
-            ax.clear()
-            sc = ax.scatter(rng, ang, dop, c=snr, cmap="jet", alpha=0.7, s=15)
-            ax.set_xlabel("Range (m)")
-            ax.set_ylabel("Angle (rad)")
-            ax.set_zlabel("Doppler bin")
-            ax.set_title(f"Frame {int(f)} — {len(pts)} points")
-            ax.set_xlim(1.0, 2.0)
-            ax.set_ylim(-1.0, 1.0)
-            ax.set_zlim(0, 16)
-            fig.colorbar(sc, ax=ax, label="SNR (dB)", shrink=0.6)
+            # --- Bird's-eye ---
+            ax1 = fig.add_subplot(121)
+            ax1.clear()
+            ax1.scatter(rng, ang, c=snr, cmap="jet", alpha=0.7, s=18,
+                        edgecolors="k", linewidths=0.3, vmin=data[:, 4].min(),
+                        vmax=data[:, 4].max())
+            ax1.set_xlabel("Range (m)", fontsize=12)
+            ax1.set_ylabel("Angle (rad)", fontsize=12)
+            ax1.set_title(f"Bird's-Eye View — frame {int(f)}", fontsize=12, fontweight="bold")
+            ax1.grid(True, alpha=0.3)
+            ax1.set_facecolor("#f8f9fa")
+            ax1.set_xlim(1.0, 2.2)
+            ax1.set_ylim(-0.8, 0.8)
+
+            # --- 3D ---
+            ax2 = fig.add_subplot(122, projection="3d")
+            ax2.clear()
+            ax2.scatter(rng, ang, dop, c=snr, cmap="jet", alpha=0.7, s=14,
+                        edgecolors="k", linewidths=0.2, vmin=data[:, 4].min(),
+                        vmax=data[:, 4].max())
+            ax2.set_xlabel("Range (m)", fontsize=12, labelpad=8)
+            ax2.set_ylabel("Angle (rad)", fontsize=12, labelpad=8)
+            ax2.set_zlabel("Doppler bin", fontsize=12, labelpad=8)
+            ax2.set_title(f"3D Point Cloud — {len(pts)} pts", fontsize=12, fontweight="bold")
+            ax2.set_xlim(1.0, 2.2)
+            ax2.set_ylim(-0.8, 0.8)
+            ax2.set_zlim(0, 16)
+            ax2.view_init(elev=25, azim=-60)
 
             writer.grab_frame()
             print(f"  frame {int(f)} written")
