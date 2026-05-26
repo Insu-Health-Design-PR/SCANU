@@ -9,7 +9,7 @@ import numpy as np
 from .signal_processor import ProcessedFrame
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class HeatmapFeatures:
     """Heatmap projections and summary vector derived from one processed frame."""
 

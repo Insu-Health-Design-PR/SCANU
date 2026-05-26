@@ -60,7 +60,7 @@ def normalize_thermal_frame(frame: np.ndarray) -> np.ndarray:
     return frame
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ThermalFrameInfo:
     width: int
     height: int

@@ -12,7 +12,7 @@ from .dca1000_udp import Dca1000NetworkConfig, UdpCaptureResult, UdpDca1000Recor
 from .radar_cli import RadarCliConfig, configure_radar_from_file, send_sensor_start, send_sensor_stop
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class CapturePlan:
     """One raw ADC capture run."""
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PresenceFrame:
     """One raw presence reading from the 60 GHz sensor source."""
 
@@ -25,7 +25,7 @@ class PresenceFrame:
         }
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PresenceFeatures:
     """Normalized presence feature set for downstream fusion."""
 

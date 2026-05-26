@@ -24,7 +24,7 @@ import numpy as np
 SplitName = Literal["safe", "unsafe"]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class CaptureSample:
     """One logical capture: same basename for mp4 / capture / report when present."""
 

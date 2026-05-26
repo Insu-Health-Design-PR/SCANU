@@ -12,7 +12,7 @@ from .feature_extractor import FeatureExtractor, HeatmapFeatures
 from .signal_processor import ProcessedFrame, SignalProcessor
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RealtimeFrame:
     """One realtime frame after passing from Layer 1 into Layer 2."""
 

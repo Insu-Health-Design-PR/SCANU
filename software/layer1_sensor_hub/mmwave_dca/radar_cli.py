@@ -10,7 +10,7 @@ from typing import Iterable, List
 import serial
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RadarCliConfig:
     """Serial settings for the mmWave CLI/control port."""
 

@@ -38,14 +38,14 @@ class RadarState(str, Enum):
     UNKNOWN = "unknown"
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class CliProbe:
     state: CliState
     response_text: str
     command_used: str
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class DataProbe:
     state: DataState
     bytes_seen: int
@@ -53,7 +53,7 @@ class DataProbe:
     sample_window_s: float
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RadarStateReport:
     radar_state: RadarState
     cli: CliProbe

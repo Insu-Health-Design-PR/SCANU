@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import BinaryIO, Callable, Optional
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Dca1000NetworkConfig:
     """Network values normally used by DCA1000EVM."""
 
@@ -21,7 +21,7 @@ class Dca1000NetworkConfig:
     socket_timeout_s: float = 1.0
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class UdpCaptureResult:
     """Summary of one UDP ADC recording."""
 

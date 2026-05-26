@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from typing import Iterable
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class PortInfo:
     device: str
     description: str

@@ -57,7 +57,7 @@ def _sorted_by_frame_number(frames: Iterable[dict[str, Any]]) -> list[dict[str, 
     return sorted(list(frames), key=key)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Layer3Feature:
     frame_number: int
     timestamp_ms: float

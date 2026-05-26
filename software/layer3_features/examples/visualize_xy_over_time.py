@@ -108,7 +108,7 @@ def _limit_frames_by_seconds(
     return frames[: max_frames if max_frames > 0 else len(frames)]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Trajectory:
     t_s: np.ndarray
     x_m: np.ndarray

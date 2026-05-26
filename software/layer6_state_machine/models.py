@@ -17,7 +17,7 @@ class SystemState(str, Enum):
     FAULT = "FAULT"
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class StateMachineConfig:
     trigger_threshold: float = 0.35
     scan_threshold: float = 0.45
@@ -30,7 +30,7 @@ class StateMachineConfig:
     anomaly_exit_frames: int = 3
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class WeaponStateMachineConfig(StateMachineConfig):
     trigger_threshold: float = 0.25
     scan_threshold: float = 0.35
@@ -39,7 +39,7 @@ class WeaponStateMachineConfig(StateMachineConfig):
     minimum_confidence: float = 0.25
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SystemHealth:
     has_fault: bool = False
     fault_code: Optional[str] = None
@@ -47,7 +47,7 @@ class SystemHealth:
     sensor_online_count: int = 0
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class StateEvent:
     previous_state: SystemState
     current_state: SystemState
@@ -58,7 +58,7 @@ class StateEvent:
     scores: dict[str, float] = field(default_factory=dict)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class StateSnapshot:
     state: SystemState
     dwell_ms: float
@@ -68,7 +68,7 @@ class StateSnapshot:
     active_radars: tuple[str, ...] = field(default_factory=tuple)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class RadarRuntimeSpec:
     radar_id: str
     config_port: Optional[str] = None
@@ -76,7 +76,7 @@ class RadarRuntimeSpec:
     default_config_path: Optional[str] = None
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class SensorStatus:
     radar_id: str
     connected: bool
@@ -88,7 +88,7 @@ class SensorStatus:
     data_port: Optional[str] = None
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ControlResult:
     radar_id: str
     action: str
@@ -97,7 +97,7 @@ class ControlResult:
     details: dict[str, object] = field(default_factory=dict)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ActionRequest:
     radar_id: str
     action: str

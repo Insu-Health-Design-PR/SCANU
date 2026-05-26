@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from .thermal import ThermalCameraSource
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class HubFrame:
     """Single synchronized read across all enabled sensor sources."""
 

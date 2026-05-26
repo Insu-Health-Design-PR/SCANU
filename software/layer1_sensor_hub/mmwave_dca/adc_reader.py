@@ -11,7 +11,7 @@ import numpy as np
 IqOrder = Literal["ti", "iq"]
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class AdcCaptureShape:
     """Expected dimensions for a raw ADC capture."""
 
@@ -27,6 +27,11 @@ class AdcCaptureShape:
     @property
     def int16_values(self) -> int:
         return self.complex_samples * 2
+
+    @classmethod
+    def from_bytes(cls, nbytes: int, *, chirps: int, rx: int, samples: int) -> AdcCaptureShape:
+        frames = nbytes // (2 * chirps * rx * samples * 2)
+        return cls(frames=frames, chirps=chirps, rx=rx, samples=samples)
 
 
 def _to_complex_iq(raw: np.ndarray, iq_order: IqOrder) -> np.ndarray:
@@ -103,3 +108,47 @@ def range_doppler_map(adc_frame: np.ndarray, *, window: bool = True) -> np.ndarr
     dfft = np.fft.fftshift(np.fft.fft(rfft, axis=0), axes=0)
     mag = np.sum(np.abs(dfft), axis=1)
     return 20.0 * np.log10(mag + 1e-6)
+
+
+def compute_mti(adc_frame: np.ndarray, alpha: float = 0.8) -> np.ndarray:
+    """Moving Target Indicator filter via exponential background subtraction.
+
+    Subtracts an exponentially-weighted background estimate from each
+    chirp's range profile to suppress static clutter.
+
+    Args:
+        adc_frame: complex64 shaped ``[chirps, rx, samples]``.
+        alpha: forgetting factor (0..1). Higher = slower adaptation.
+
+    Returns:
+        MTI-filtered frame, same shape as input.
+    """
+
+    data = np.asarray(adc_frame, dtype=np.complex64)
+    bg = np.zeros_like(data[0])
+    result = np.empty_like(data)
+    for i in range(data.shape[0]):
+        result[i] = data[i] - bg
+        bg = alpha * bg + (1 - alpha) * data[i]
+    return result
+
+
+def coherence_factor(adc_frame: np.ndarray) -> np.ndarray:
+    """Per-range-bin coherence across RX antennas.
+
+    High coherence suggests a compact reflector (like a firearm),
+    while distributed body returns have lower coherence.
+
+    Args:
+        adc_frame: complex64 shaped ``[chirps, rx, samples]``.
+
+    Returns:
+        Coherence per range bin, shape ``[samples]``.
+    """
+
+    data = np.asarray(adc_frame, dtype=np.complex64)
+    rfft = np.fft.fft(data, axis=-1)
+    coherent_sum = np.abs(np.sum(rfft, axis=1))
+    incoherent_sum = np.sum(np.abs(rfft), axis=1)
+    coherence = coherent_sum / (incoherent_sum + 1e-10)
+    return np.mean(coherence, axis=0)

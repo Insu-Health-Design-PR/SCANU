@@ -17,7 +17,7 @@ import numpy as np
 from .calibration import BackgroundModel
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ProcessedFrame:
     """Normalized outputs consumed by downstream feature extraction."""
 
@@ -99,7 +99,7 @@ class SignalProcessor:
             num_doppler_bins=num_doppler,
         )
 
-    @dataclass(frozen=True, slots=True)
+    @dataclass(frozen=True)
     class _NormalizedInput:
         frame_number: int
         timestamp_ms: float

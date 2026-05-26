@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class FusionInputContract:
     """Normalised fusion output consumed by Layer 6 state machine."""
 

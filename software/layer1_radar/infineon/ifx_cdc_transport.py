@@ -33,7 +33,7 @@ def crc16_ccitt_false(data: bytes) -> int:
     return crc & 0xFFFF
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class IfxCdcReply:
     payload: bytes
     crc_ok: bool

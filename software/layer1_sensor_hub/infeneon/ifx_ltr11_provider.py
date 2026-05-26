@@ -9,7 +9,7 @@ from typing import Optional
 import numpy as np
 
 
-@dataclass(slots=True)
+@dataclass()
 class IfxLtr11ProviderConfig:
     """Optional configuration overrides for LTR11."""
 

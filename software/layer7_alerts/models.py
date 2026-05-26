@@ -13,7 +13,7 @@ class AlertLevel(str, Enum):
     FAULT = "FAULT"
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class AlertPayload:
     event_id: str
     timestamp_utc: str
