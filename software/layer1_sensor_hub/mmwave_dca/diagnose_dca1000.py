@@ -30,7 +30,32 @@ from .dca1000_control import (
     network_from_config,
 )
 from .dca1000_udp import Dca1000NetworkConfig
-from .radar_cli import RadarCliConfig, _find_cli_port, send_cli_commands
+from .radar_cli import RadarCliConfig, send_cli_commands
+
+# Import _find_cli_port from radar_cli (added there for auto-detection)
+try:
+    from .radar_cli import _find_cli_port
+except ImportError:
+    # Fallback: simple port enumeration
+    def _find_cli_port() -> str | None:
+        import serial.tools.list_ports
+        for p in serial.tools.list_ports.comports():
+            port = p.device
+            try:
+                import serial
+                with serial.Serial(port, 115200, timeout=1.0) as ser:
+                    ser.reset_input_buffer()
+                    ser.write(b"version\r\n")
+                    import time
+                    time.sleep(0.8)
+                    waiting = ser.in_waiting
+                    if waiting:
+                        resp = ser.read(waiting).decode("utf-8", errors="ignore")
+                        if "xWR68" in resp or "IWR68" in resp or "mmWave" in resp or "mmwDemo" in resp:
+                            return port
+            except Exception:
+                continue
+        return None
 
 logger = logging.getLogger(__name__)
 

@@ -152,3 +152,160 @@ def coherence_factor(adc_frame: np.ndarray) -> np.ndarray:
     incoherent_sum = np.sum(np.abs(rfft), axis=1)
     coherence = coherent_sum / (incoherent_sum + 1e-10)
     return np.mean(coherence, axis=0)
+
+
+# ── MIMO helpers (TDM 3 TX × 4 RX = 12 virtual channels) ────────────────
+
+MIMO_LOOPS = 16
+MIMO_NUM_TX = 3
+
+
+def mimo_demux(adc_frame: np.ndarray) -> np.ndarray:
+    """Demultiplex a TDM-MIMO frame into ``[loops, tx, rx, samples]``.
+
+    Input shape: ``[loops * num_tx, rx, samples]`` (48 chirps, 4 RX, 384 samples).
+    Output shape: ``[loops, num_tx, rx, samples]``.
+
+    The 3 TX chirps fire in sequence per loop: TX1, TX2, TX3.
+    """
+    total_chirps = adc_frame.shape[0]
+    if total_chirps % MIMO_NUM_TX != 0:
+        raise ValueError(f"Total chirps {total_chirps} not divisible by {MIMO_NUM_TX} TX")
+    loops = total_chirps // MIMO_NUM_TX
+    return adc_frame.reshape(loops, MIMO_NUM_TX, *adc_frame.shape[1:])
+
+
+def mimo_range_doppler(mimo_frame: np.ndarray, tx_idx: int = 0) -> np.ndarray:
+    """Range-Doppler map for one TX, sum across RX.
+
+    Uses TX1 by default (index 0). TX1-only gives same noise floor as
+    legacy 4-RX processing. TX2/TX3 are used only for angle estimation.
+
+    Input: ``[loops, num_tx, rx, samples]`` (16, 3, 4, 384).
+    ``tx_idx``: TX antenna index (0=TX1, 1=TX2, 2=TX3).
+    Returns: RX-combined RD map in dB, shape ``[doppler, range]``.
+    """
+    loops, num_tx, rx, samples = mimo_frame.shape
+    data = np.asarray(mimo_frame, dtype=np.complex64)
+    data *= np.hanning(samples)[None, None, None, :]
+    data *= np.hanning(loops)[:, None, None, None]
+
+    rfft = np.fft.fft(data, axis=-1)
+    dfft = np.fft.fftshift(np.fft.fft(rfft, axis=0), axes=0)
+
+    mag = np.sum(np.abs(dfft[:, tx_idx]), axis=1)
+    return 20.0 * np.log10(mag + 1e-6)
+
+
+def mimo_virtual_snapshot(
+    mimo_frame: np.ndarray, range_bin: int, doppler_bin: int
+) -> np.ndarray:
+    """Extract the complex snapshot across the 12 virtual channels.
+
+    The virtual array order: TX1+RX1..RX4, TX2+RX1..RX4, TX3+RX1..RX4.
+    Returns: complex64 array of length 12.
+    """
+    loops, num_tx, rx, samples = mimo_frame.shape
+    data = np.asarray(mimo_frame, dtype=np.complex64)
+
+    data *= np.hanning(samples)[None, None, None, :]
+
+    rfft = np.fft.fft(data, axis=-1)
+    rfft *= np.hanning(loops)[:, None, None, None]
+    dfft = np.fft.fftshift(np.fft.fft(rfft, axis=0), axes=0)
+
+    doppler_idx = dfft.shape[0] // 2 + doppler_bin
+    if doppler_idx < 0 or doppler_idx >= dfft.shape[0]:
+        doppler_idx = dfft.shape[0] // 2
+    if range_bin < 0 or range_bin >= samples:
+        range_bin = 0
+
+    snapshot = dfft[doppler_idx, :, :, range_bin]
+    return snapshot.flatten()
+
+
+def mimo_beamform_angle(
+    virtual_snapshot: np.ndarray,
+    num_virtual: int = 12,
+    n_fft: int = 128,
+    d_lambda: float = 0.5,
+) -> float:
+    """Estimate angle from a virtual array snapshot.
+
+    Applies RX phase calibration (180° correction on every other element
+    per TX group, matching ``compRangeBiasAndRxChanPhase``) before
+    correlation-based angle estimation.
+
+    Uses adjacent-element correlation which is robust to small arrays.
+    ``num_virtual=8`` for azimuth (TX1+RX + TX2+RX).
+
+    Returns: angle in degrees.
+    """
+    x = virtual_snapshot.copy()
+    if len(x) < 2:
+        return 0.0
+
+    # Apply phase calibration: every other RX element per TX group
+    # gets 180° correction (matching compRangeBiasAndRxChanPhase in cfg)
+    cal = np.ones(len(x), dtype=np.complex64)
+    for group_start in range(0, len(x), 4):
+        for i in [1, 3]:
+            idx = group_start + i
+            if idx < len(x):
+                cal[idx] = -1
+    x = x * cal
+
+    # Correlation-based angle estimation
+    corr = np.mean(x[1:] * np.conj(x[:-1]))
+    delta_phi = np.angle(corr)
+    if abs(delta_phi) > 1e-6:
+        est_sin = delta_phi / (2.0 * np.pi * d_lambda)
+        if abs(est_sin) <= 1.0:
+            return float(np.rad2deg(np.arcsin(est_sin)))
+    return 0.0
+
+
+def mimo_coherence(mimo_frame: np.ndarray) -> np.ndarray:
+    """Per-range-bin coherence — per-TX across 4 RX, then take max across TX.
+
+    This preserves the weapon signature (coherent across RX for a given TX)
+    while avoiding TX spatial phase differences from washing out the result.
+
+    Input: ``[loops, num_tx, rx, samples]``.
+    Returns: coherence per range bin, shape ``[samples]``.
+    """
+    data = np.asarray(mimo_frame, dtype=np.complex64)
+    rfft = np.fft.fft(data, axis=-1)
+
+    loops, num_tx, rx = rfft.shape[:3]
+    max_coherence = np.zeros(rfft.shape[-1], dtype=np.float32)
+    for tx in range(num_tx):
+        tx_data = rfft[:, tx]
+        coherent_sum = np.abs(np.sum(tx_data, axis=1))
+        incoherent_sum = np.sum(np.abs(tx_data), axis=1)
+        coh = coherent_sum / (incoherent_sum + 1e-10)
+        coh_avg = np.mean(coh, axis=0)
+        np.maximum(max_coherence, coh_avg, out=max_coherence)
+    return max_coherence
+
+
+def mimo_phase_stability(mimo_frame: np.ndarray) -> np.ndarray:
+    """Per-range-bin phase stability — per-TX max across 4 RX.
+
+    Input: ``[loops, num_tx, rx, samples]``.
+    Returns: phase stability per range bin, shape ``[samples]``.
+    """
+    data = np.asarray(mimo_frame, dtype=np.complex64)
+    rfft = np.fft.fft(data, axis=-1)
+
+    loops, num_tx, rx = rfft.shape[:3]
+    max_pstab = np.zeros(rfft.shape[-1], dtype=np.float32)
+    for tx in range(num_tx):
+        tx_data = rfft[:, tx]
+        sum_v = np.sum(tx_data, axis=1)
+        phase = np.angle(sum_v)
+        mean_cos = np.mean(np.cos(phase), axis=0)
+        mean_sin = np.mean(np.sin(phase), axis=0)
+        pstab = np.sqrt(mean_cos ** 2 + mean_sin ** 2)
+        np.maximum(max_pstab, pstab, out=max_pstab)
+    return max_pstab

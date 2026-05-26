@@ -6,10 +6,12 @@ confidence from the mmWave tracker) alongside thermal presence and
 camera-based gun detection.
 """
 
+from .deterministic_fusion import DeterministicFusionAdapter
 from .fusion_adapter import L1L2FusionAdapter
 from .models import FusionInputContract
 
 __all__ = [
+    "DeterministicFusionAdapter",
     "L1L2FusionAdapter",
     "FusionInputContract",
 ]

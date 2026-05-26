@@ -3,6 +3,10 @@
 Uses primitives from adc_reader.py and adds weapon-optimised CFAR with
 zone-specific coherence analysis tuned for concealed firearms on the body.
 
+Supports TDM-MIMO (3 TX × 4 RX = 12 virtual channels).
+When input frame has 48 chirps, MIMO processing is automatically enabled.
+Legacy 16-chirp frames are processed with 4 RX only.
+
 Typical usage::
 
     detector = RawAdcWeaponDetector()
@@ -18,13 +22,20 @@ from typing import Optional
 
 import numpy as np
 
-from .adc_reader import coherence_factor, compute_mti, range_doppler_map, range_fft
+from .adc_reader import (
+    coherence_factor,
+    compute_mti,
+    range_doppler_map,
+    mimo_demux,
+    mimo_virtual_snapshot,
+    mimo_beamform_angle,
+    mimo_coherence,
+    mimo_phase_stability,
+)
 
 
 @dataclass(frozen=True)
 class MmweaponCfarParams:
-    """2D CFAR parameters optimised for compact reflector detection."""
-
     range_guard: int = 2
     range_train: int = 4
     doppler_guard: int = 1
@@ -36,15 +47,6 @@ class MmweaponCfarParams:
 
 @dataclass(frozen=True)
 class WeaponZoneParams:
-    """Range-bin zone where a concealed weapon is expected.
-
-    When a person is detected (via MTI motion) the zone is placed relative
-    to the motion peak; otherwise a static fallback zone is used.
-
-    Static fallback covers 1.2–1.9 m (bins 90–150), tuned for a person
-    standing ~1 m from the radar with the weapon at waist height.
-    """
-
     static_start: int = 90
     static_end: int = 150
     motion_offset_start: int = -60
@@ -53,29 +55,16 @@ class WeaponZoneParams:
 
 @dataclass
 class MmwaveDetectionResult:
-    """Output of one frame processed by RawAdcWeaponDetector."""
-
     frame_number: int
     weapon_score: float
     rd_map: np.ndarray
     cfar_mask: np.ndarray
     point_cloud: Optional[np.ndarray]
     features: dict[str, float]
+    mimo_enabled: bool = False
 
 
 class RawAdcWeaponDetector:
-    """Process raw ADC frames and produce weapon scores + point clouds.
-
-    Steps per frame:
-    1. Range-Doppler map
-    2. MTI filtering (clutter suppression)
-    3. Weapon-tuned 2D CFAR
-    4. Zone-specific coherence analysis
-    5. Feature extraction (zone-focused)
-    6. Composite weapon score
-    7. 3D point cloud
-    """
-
     def __init__(
         self,
         cfar: MmweaponCfarParams = MmweaponCfarParams(),
@@ -88,6 +77,51 @@ class RawAdcWeaponDetector:
 
     def detect(self, frame: np.ndarray, frame_number: int = 0) -> MmwaveDetectionResult:
         chirps, rx, samples = frame.shape
+        is_mimo = chirps == 48 and rx == 4
+
+        if is_mimo:
+            return self._detect_mimo(frame, frame_number)
+        else:
+            return self._detect_legacy(frame, frame_number)
+
+    def _detect_mimo(self, frame: np.ndarray, frame_number: int) -> MmwaveDetectionResult:
+        mimo = mimo_demux(frame)
+
+        # Use TX1-only for RD/MTI (clean, optimal SNR for stationary targets)
+        tx1_frame = mimo[:, 0, :, :]
+
+        rd = range_doppler_map(tx1_frame, window=True)
+
+        mti_frame = compute_mti(tx1_frame, alpha=self.mti_alpha)
+        mti_rd = range_doppler_map(mti_frame, window=True)
+
+        cfar_mask = self._cfar_2d(mti_rd)
+
+        rd_person = rd[:, 30:200]
+        cfar_person = np.zeros_like(rd, dtype=bool)
+        cfar_person[:, 30:200] = self._cfar_2d(rd_person)
+
+        coh = mimo_coherence(mimo)
+        pstab = mimo_phase_stability(mimo)
+
+        features = self._build_feature_dict(rd, mti_rd, cfar_mask, coh, pstab)
+
+        weapon_score = self._compute_weapon_score(features)
+
+        cloud = self._build_point_cloud_mimo(rd, cfar_person, mimo) if np.any(cfar_person) else None
+
+        return MmwaveDetectionResult(
+            frame_number=frame_number,
+            weapon_score=weapon_score,
+            rd_map=rd,
+            cfar_mask=cfar_mask,
+            point_cloud=cloud,
+            features=features,
+            mimo_enabled=True,
+        )
+
+    def _detect_legacy(self, frame: np.ndarray, frame_number: int) -> MmwaveDetectionResult:
+        chirps, rx, samples = frame.shape
 
         rd = range_doppler_map(frame, window=True)
 
@@ -96,7 +130,6 @@ class RawAdcWeaponDetector:
 
         cfar_mask = self._cfar_2d(mti_rd)
 
-        # Point cloud CFAR: use raw RD on person range only (bins 30-200)
         rd_person = rd[:, 30:200]
         cfar_person = np.zeros_like(rd, dtype=bool)
         cfar_person[:, 30:200] = self._cfar_2d(rd_person)
@@ -117,6 +150,7 @@ class RawAdcWeaponDetector:
             cfar_mask=cfar_mask,
             point_cloud=cloud,
             features=features,
+            mimo_enabled=False,
         )
 
     def _cfar_2d(self, rd_map: np.ndarray) -> np.ndarray:
@@ -129,7 +163,6 @@ class RawAdcWeaponDetector:
         for d in range(g_d + t_d, n_doppler - g_d - t_d):
             for r in range(g_r + t_r, n_range - g_r - t_r):
                 cell = rd_map[d, r]
-
                 guard = rd_map[
                     d - g_d : d + g_d + 1,
                     r - g_r : r + g_r + 1,
@@ -146,21 +179,28 @@ class RawAdcWeaponDetector:
                 noise_floor = np.nanmean(noise)
                 if np.isnan(noise_floor):
                     continue
-
                 threshold = noise_floor + self.cfar.threshold_scale + self.cfar.noise_floor_offset_db
                 if cell > threshold:
                     mask[d, r] = True
-
         return mask
 
     def _extract_features(
+        self, rd, mti_rd, cfar_mask, coherence, phase_stability, frame
+    ) -> dict[str, float]:
+        return self._build_feature_dict(rd, mti_rd, cfar_mask, coherence, phase_stability)
+
+    def _extract_features_mimo(
+        self, rd, mti_rd, cfar_mask, coherence, phase_stability, mimo_frame
+    ) -> dict[str, float]:
+        return self._build_feature_dict(rd, mti_rd, cfar_mask, coherence, phase_stability)
+
+    def _build_feature_dict(
         self,
         rd: np.ndarray,
         mti_rd: np.ndarray,
         cfar_mask: np.ndarray,
         coherence: np.ndarray,
         phase_stability: np.ndarray,
-        frame: np.ndarray,
     ) -> dict[str, float]:
         zs = self.zone.static_start
         ze = self.zone.static_end
@@ -290,9 +330,7 @@ class RawAdcWeaponDetector:
         correction = np.where(diff < -np.pi, 2 * np.pi, correction)
         return np.cumsum(np.concatenate([[ph[0]], correction]))
 
-    def _estimate_angle(
-        self, frame: np.ndarray, range_bin: int, doppler_bin: int
-    ) -> float:
+    def _estimate_angle(self, frame: np.ndarray, range_bin: int, doppler_bin: int) -> float:
         chirps, rx, samples = frame.shape
         cell = frame[:, :, range_bin]
         phase = np.angle(cell[doppler_bin, :])
@@ -305,13 +343,7 @@ class RawAdcWeaponDetector:
             return float(angle_rad)
         return 0.0
 
-    def _build_point_cloud(
-        self,
-        mti_rd: np.ndarray,
-        cfar_mask: np.ndarray,
-        frame: np.ndarray,
-        rd: np.ndarray,
-    ) -> np.ndarray:
+    def _build_point_cloud(self, mti_rd, cfar_mask, frame, rd) -> np.ndarray:
         det_indices = np.argwhere(cfar_mask)
         if len(det_indices) == 0:
             return np.empty((0, 5), dtype=np.float32)
@@ -330,5 +362,33 @@ class RawAdcWeaponDetector:
         for (d_bin, r_bin), snr, wz in zip(det_indices, strengths, in_zone):
             angle = self._estimate_angle(frame, int(r_bin), int(d_bin))
             points.append([float(r_bin), float(d_bin), angle, float(snr), float(wz)])
+        return np.array(points, dtype=np.float32)
 
+    @staticmethod
+    def _estimate_angle_mimo(mimo_frame: np.ndarray, range_bin: int, doppler_bin: int) -> float:
+        snapshot = mimo_virtual_snapshot(mimo_frame, int(range_bin), int(doppler_bin))
+        angle = mimo_beamform_angle(snapshot, num_virtual=8, d_lambda=0.5)
+        return angle
+
+    def _build_point_cloud_mimo(
+        self, rd: np.ndarray, cfar_mask: np.ndarray, mimo_frame: np.ndarray
+    ) -> np.ndarray:
+        det_indices = np.argwhere(cfar_mask)
+        if len(det_indices) == 0:
+            return np.empty((0, 5), dtype=np.float32)
+
+        zs, ze = self.zone.static_start, self.zone.static_end
+        in_zone = (det_indices[:, 1] >= zs) & (det_indices[:, 1] < ze)
+
+        strengths = rd[cfar_mask]
+        if len(strengths) > self.cfar.max_points:
+            top_k = np.argpartition(strengths, -self.cfar.max_points)[-self.cfar.max_points:]
+            det_indices = det_indices[top_k]
+            strengths = strengths[top_k]
+            in_zone = in_zone[top_k]
+
+        points = []
+        for (d_bin, r_bin), snr, wz in zip(det_indices, strengths, in_zone):
+            angle = self._estimate_angle_mimo(mimo_frame, int(r_bin), int(d_bin))
+            points.append([float(r_bin), float(d_bin), angle, float(snr), float(wz)])
         return np.array(points, dtype=np.float32)

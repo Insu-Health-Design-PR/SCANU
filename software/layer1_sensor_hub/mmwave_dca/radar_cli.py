@@ -20,6 +20,33 @@ class RadarCliConfig:
     command_delay_s: float = 0.04
 
 
+def _find_cli_port() -> str | None:
+    """Auto-detect the radar CLI serial port.
+
+    Scans all available serial ports, sends ``version``, and returns the
+    first port whose response contains ``xWR68``, ``IWR68``, or ``mmWave``.
+    Returns ``None`` if no radar is found.
+    """
+    import serial.tools.list_ports
+
+    for p in serial.tools.list_ports.comports():
+        port = p.device
+        try:
+            with serial.Serial(port, 115200, timeout=1.0) as ser:
+                ser.reset_input_buffer()
+                ser.reset_output_buffer()
+                ser.write(b"version\r\n")
+                time.sleep(0.8)
+                waiting = ser.in_waiting
+                if waiting:
+                    resp = ser.read(waiting).decode("utf-8", errors="ignore")
+                    if "xWR68" in resp or "IWR68" in resp or "mmWave" in resp or "mmwDemo" in resp:
+                        return port
+        except (OSError, serial.SerialException):
+            continue
+    return None
+
+
 def load_cli_commands(config_path: str | Path) -> List[str]:
     """Load non-empty, non-comment CLI commands from a TI ``.cfg`` file."""
 

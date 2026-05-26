@@ -12,7 +12,7 @@ from .radar_cli import RadarCliConfig
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Capture raw ADC from TI mmWave + DCA1000EVM")
-    parser.add_argument("--cli-port", required=True, help="Radar CLI/control port, e.g. /dev/ttyACM0")
+    parser.add_argument("--cli-port", default="", help="Radar CLI/control port, e.g. /dev/ttyUSB0 (auto-detect if empty)")
     parser.add_argument("--config", required=True, help="Radar .cfg file with LVDS enabled")
     parser.add_argument("--dca-config", default="", help="DCA1000 JSON config for native Jetson UDP control")
     parser.add_argument("--output", default="adc_data.bin", help="Output adc_data.bin path")
@@ -33,6 +33,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> int:
     args = build_parser().parse_args()
+    if not args.cli_port:
+        from .radar_cli import _find_cli_port
+        detected = _find_cli_port()
+        if detected is None:
+            print("error: no radar CLI port found")
+            return 1
+        print(f"Auto-detected radar CLI port: {detected}", file=__import__("sys").stderr)
+        args.cli_port = detected
     plan = CapturePlan(
         radar_cli=RadarCliConfig(port=args.cli_port),
         radar_config_path=Path(args.config),
