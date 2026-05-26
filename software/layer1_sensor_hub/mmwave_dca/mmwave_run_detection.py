@@ -1,13 +1,20 @@
 """Run raw ADC weapon detection on a captured adc_data.bin file.
 
+Outputs are saved to ``data/`` inside the module directory
+(``layer1_sensor_hub/mmwave_dca/data/``).
+
 Usage::
 
     python -m layer1_sensor_hub.mmwave_dca.mmwave_run_detection \\
         --input captures/test_10s.bin \\
         --chirps 16 --rx 4 --samples 384 \\
         --allow-truncate \\
-        --output-csv captures/detection_results.csv \\
-        --output-plot captures/weapon_score_timeline.png
+        --output-csv data/detection_results.csv \\
+        --output-plot data/weapon_score_timeline.png
+
+Point cloud outputs::
+
+    --output-point-cloud-csv data/point_clouds/my_capture.csv
 """
 
 from __future__ import annotations

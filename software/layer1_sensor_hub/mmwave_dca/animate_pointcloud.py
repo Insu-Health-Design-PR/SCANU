@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""Animated 3D point cloud — one frame at a time, saved as MP4."""
+"""Animated 3D point cloud — one frame at a time, saved as MP4.
+
+Typical usage::
+
+    python -m layer1_sensor_hub.mmwave_dca.animate_pointcloud \\
+        data/point_clouds/weapon_1m.csv \\
+        -o data/point_clouds/animation.mp4
+"""
 
 import argparse
 import numpy as np

@@ -148,14 +148,17 @@ Std:      204.7       203.7       209.9
 
 **Fix**: `export PYTHONPATH=/home/insu/Desktop/SCANU-dev_adrian/software:$PYTHONPATH`
 
-## Generated Files
+## Directory Layout
+
+Outputs are stored in `data/` under the mmwave_dca module:
 
 ```
-captures/
-├── adc_data.bin          (14M)  Last capture via run_jetson_native_capture.sh
-├── test_3s.bin           (8.3M) 3-second capture
-├── test_5s.bin           (14M)  5-second capture
-├── test_10s.bin          (28M)  10-second capture
-├── test_5s_rd.png               Range-Doppler from test_5s
-└── test_10s_rd.png              Range-Doppler from test_10s
+data/
+├── .gitkeep
+└── point_clouds/
+    ├── .gitkeep
+    ├── weapon_1m.csv          Point cloud CSV (person + weapon at 1m)
+    └── animation.mp4           Animated 3D point cloud video
 ```
+
+Raw ADC captures (`.bin`) are kept in the project root `captures/` (gitignored).

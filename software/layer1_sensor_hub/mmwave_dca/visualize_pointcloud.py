@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
-"""Plot point cloud CSV in 3D (range, doppler, angle) colored by SNR."""
+"""Plot point cloud CSV in 3D (range, doppler, angle) colored by SNR.
+
+Point cloud CSV files are typically saved in ``data/point_clouds/``.
+
+Usage::
+
+    python -m layer1_sensor_hub.mmwave_dca.visualize_pointcloud \\
+        data/point_clouds/weapon_1m.csv
+"""
 
 import argparse
 import numpy as np
