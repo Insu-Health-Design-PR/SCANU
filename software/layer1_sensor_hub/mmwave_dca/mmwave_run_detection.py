@@ -43,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-plot", default="", help="Save weapon score timeline plot")
     parser.add_argument("--output-point-cloud", default="", help="Save point cloud 3D scatter plot")
     parser.add_argument("--output-point-cloud-csv", default="",
-                        help="Save point cloud coordinates as CSV (frame,range_bin,doppler_bin,angle_rad,snr)")
+                        help="Save point cloud coordinates as CSV (frame,range_bin,doppler_bin,angle_rad,snr,zone_flag)")
     return parser
 
 
@@ -191,7 +191,7 @@ def main() -> int:
         out_pc_csv.parent.mkdir(parents=True, exist_ok=True)
         all_pc = np.concatenate(all_point_clouds, axis=0)
         np.savetxt(out_pc_csv, all_pc, delimiter=",",
-                   header="frame,range_bin,doppler_bin,angle_rad,snr",
+                    header="frame,range_bin,doppler_bin,angle_rad,snr,zone_flag",
                    comments="", fmt="%.6f")
         print(f"  Point cloud CSV saved: {out_pc_csv} ({len(all_pc)} points)")
 

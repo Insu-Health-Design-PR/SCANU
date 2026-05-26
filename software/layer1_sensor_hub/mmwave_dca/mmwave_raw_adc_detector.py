@@ -96,6 +96,11 @@ class RawAdcWeaponDetector:
 
         cfar_mask = self._cfar_2d(mti_rd)
 
+        # Point cloud CFAR: use raw RD on person range only (bins 30-200)
+        rd_person = rd[:, 30:200]
+        cfar_person = np.zeros_like(rd, dtype=bool)
+        cfar_person[:, 30:200] = self._cfar_2d(rd_person)
+
         coh = coherence_factor(frame)
         pstab = self._phase_stability(frame)
 
@@ -103,7 +108,7 @@ class RawAdcWeaponDetector:
 
         weapon_score = self._compute_weapon_score(features)
 
-        cloud = self._build_point_cloud(mti_rd, cfar_mask, frame, rd) if np.any(cfar_mask) else None
+        cloud = self._build_point_cloud(rd, cfar_person, frame, rd) if np.any(cfar_person) else None
 
         return MmwaveDetectionResult(
             frame_number=frame_number,
@@ -309,24 +314,21 @@ class RawAdcWeaponDetector:
     ) -> np.ndarray:
         det_indices = np.argwhere(cfar_mask)
         if len(det_indices) == 0:
-            return np.empty((0, 4), dtype=np.float32)
+            return np.empty((0, 5), dtype=np.float32)
 
         zs, ze = self.zone.static_start, self.zone.static_end
         in_zone = (det_indices[:, 1] >= zs) & (det_indices[:, 1] < ze)
-        det_indices = det_indices[in_zone]
-        if len(det_indices) == 0:
-            return np.empty((0, 4), dtype=np.float32)
 
         strengths = rd[cfar_mask]
-        strengths = strengths[in_zone]
         if len(strengths) > self.cfar.max_points:
             top_k = np.argpartition(strengths, -self.cfar.max_points)[-self.cfar.max_points:]
             det_indices = det_indices[top_k]
             strengths = strengths[top_k]
+            in_zone = in_zone[top_k]
 
         points = []
-        for (d_bin, r_bin), snr in zip(det_indices, strengths):
+        for (d_bin, r_bin), snr, wz in zip(det_indices, strengths, in_zone):
             angle = self._estimate_angle(frame, int(r_bin), int(d_bin))
-            points.append([float(r_bin), float(d_bin), angle, float(snr)])
+            points.append([float(r_bin), float(d_bin), angle, float(snr), float(wz)])
 
         return np.array(points, dtype=np.float32)
