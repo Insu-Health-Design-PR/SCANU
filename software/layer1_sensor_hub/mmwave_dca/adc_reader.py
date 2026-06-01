@@ -8,6 +8,8 @@ from typing import Literal
 
 import numpy as np
 
+from software.settings import MIMO_LOOPS, MIMO_NUM_TX
+
 IqOrder = Literal["ti", "iq"]
 
 
@@ -155,10 +157,6 @@ def coherence_factor(adc_frame: np.ndarray) -> np.ndarray:
 
 
 # ── MIMO helpers (TDM 3 TX × 4 RX = 12 virtual channels) ────────────────
-
-MIMO_LOOPS = 16
-MIMO_NUM_TX = 3
-
 
 def mimo_demux(adc_frame: np.ndarray) -> np.ndarray:
     """Demultiplex a TDM-MIMO frame into ``[loops, tx, rx, samples]``.

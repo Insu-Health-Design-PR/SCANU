@@ -15,6 +15,7 @@ from collections import deque
 from dataclasses import dataclass, field
 
 import numpy as np
+from software.settings import DBSCAN_EPS, DBSCAN_MIN_SAMPLES
 from sklearn.cluster import DBSCAN
 
 
@@ -101,7 +102,7 @@ class WeaponTracker:
             return [cloud]
 
         xy = cloud[:, :2]
-        clustering = DBSCAN(eps=radius_m, min_samples=1).fit(xy)
+        clustering = DBSCAN(eps=radius_m, min_samples=DBSCAN_MIN_SAMPLES).fit(xy)
         labels = clustering.labels_
         n_clusters = int(labels.max()) + 1 if labels.size > 0 else 0
 

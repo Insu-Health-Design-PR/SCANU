@@ -6,17 +6,19 @@ import socket
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import BinaryIO, Callable, Optional
+from typing import Optional
+
+import numpy as np
+
+from software.settings import DCA1000_HOST_IP, DCA1000_DEVICE_IP, DCA1000_CONFIG_PORT, DCA1000_DATA_PORT
 
 
 @dataclass(frozen=True)
 class Dca1000NetworkConfig:
-    """Network values normally used by DCA1000EVM."""
-
-    pc_ip: str = "192.168.33.30"
-    dca_ip: str = "192.168.33.180"
-    config_port: int = 4096
-    data_port: int = 4098
+    pc_ip: str = DCA1000_HOST_IP
+    dca_ip: str = DCA1000_DEVICE_IP
+    config_port: int = DCA1000_CONFIG_PORT
+    data_port: int = DCA1000_DATA_PORT
     packet_size: int = 4096
     socket_timeout_s: float = 1.0
 

@@ -14,6 +14,7 @@ from typing import Any, Callable
 
 import numpy as np
 
+from software.settings import CFAR_GUARD, CFAR_TRAIN, NUM_RANGE_BINS
 from .calibration import BackgroundModel
 
 
@@ -47,11 +48,11 @@ class SignalProcessor:
         self,
         background: BackgroundModel | None = None,
         doppler_bins: int = 16,
-        cfar_guard: int = 1,
-        cfar_train: int = 2,
+        cfar_guard: int = CFAR_GUARD,
+        cfar_train: int = CFAR_TRAIN,
         cfar_threshold_scale: float = 1.8,
         weapon_cfar_threshold_scale: float = 1.2,
-        num_range_bins: int = 256,
+        num_range_bins: int = NUM_RANGE_BINS,
         time_fn: Callable[[], float] | None = None,
     ) -> None:
         if doppler_bins <= 0:

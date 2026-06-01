@@ -30,12 +30,13 @@ REPO_ROOT = THIS_FILE.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from software.settings import COLLECTING_DATA_DIR
 from software.layer1_sensor_hub.thermal import ThermalCameraSource, normalize_thermal_frame
 
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Dual camera menu (USB RGB + thermal)")
-    p.add_argument("--out-dir", default="~/Desktop/collecting_data/dual_camera", help="Output directory")
+    p.add_argument("--out-dir", default=str(COLLECTING_DATA_DIR / "dual_camera"), help="Output directory")
 
     p.add_argument(
         "--rgb-device",

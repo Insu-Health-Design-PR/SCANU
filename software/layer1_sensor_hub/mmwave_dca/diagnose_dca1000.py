@@ -20,6 +20,7 @@ import time
 import serial
 import serial.tools.list_ports
 
+from software.settings import DCA1000_HOST_IP, DCA1000_DEVICE_IP
 from .dca1000_control import (
     Dca1000Command,
     Dca1000NativeClient,
@@ -132,8 +133,8 @@ def diagnose(args: argparse.Namespace) -> int:
     # 5. Ethernet interface
     # ------------------------------------------------------------------
     print("\n--- 5. Ethernet (DCA1000 Network) ---")
-    pc_ip = args.pc_ip or "192.168.33.30"
-    dca_ip = args.dca_ip or "192.168.33.180"
+    pc_ip = args.pc_ip or DCA1000_HOST_IP
+    dca_ip = args.dca_ip or DCA1000_DEVICE_IP
     try:
         import subprocess
 
@@ -210,8 +211,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="DCA1000 / mmWave radar diagnostic")
     parser.add_argument("--cli-port", default="", help="Radar CLI port (auto-detect if empty)")
     parser.add_argument("--data-port", default="", help="Radar data port")
-    parser.add_argument("--pc-ip", default="192.168.33.30")
-    parser.add_argument("--dca-ip", default="192.168.33.180")
+    parser.add_argument("--pc-ip", default=DCA1000_HOST_IP)
+    parser.add_argument("--dca-ip", default=DCA1000_DEVICE_IP)
     parser.add_argument("--eth-dev", default="eth0", help="Ethernet device for DCA1000")
     parser.add_argument("--dca-timeout", type=float, default=2.0)
     parser.add_argument("--dca-retries", type=int, default=2)

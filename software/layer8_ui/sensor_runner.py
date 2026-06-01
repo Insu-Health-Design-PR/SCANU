@@ -7,13 +7,13 @@ delegating command lines to ``thermal_runner`` and ``webcam_runner``.
 
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import shlex
 import signal
 import subprocess
 import sys
-import threading
 import time
 from pathlib import Path
 from typing import Any, Literal
@@ -23,7 +23,6 @@ from layer8_ui.artifact_paths import software_root_from_settings
 
 SensorId = Literal["thermal", "webcam", "mmwave"]
 
-_lock = threading.Lock()
 _STATE_PATH: Path | None = None
 
 
@@ -45,6 +44,7 @@ def _read_state(path: Path) -> dict[str, Any]:
         return {}
     try:
         with open(path) as f:
+            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
             return json.load(f)
     except (json.JSONDecodeError, OSError):
         return {}
@@ -54,7 +54,10 @@ def _write_state(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(".tmp")
     with open(tmp, "w") as f:
+        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
         json.dump(data, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
     tmp.replace(path)
 
 
@@ -140,17 +143,15 @@ def command_cwd(sensor: SensorId, settings: dict[str, Any], _layer8_dir: Path | 
 
 def status(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
     path = _state_path(layer8_dir)
-    with _lock:
-        st = _read_state(path)
+    st = _read_state(path)
     entry = st.get(sensor) or {}
     pid = int(entry.get("pid") or 0)
     running = _pid_alive(pid)
     if not running and pid:
-        with _lock:
-            st = _read_state(path)
-            if st.get(sensor, {}).get("pid") == pid:
-                st.pop(sensor, None)
-                _write_state(path, st)
+        st = _read_state(path)
+        if st.get(sensor, {}).get("pid") == pid:
+            st.pop(sensor, None)
+            _write_state(path, st)
         pid = 0
     log_file = entry.get("log_file")
     tail = ""
@@ -165,19 +166,17 @@ def status(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
 
 def stop(sensor: SensorId, layer8_dir: Path) -> dict[str, Any]:
     path = _state_path(layer8_dir)
-    with _lock:
-        st = _read_state(path)
-        entry = st.get(sensor) or {}
-        pid = int(entry.get("pid") or 0)
+    st = _read_state(path)
+    entry = st.get(sensor) or {}
+    pid = int(entry.get("pid") or 0)
     if pid and _pid_alive(pid):
         try:
             os.kill(pid, signal.SIGTERM)
         except OSError:
             pass
-    with _lock:
-        st = _read_state(path)
-        st.pop(sensor, None)
-        _write_state(path, st)
+    st = _read_state(path)
+    st.pop(sensor, None)
+    _write_state(path, st)
     return {"ok": True, "stopped_pid": pid}
 
 
@@ -221,21 +220,19 @@ def start(sensor: SensorId, settings: dict[str, Any], layer8_dir: Path) -> dict[
         return {"ok": False, "error": str(e)}
     log_f.close()
 
-    with _lock:
-        st = _read_state(path)
-        st[sensor] = {"pid": proc.pid, "log_file": str(log_path)}
-        _write_state(path, st)
+    st = _read_state(path)
+    st[sensor] = {"pid": proc.pid, "log_file": str(log_path)}
+    _write_state(path, st)
 
     # If the child dies during imports or camera open, surface failure instead of "Run OK" + idle.
     for _ in range(24):
         code = proc.poll()
         if code is not None:
             tail = _tail_log(log_path)
-            with _lock:
-                st2 = _read_state(path)
-                if st2.get(sensor, {}).get("pid") == proc.pid:
-                    st2.pop(sensor, None)
-                    _write_state(path, st2)
+            st2 = _read_state(path)
+            if st2.get(sensor, {}).get("pid") == proc.pid:
+                st2.pop(sensor, None)
+                _write_state(path, st2)
             err = (
                 f"{sensor} subprocess exited immediately (code {code}). "
                 f"Check paths, camera index, GPU memory, and checkpoint. Log ({log_path}):\n{tail}"

@@ -30,6 +30,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable, Optional
 
+from software.settings import DCA1000_HOST_IP, DCA1000_DEVICE_IP
 from .dca1000_udp import Dca1000NetworkConfig
 
 logger = logging.getLogger(__name__)
@@ -91,8 +92,8 @@ def network_from_config(config: dict[str, Any]) -> Dca1000NetworkConfig:
     root = _config_root(config)
     eth = root.get("ethernetConfig") or {}
     update = root.get("ethernetConfigUpdate") or {}
-    pc_ip = str(update.get("systemIPAddress") or root.get("pc_ip") or "192.168.33.30")
-    dca_ip = str(eth.get("DCA1000IPAddress") or update.get("DCA1000IPAddress") or root.get("dca_ip") or "192.168.33.180")
+    pc_ip = str(update.get("systemIPAddress") or root.get("pc_ip") or DCA1000_HOST_IP)
+    dca_ip = str(eth.get("DCA1000IPAddress") or update.get("DCA1000IPAddress") or root.get("dca_ip") or DCA1000_DEVICE_IP)
     config_port = int(eth.get("DCA1000ConfigPort") or update.get("DCA1000ConfigPort") or root.get("config_port") or 4096)
     data_port = int(eth.get("DCA1000DataPort") or update.get("DCA1000DataPort") or root.get("data_port") or 4098)
     return Dca1000NetworkConfig(pc_ip=pc_ip, dca_ip=dca_ip, config_port=config_port, data_port=data_port)

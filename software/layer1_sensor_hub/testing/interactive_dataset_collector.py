@@ -24,7 +24,8 @@ ANOMALY_REPORT_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/view/ano
 
 DEFAULT_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg"
 DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json"
-DEFAULT_OUT_BASE = Path("/home/insu/Desktop/collecting_data")
+from software.settings import COLLECTING_DATA_DIR
+DEFAULT_OUT_BASE = COLLECTING_DATA_DIR
 
 SAFE_SCENARIOS = [
     "empty_room",

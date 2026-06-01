@@ -13,6 +13,7 @@ from typing import Any
 
 import numpy as np
 
+from software.settings import MMWAVE_MAX_POINTS, THERMAL_ALPHA, WEAPON_WEIGHT
 from .models import FusionInputContract
 
 
@@ -22,9 +23,9 @@ class L1L2FusionAdapter:
     def __init__(
         self,
         *,
-        mmwave_max_points: int = 12,
-        thermal_alpha: float = 0.05,
-        weapon_weight: float = 0.50,
+        mmwave_max_points: int = MMWAVE_MAX_POINTS,
+        thermal_alpha: float = THERMAL_ALPHA,
+        weapon_weight: float = WEAPON_WEIGHT,
     ) -> None:
         self._mmwave_max_points = max(1, int(mmwave_max_points))
         self._thermal_alpha = float(np.clip(thermal_alpha, 0.001, 1.0))

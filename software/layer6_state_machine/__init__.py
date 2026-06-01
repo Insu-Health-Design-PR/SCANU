@@ -1,6 +1,5 @@
 """Public API for Layer 6 state and control plane."""
 
-from .fusion_adapter import L1L2FusionAdapter  # deprecated — use layer5_fusion
 from .models import (
     ActionRequest,
     ControlResult,
@@ -23,7 +22,6 @@ __all__ = [
     "ActionRequest",
     "ControlResult",
     "FusionInputContract",
-    "L1L2FusionAdapter",
     "Layer6Orchestrator",
     "RadarRuntimeSpec",
     "SensorControlManager",

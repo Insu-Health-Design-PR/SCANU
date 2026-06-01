@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from software.settings import DCA1000_HOST_IP, DCA1000_DEVICE_IP, DCA1000_CONFIG_PORT, DCA1000_DATA_PORT
 from .capture_runner import CapturePlan, run_capture_plan
 from .dca1000_udp import Dca1000NetworkConfig
 from .radar_cli import RadarCliConfig
@@ -18,10 +19,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output", default="adc_data.bin", help="Output adc_data.bin path")
     parser.add_argument("--duration-s", type=float, default=5.0)
     parser.add_argument("--max-packets", type=int, default=0)
-    parser.add_argument("--pc-ip", default="192.168.33.30")
-    parser.add_argument("--dca-ip", default="192.168.33.180")
-    parser.add_argument("--data-port", type=int, default=4098)
-    parser.add_argument("--config-port", type=int, default=4096)
+    parser.add_argument("--pc-ip", default=DCA1000_HOST_IP)
+    parser.add_argument("--dca-ip", default=DCA1000_DEVICE_IP)
+    parser.add_argument("--data-port", type=int, default=DCA1000_DATA_PORT)
+    parser.add_argument("--config-port", type=int, default=DCA1000_CONFIG_PORT)
     parser.add_argument("--skip-radar-config", action="store_true")
     parser.add_argument("--configure-dca", action="store_true", help="Configure DCA1000 over UDP from --dca-config")
     parser.add_argument("--start-dca", action="store_true", help="Send DCA1000 start_record before sensorStart")

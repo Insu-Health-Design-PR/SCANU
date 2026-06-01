@@ -22,6 +22,7 @@ from typing import Optional
 
 import numpy as np
 
+from software.settings import CFAR_THRESHOLD_SCALE, CFAR_NOISE_FLOOR_OFFSET_DB
 from .adc_reader import (
     coherence_factor,
     compute_mti,
@@ -40,8 +41,8 @@ class MmweaponCfarParams:
     range_train: int = 4
     doppler_guard: int = 1
     doppler_train: int = 3
-    threshold_scale: float = 8.0
-    noise_floor_offset_db: float = 3.0
+    threshold_scale: float = CFAR_THRESHOLD_SCALE
+    noise_floor_offset_db: float = CFAR_NOISE_FLOOR_OFFSET_DB
     max_points: int = 64
 
 

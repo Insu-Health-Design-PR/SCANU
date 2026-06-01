@@ -36,6 +36,7 @@ REPO_ROOT = THIS_FILE.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+from software.settings import COLLECTING_DATA_DIR
 from software.layer1_sensor_hub.infineon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
 from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
@@ -50,7 +51,7 @@ SCENARIOS: list[tuple[str, str]] = [
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="4-scenario multisensor capture (RGB + thermal + mmWave + presence)")
-    p.add_argument("--out-dir", default="~/Desktop/collecting_data/four_scenario_multisensor", help="Output directory")
+    p.add_argument("--out-dir", default=str(COLLECTING_DATA_DIR / "four_scenario_multisensor"), help="Output directory")
     p.add_argument("--session", default="session", help="Session tag used in file names")
 
     p.add_argument("--capture-seconds", type=float, default=8.0, help="Capture duration for each scenario")

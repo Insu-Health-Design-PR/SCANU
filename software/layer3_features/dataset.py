@@ -1,6 +1,6 @@
 """
 Multimodal capture dataset: group ``*_capture.json``, ``*_report.json``, and ``.mp4`` by stem
-under ``safe/<scenario>/`` and ``unsafe/<scenario>/`` (e.g. ``~/Desktop/collecting_data``).
+under ``safe/<scenario>/`` and ``unsafe/<scenario>/`` (default: ``COLLECTING_DATA_DIR`` from ``software.settings``).
 
 Produces ML-ready structures:
   - :class:`CaptureSample` — paths + labels + scenario

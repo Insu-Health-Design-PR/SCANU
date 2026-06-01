@@ -14,6 +14,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from software.settings import COLLECTING_DATA_DIR
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 
 
@@ -24,7 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Capture thermal images by view (front/back/side)")
     p.add_argument(
         "--out-dir",
-        default="~/Desktop/collecting_data/thermal_weapon_views",
+        default=str(COLLECTING_DATA_DIR / "thermal_weapon_views"),
         help="Base output directory",
     )
     p.add_argument("--images-per-view", type=int, default=20, help="Target images per view")
