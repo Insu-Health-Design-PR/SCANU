@@ -65,28 +65,4 @@ serial_mgr.disconnect()
 
 
 
-mmWave Data Ingestion Setup
-mmWave Parsing & Object Extraction
-mmWave Visualization (basic overlay points)
-Sensor Fusion (mmWave → camera mapping basic)
-Improved mmWave Visualization (movement vectors)
-UI Base Setup (React app skeleton)
-Live Camera Feed Component
-Detection Overlay UI (bounding boxes)
-Device Listing UI (CCTV/Ring style grid)
 
-Frontend UI with Device listing like ring UI or CCTV camera UI.
-Alert UI (weapon detection indicators)
-UI Metrics Panel (FPS, latency display)
-UI + mmWave overlay integration
-Enhanced Visualization (trajectory preview UI)
-UI Status Indicators (device health)
-UI Controls (toggle modes, configs)
-Failure State UI (alerts, warnings)
-UI Auto-refresh + reconnection logic
-Recovery UI indicators
-Alert Visualization Improvements
-Config Panel UI
-Tracking Visualization (IDs + paths)
-UI Path Rendering (lines/trails)
-Unsafe Person Highlight UI
