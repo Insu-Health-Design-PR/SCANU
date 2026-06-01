@@ -74,7 +74,7 @@ Configure radar, arm DCA1000, start radar, receive UDP ADC, stop:
 ```bash
 python3 -m layer1_sensor_hub.mmwave_dca.run_dca_capture \
   --cli-port /dev/ttyACM0 \
-  --config layer1_sensor_hub/testing/configs/dca1000_adc_capture.cfg \
+  --config layer1_sensor_hub/examples/configs/dca1000_adc_capture.cfg \
   --dca-config layer1_sensor_hub/mmwave_dca/ti_cli/configFile.json \
   --output captures/adc_data.bin \
   --duration-s 5 \

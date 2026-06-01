@@ -8,7 +8,8 @@ consume thermal frames consistently in headless mode.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from pathlib import Path
+from typing import Optional, Union
 
 import cv2
 import numpy as np
@@ -34,6 +35,52 @@ def normalize_thermal_frame(frame: np.ndarray) -> np.ndarray:
     return frame
 
 
+def _is_numeric_device(device: Union[int, str]) -> bool:
+    if isinstance(device, int):
+        return True
+    try:
+        int(device)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+
+def _open_capture(
+    device: Union[int, str],
+    width: int,
+    height: int,
+    fps: int,
+    open_retries: int,
+    open_retry_delay_s: float,
+) -> cv2.VideoCapture:
+    import time
+
+    cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
+    cap.set(cv2.CAP_PROP_CONVERT_RGB, 0)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"Y16 "))
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+
+    for attempt in range(1, open_retries + 1):
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        cap.set(cv2.CAP_PROP_FPS, fps)
+        if cap.isOpened():
+            return cap
+        if attempt < open_retries:
+            time.sleep(open_retry_delay_s)
+            cap.open(device, cv2.CAP_V4L2)
+
+    raise RuntimeError(f"Cannot open thermal camera {device}")
+
+
+def _display_device(device: Union[int, str]) -> str:
+    if isinstance(device, int):
+        return f"/dev/video{device}"
+    if "/" not in device:
+        return f"/dev/video{device}"
+    return str(device)
+
+
 @dataclass(frozen=True)
 class ThermalFrameInfo:
     width: int
@@ -42,22 +89,30 @@ class ThermalFrameInfo:
 
 
 class ThermalCameraSource:
-    """Small V4L2 thermal source wrapper for examples."""
+    """V4L2 thermal source wrapper with robust retry logic."""
 
     def __init__(
         self,
-        device: int = 0,
+        device: Union[int, str] = 0,
         width: int = 640,
         height: int = 480,
         fps: int = 30,
+        open_retries: int = 10,
+        open_retry_delay_s: float = 0.25,
+        read_retries: int = 4,
     ) -> None:
-        self._cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
-        if not self._cap.isOpened():
-            raise RuntimeError(f"Cannot open thermal camera /dev/video{device}")
+        self._device = device
+        self._width = width
+        self._height = height
+        self._fps = fps
+        self._read_retries = read_retries
+        self._cap = _open_capture(device, width, height, fps, open_retries, open_retry_delay_s)
 
-        self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
-        self._cap.set(cv2.CAP_PROP_FPS, fps)
+    def __enter__(self) -> ThermalCameraSource:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.close()
 
     def info(self) -> ThermalFrameInfo:
         return ThermalFrameInfo(
@@ -67,10 +122,11 @@ class ThermalCameraSource:
         )
 
     def read_raw(self) -> Optional[np.ndarray]:
-        ok, frame = self._cap.read()
-        if not ok:
-            return None
-        return frame
+        for _ in range(self._read_retries):
+            ok, frame = self._cap.read()
+            if ok:
+                return frame
+        return None
 
     def read_colormap_bgr(self) -> Optional[np.ndarray]:
         frame = self.read_raw()
@@ -83,3 +139,11 @@ class ThermalCameraSource:
         if self._cap is not None:
             self._cap.release()
 
+    def save_raw(self, path: Union[str, Path]) -> Path:
+        frame = self.read_raw()
+        if frame is None:
+            raise RuntimeError("No thermal frame to save")
+        out = Path(path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        cv2.imwrite(str(out), frame)
+        return out

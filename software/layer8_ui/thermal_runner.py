@@ -1,7 +1,7 @@
 """
 Thermal capture + live preview (shared V4L2 reader, colormap JPEG).
 
-Subprocess entrypoint uses ``layer1_radar.examples.thermal_only_capture`` (same as
+Subprocess entrypoint uses ``layer1_sensor_hub.examples.thermal_only_capture`` (same as
 ``ThermalCameraSource`` pipeline in layer1). Live dashboard reads frames here with OpenCV
 when the capture subprocess is not holding the device.
 """
@@ -27,7 +27,7 @@ _THERMAL_CAM_CFG_LEN = 9
 
 
 def layer1_examples_dir(software_root: Path) -> Path:
-    return software_root / "layer1_radar" / "examples"
+    return software_root / "layer1_sensor_hub" / "examples"
 
 
 def thermal_capture_script(software_root: Path) -> Path:
@@ -35,7 +35,7 @@ def thermal_capture_script(software_root: Path) -> Path:
 
 
 def build_thermal_command(settings: dict[str, Any], _layer8_dir: Path) -> list[str]:
-    """CLI for ``thermal_only_capture.py`` (layer1 example)."""
+    """CLI for ``thermal_only_capture.py`` (layer1_sensor_hub example)."""
     import os as _os
     import sys
 

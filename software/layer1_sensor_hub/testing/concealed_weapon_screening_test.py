@@ -22,7 +22,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 RICH_CAPTURE_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/capture_all_sensors_rich.py"
-DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
+DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json"
 DEFAULT_OUT_DIR = REPO_ROOT / "software/layer1_sensor_hub/testing/view"
 
 MODE_PRESETS = {

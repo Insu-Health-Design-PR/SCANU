@@ -161,7 +161,7 @@ def main():
         rgb_img, thermal_img = capture_cameras(args)
 
         print(f"Radar capture ({args.duration}s)... person stay still!")
-        cfg = f"{software}/layer1_sensor_hub/testing/configs/weapon_detection_dca1000.cfg"
+        cfg = f"{software}/layer1_sensor_hub/examples/configs/weapon_detection_dca1000.cfg"
         mod = "layer1_sensor_hub.mmwave_dca.run_dca_capture"
         env = {**os.environ, "PYTHONPATH": str(software)}
         subprocess.run(

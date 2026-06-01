@@ -20,7 +20,7 @@ REPO_ROOT = THIS_FILE.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
+from software.layer1_sensor_hub.infineon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
 from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 

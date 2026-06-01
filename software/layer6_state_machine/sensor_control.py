@@ -86,7 +86,7 @@ class SensorControlManager:
             / "examples"
             / "radar_kill_switch.py"
         )
-        spec = importlib.util.spec_from_file_location("layer1_radar_kill_switch", path)
+        spec = importlib.util.spec_from_file_location("layer1_sensor_hub_kill_switch", path)
         if spec is None or spec.loader is None:
             return _NoopKillSwitch()
         module = importlib.util.module_from_spec(spec)

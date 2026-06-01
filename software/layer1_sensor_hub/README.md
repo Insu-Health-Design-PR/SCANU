@@ -1,15 +1,16 @@
 # Layer 1 Sensor Hub
 
-Unified Layer 1 entrypoint for three sensors:
+Unified Layer 1 entrypoint for all sensors:
 
 - `mmwave`: TI IWR6843 UART + TLV
 - `mmwave_dca`: TI IWR6843/AWR1843 raw ADC capture through DCA1000EVM
-- `infeneon`: 60 GHz LTR11 presence provider
+- `infineon`: 60 GHz LTR11 presence provider
 - `thermal`: thermal camera frame source
+- `webcam`: RGB camera (via layer8_ui)
 
 ## Goals
 
-- Keep `layer1_sensor_hub` independent from `layer1_radar`
+- **Single Layer 1** — all sensor drivers in one place
 - Provide one place to read all enabled sensors per cycle
 - Preserve per-sensor modules for low-level debugging
 
@@ -17,7 +18,7 @@ Unified Layer 1 entrypoint for three sensors:
 
 ```python
 from software.layer1_sensor_hub.mmwave import SerialManager, RadarConfigurator, UARTSource, TLVParser
-from software.layer1_sensor_hub.infeneon import MockPresenceProvider, PresenceSource
+from software.layer1_sensor_hub.infineon import MockPresenceProvider, PresenceSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 from software.layer1_sensor_hub import MultiSensorHub
 

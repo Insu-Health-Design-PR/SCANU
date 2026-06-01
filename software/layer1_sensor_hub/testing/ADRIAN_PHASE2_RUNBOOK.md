@@ -13,11 +13,11 @@ mmWave data in -> normalized objects -> top-down preview -> camera overlay -> UI
 From the `software/` directory:
 
 ```bash
-python3 -m layer1_radar.examples.live_capture \
+python3 -m layer1_sensor_hub.examples.live_capture \
   --mmwave-only \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config layer1_radar/examples/configs/stable_tracking_indoor2_low_uart.cfg \
+  --config layer1_sensor_hub/examples/configs/stable_tracking_indoor2_low_uart.cfg \
   --frames 300 \
   --output layer8_ui/artifacts/mmwave_frames.json \
   --live-frame layer8_ui/artifacts/live_mmwave.jpg \

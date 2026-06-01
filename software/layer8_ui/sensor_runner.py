@@ -1,5 +1,5 @@
 """
-mmWave capture via ``layer1_radar/examples/live_capture.py`` (UART/TLV stack under ``layer1_radar/mmwave``).
+mmWave capture via ``layer1_sensor_hub/examples/live_capture.py`` (UART/TLV stack under ``layer1_sensor_hub/mmwave``).
 
 Also owns shared PID/log state and ``start`` / ``stop`` / ``status`` for **thermal** and **webcam**,
 delegating command lines to ``thermal_runner`` and ``webcam_runner``.
@@ -78,7 +78,7 @@ def mmwave_capture_script(software_root: Path) -> Path:
 
 
 def build_mmwave_command(settings: dict[str, Any], layer8_dir: Path) -> list[str]:
-    """CLI for ``live_capture.py`` (uses ``layer1_radar.mmwave`` UART/TLV stack)."""
+    """CLI for ``live_capture.py`` (uses ``layer1_sensor_hub.mmwave`` UART/TLV stack)."""
     del layer8_dir
     sw = software_root_from_settings(settings)
     py = os.environ.get("PYTHON", sys.executable)

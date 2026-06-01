@@ -57,10 +57,10 @@ DEFAULT_SETTINGS: dict[str, Any] = {
     "mmwave": {
         "frames": 300,
         "mmwave_only": 1,
-        "config": "layer1_radar/examples/configs/stable_tracking_indoor2_low_uart.cfg",
+        "config": "layer1_sensor_hub/examples/configs/stable_tracking_indoor2_low_uart.cfg",
         "cli_port": "/dev/ttyUSB0",
         "data_port": "/dev/ttyUSB1",
-        "video": "layer1_radar/examples/latest_test.mp4",
+        "video": "layer1_sensor_hub/examples/latest_test.mp4",
         "live_frame": "layer8_ui/artifacts/live_mmwave.jpg",
         "output": "layer8_ui/artifacts/mmwave_frames.json",
         "no_frame_timeout_s": 30.0,

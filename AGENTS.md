@@ -12,10 +12,18 @@ Use **raw mmWave ADC data** (captured via DCA1000) to:
 
 ```
 software/
-├── layer1_radar/           ← Radar drivers (mmWave SDK, Infineon)
-│   └── mmwave/             ← TI radar constants
-├── layer1_sensor_hub/      ← Sensor hub (radar, thermal camera)
-│   ├── mmwave_dca/         ← ★ DCA1000 module (raw ADC capture)
+├── layer1_sensor_hub/       ← ★ Unified Layer 1: radar drivers, sensor hub, thermal, cameras
+│   ├── mmwave/              ← TI radar constants, serial, TLV parser, zone_config, heatmap
+│   │   ├── zone_config.py        ← ZoneConfig, ZoneAlert, ZoneMonitor
+│   │   ├── heatmap.py            ← HeatmapGenerator (occupancy, SNR, velocity)
+│   │   ├── visualization.py      ← MovementTrailTracker, CameraProjectionConfig, render_*
+│   │   ├── normalized.py         ← NormalizedMmwaveFrame/Object, dump/load helpers
+│   │   ├── serial_manager.py     ← SerialManager, RadarPorts
+│   │   ├── radar_config.py       ← DEFAULT_CONFIG, WPN_CONFIG, RadarConfigurator
+│   │   ├── uart_source.py        ← UARTSource, FrameHeader
+│   │   ├── tlv_parser.py         ← TLVParser, ParsedFrame, DetectedPoint
+│   │   └── radar_state.py        ← RadarStateInspector
+│   ├── mmwave_dca/          ← ★ DCA1000 module (raw ADC capture)
 │   │   ├── dca1000_control.py     ← DCA1000 UDP control
 │   │   ├── dca1000_udp.py         ← UDP data receiver
 │   │   ├── capture_runner.py      ← Capture orchestrator
@@ -29,18 +37,23 @@ software/
 │   │   ├── ti_cli/configFile.json ← DCA1000 JSON config
 │   │   ├── DCA1000_CAPTURE_GUIDE.md ← ★ Capture guide (EN)
 │   │   └── CAPTURE_TESTS.md       ← ★ Test results (EN)
-│   └── testing/configs/    ← Radar .cfg files
+│   ├── infineon/            ← Infineon 60 GHz presence sensor
+│   ├── thermal/             ← ThermalCameraSource (robust: retry, FOURCC=Y16, context manager)
+│   ├── examples/            ← Capture scripts and configs
+│   └── testing/configs/     ← Radar .cfg files
 │       ├── weapon_detection_dca1000.cfg  ← ★ Default for DCA1000
 │       ├── dca1000_adc_capture.cfg       ← Basic ADC config
 │       └── ...other .cfg...
-├── layer3_features/        ← Feature processing
+├── layer3_features/         ← Feature processing
 │   └── multimodal_features.py  ← ★ Multi-sensor feature extractor
-├── layer5_fusion/          ← Multi-sensor fusion
+├── layer5_fusion/           ← Multi-sensor fusion
 │   ├── fusion_adapter.py       ← Original weighted fusion
-│   ├── deterministic_fusion.py ← ★ New logic-based 3-sensor fusion
+│   ├── deterministic_fusion.py ← ★ Logic-based 3-sensor fusion
+│   ├── kalman_tracker.py       ← KalmanFilterTracker, FusedTrack
 │   └── models.py               ← FusionInputContract
-├── layer6_state_machine/   ← State machine
-└── layer7_alerts/          ← Alert system
+├── layer6_state_machine/    ← State machine
+├── layer7_alerts/           ← Alert system
+└── layer8_ui/               ← Dashboard & API
 ```
 
 ### ★ Changes made to dca1000_control.py
@@ -222,3 +235,82 @@ python -m layer1_sensor_hub.mmwave_dca.train_data_loader \\
 - PYTHONPATH must include `/home/insu/Desktop/SCANU-dev_adrian` (NOT `software/`) because `sensor_control.py` imports `from software.layer1_sensor_hub...`
 - Test captures showed consistent ADC data (noise ~200 LSB, no saturation, ~2000 pkt/s).
 - Point cloud columns: `[range_bin, doppler_bin, angle, snr, zone_flag]` (5 columns). SNR at index 3, zone_flag at index 4.
+
+---
+
+## ★ Session: layer1_sensor_hub consolidation + all-5-track improvements
+
+### What was done
+
+#### 1. Zone detection (`layer1_sensor_hub/mmwave/zone_config.py`)
+- `ZoneConfig` — configurable named spatial zone (range ± angle), color, label
+- `ZoneAlert` — `zone_entry` / `zone_exit` events with track_id, range, SNR, confidence
+- `ZoneMonitor` — tracks objects per zone across frames, fires `on_alert` callback
+- Default weapon zone `(1.17–1.95 m)` no longer hardcoded in visualization
+- `render_mmwave_camera_overlay()` and `render_top_down_jpeg()` accept `zones: list[ZoneConfig]`
+- Helper functions `_in_any_zone()`, `_zone_color()`, `_zone_label()`
+
+#### 2. Heatmap generation (`layer1_sensor_hub/mmwave/heatmap.py`)
+- `HeatmapConfig` — resolution, range limits, Gaussian smoothing
+- `HeatmapGenerator.occupancy()` — binary 2D occupancy
+- `HeatmapGenerator.snr_weighted()` — SNR-weighted accumulation
+- `HeatmapGenerator.velocity_magnitude()` — |velocity|-weighted
+- `HeatmapGenerator.cumulative_occupancy()` — multi-frame occupancy
+- `HeatmapGenerator.render()` — color-map to PNG via CV2
+
+#### 3. DBSCAN clustering (`layer2_signal_processing/weapon_tracker.py`)
+- `_cluster_points()` replaced brute‑force BFS with `sklearn.cluster.DBSCAN`
+- `eps = radius_m`, `min_samples = 1` (noise points become their own cluster)
+- Sklearn 1.3+ available in environment
+
+#### 4. Kalman filter fusion (`layer5_fusion/kalman_tracker.py`)
+- `FusedTrack` — per-track state with Kalman matrices
+- `KalmanFilterTracker` — 4‑state CV filter (x, y, vx, vy)
+- `predict_all()` — propagate + prune stale tracks
+- `update_track()` — single‑shot KF update
+- `associate_and_update()` — nearest‑neighbour association + KF update + new track creation
+- `get_active_tracks()` — returns tracks with `age < 5`
+
+#### 5. Thermal camera robustness (`layer1_sensor_hub/thermal/thermal_source.py`)
+- Merged robust `ThermalCameraSource` from `layer1_radar/thermal/`
+- `CAP_PROP_CONVERT_RGB = 0`, `FOURCC = Y16 `, `CAP_PROP_BUFFERSIZE = 1`
+- `open_retries=10`, `open_retry_delay_s=0.25` on failed open
+- `read_retries=4` on failed frame read
+- Supports `device: int | str` (numeric or `/dev/v4l/by-*` path)
+- `__enter__` / `__exit__` context manager
+- `save_raw()` method
+
+### New files
+| File | Purpose |
+|---|---|
+| `layer1_sensor_hub/mmwave/zone_config.py` | ZoneConfig, ZoneAlert, ZoneMonitor |
+| `layer1_sensor_hub/mmwave/heatmap.py` | HeatmapConfig, HeatmapGenerator |
+| `layer5_fusion/kalman_tracker.py` | FusedTrack, KalmanFilterTracker |
+| `layer1_sensor_hub/testing/test_zone_config.py` | 7 tests for zone module |
+| `layer1_sensor_hub/testing/test_heatmap.py` | 8 tests for heatmap module |
+| `layer1_sensor_hub/testing/test_thermal_source.py` | 6 tests for thermal module |
+| `layer5_fusion/test_kalman_tracker.py` | 8 tests for Kalman filter |
+
+#### 🌊 DCA1000 streaming processor (`dca1000_stream.py`)
+- `Dca1000StreamProcessor` — processes UDP packets incrementally as they arrive
+- Accumulates raw bytes into frame-sized buffers, runs `RawAdcWeaponDetector` per frame
+- Yields `StreamResult` with frame_number, detection, packet count
+- Can also write raw ADC to disk simultaneously
+- Thread-safe for concurrent sender
+
+#### 🔧 Auto CFAR tuning (`auto_cfar_tune.py`)
+- CLI to find optimal CFAR thresholds from recorded `adc_data.bin` files (weapon vs no-weapon)
+- Grid search over `threshold_scale` and `noise_floor_offset_db`
+- Reports top-10 parameter sets by separation (weapon_mean − no_weapon_mean)
+- `--output` to save full results as JSON
+
+### New tests
+| File | Tests | What it covers |
+|---|---|---|
+| `layer1_sensor_hub/testing/test_dca1000_pipeline.py` | 10 | ADC roundtrip, detector (MIMO, legacy, empty, weapon scoring), CFAR/zone params, synthetic frame energy |
+| `layer1_sensor_hub/testing/test_dca1000_stream.py` | 3 | Stream processor loopback, empty timeout, file output |
+
+### All 64 tests pass
+```
+64 passed in 14.77s
+```

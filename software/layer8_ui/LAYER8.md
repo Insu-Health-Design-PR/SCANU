@@ -29,7 +29,7 @@ rm -rf .venv
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip setuptools wheel
-pip install -r layer1_radar/requirements.txt
+pip install -r layer1_sensor_hub/requirements.txt
 pip install -r layer8_ui/requirements.txt
 pip install matplotlib
 pip install opencv-python-headless numpy tqdm scikit-learn onnx ultralytics PyYAML

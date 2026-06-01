@@ -17,7 +17,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from software.layer1_sensor_hub import MultiSensorHub
-from software.layer1_sensor_hub.infeneon import (  # type: ignore
+from software.layer1_sensor_hub.infineon import (  # type: ignore
     IfxLtr11PresenceProvider,
     MockPresenceProvider,
     PresenceSource,
@@ -58,7 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--config",
         type=str,
-        default="software/layer1_sensor_hub/testing/configs/mmwave_main.cfg",
+        default="software/layer1_sensor_hub/examples/configs/mmwave_main.cfg",
         help="Path to mmWave .cfg file used for configuration",
     )
     parser.add_argument("--skip-mmwave-config", action="store_true")
@@ -118,7 +118,7 @@ def _build_mmwave(args: argparse.Namespace) -> tuple[Optional[SerialManager], Op
         if not cfg_path.exists():
             raise RuntimeError(
                 f"mmWave config file not found: {cfg_path}. "
-                "Add a .cfg under testing/configs or pass --config explicitly."
+                "Add a .cfg under examples/configs or pass --config explicitly."
             )
         config_result = RadarConfigurator(serial_mgr).configure_from_file(cfg_path)
         if not config_result.success:

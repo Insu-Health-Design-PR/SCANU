@@ -39,7 +39,7 @@ echo "source software/.venv/bin/activate"
 echo "python3 - <<'PY'"
 echo "from pathlib import Path"
 echo "from software.layer1_sensor_hub.mmwave_dca.radar_cli import RadarCliConfig, configure_radar_from_file"
-echo "configure_radar_from_file(RadarCliConfig(port='/dev/ttyACM0'), Path('software/layer1_sensor_hub/testing/configs/dca1000_adc_capture.cfg'), defer_sensor_start=False)"
+echo "configure_radar_from_file(RadarCliConfig(port='/dev/ttyACM0'), Path('software/layer1_sensor_hub/examples/configs/dca1000_adc_capture.cfg'), defer_sensor_start=False)"
 echo "PY"
 echo
 echo "After capture, stop recording with:"

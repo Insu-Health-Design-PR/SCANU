@@ -87,7 +87,7 @@ Use this when output seems weak/intermittent:
 ```bash
 python3 - <<'PY'
 import time
-from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider
+from software.layer1_sensor_hub.infineon import IfxLtr11PresenceProvider
 
 p = IfxLtr11PresenceProvider()
 try:
@@ -113,7 +113,7 @@ Interpretation:
 ## 5) Current Code Behavior (Analysis)
 
 - `presence_raw` is computed from a combined signal (`active + power + motion`) with smoothing in:
-  - `software/layer1_sensor_hub/infeneon/ifx_ltr11_provider.py`
+  - `software/layer1_sensor_hub/infineon/ifx_ltr11_provider.py`
 - `motion_raw` is a hybrid of motion flag and normalized motion energy.
 - `distance_m` is intentionally not treated as real distance in this flow.
 

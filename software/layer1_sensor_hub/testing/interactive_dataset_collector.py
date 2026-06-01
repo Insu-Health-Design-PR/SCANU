@@ -22,8 +22,8 @@ REPO_ROOT = THIS_FILE.parents[3]
 RICH_CAPTURE_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/capture_all_sensors_rich.py"
 ANOMALY_REPORT_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/view/anomaly_report_from_capture.py"
 
-DEFAULT_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg"
-DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
+DEFAULT_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg"
+DEFAULT_RISK_CONFIG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json"
 DEFAULT_OUT_BASE = Path("/home/insu/Desktop/collecting_data")
 
 SAFE_SCENARIOS = [

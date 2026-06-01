@@ -36,7 +36,7 @@ REPO_ROOT = THIS_FILE.parents[3]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from software.layer1_sensor_hub.infeneon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
+from software.layer1_sensor_hub.infineon import IfxLtr11PresenceProvider, MockPresenceProvider, PresenceSource
 from software.layer1_sensor_hub.mmwave import RadarConfigurator, SerialManager, TLVParser, UARTSource
 from software.layer1_sensor_hub.thermal import ThermalCameraSource
 
@@ -81,7 +81,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--data-port", default=None, help="mmWave DATA port (optional, auto when omitted)")
     p.add_argument(
         "--config",
-        default="software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg",
+        default="software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg",
         help="mmWave cfg path",
     )
     p.add_argument("--skip-mmwave-config", action="store_true", help="Skip sending mmWave cfg")

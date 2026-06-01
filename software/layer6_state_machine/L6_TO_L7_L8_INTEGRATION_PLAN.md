@@ -112,7 +112,7 @@ insu@insu-desktop:~/Desktop/SCANU-dev_adrian$ cd ~/SCANU-dev_adrian
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install -r software/layer1_radar/requirements.txt
+pip install -r software/layer1_sensor_hub/requirements.txt
 bash: cd: /home/insu/SCANU-dev_adrian: No such file or directory
 Requirement already satisfied: pip in ./.venv/lib/python3.10/site-packages (22.0.2)
 Collecting pip
@@ -123,9 +123,9 @@ Installing collected packages: pip
     Uninstalling pip-22.0.2:
       Successfully uninstalled pip-22.0.2
 Successfully installed pip-26.0.1
-Collecting pyserial>=3.5 (from -r software/layer1_radar/requirements.txt (line 5))
+Collecting pyserial>=3.5 (from -r software/layer1_sensor_hub/requirements.txt (line 5))
   Using cached pyserial-3.5-py2.py3-none-any.whl.metadata (1.6 kB)
-Collecting numpy>=1.21.0 (from -r software/layer1_radar/requirements.txt (line 8))
+Collecting numpy>=1.21.0 (from -r software/layer1_sensor_hub/requirements.txt (line 8))
   Using cached numpy-2.2.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl.metadata (63 kB)
 Using cached pyserial-3.5-py2.py3-none-any.whl (90 kB)
 Using cached numpy-2.2.6-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl (14.3 MB)
@@ -304,7 +304,7 @@ Successfully installed numpy-2.2.6 pyserial-3.5
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --config software/layer1_sensor_hub/examples/configs/full_config.cfg \
   reconfig
 {
   "radar_id": "radar_main",
@@ -312,7 +312,7 @@ Successfully installed numpy-2.2.6 pyserial-3.5
   "success": true,
   "message": "Radar configured",
   "details": {
-    "source": "software/layer1_sensor_hub/testing/configs/full_config.cfg",
+    "source": "software/layer1_sensor_hub/examples/configs/full_config.cfg",
     "commands_sent": 30,
     "errors": []
   }
@@ -432,7 +432,7 @@ mmwDemo:/>
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --aux-radar radar_aux_1:/dev/ttyUSB2:/dev/ttyUSB3:software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --aux-radar radar_aux_1:/dev/ttyUSB2:/dev/ttyUSB3:software/layer1_sensor_hub/examples/configs/full_config.cfg \
   status
 {
   "radar_id": "radar_main",
@@ -459,7 +459,7 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --config software/layer1_sensor_hub/examples/configs/full_config.cfg \
   run --mode live --mmwave on --presence mock --thermal off --max-frames 50
 
 
@@ -471,7 +471,7 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --config software/layer1_sensor_hub/examples/configs/full_config.cfg \
   run --mode live --mmwave on --presence mock --thermal off --max-frames 50
 {
   "event": {

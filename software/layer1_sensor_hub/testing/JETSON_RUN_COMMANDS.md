@@ -43,7 +43,7 @@ python3 software/layer1_sensor_hub/testing/device_check_hub.py
 Put your config file here:
 
 `  --mmwave on \
-  --config software/layer1_sensor_hub/testing/configs/mmwave_main.cfg \
+  --config software/layer1_sensor_hub/examples/configs/mmwave_main.cfg \
   --presence mock \
   --thermal on \
   --max-frames 0 \
@@ -56,7 +56,7 @@ Put your config file here:
 python3 software/layer1_sensor_hub/testing/capture_mmwave_json.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/testq.json
 ```
@@ -85,13 +85,13 @@ python3 -m pytest -q \
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/all_sensors.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/all_sensors.json \
   --thermal-device 0 \
   --presence ifx``bash
-software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg
+software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg
 ```
 
 ## 5) Sensor approval test (PASS/FAIL)
@@ -108,7 +108,7 @@ python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
 ```bash
 python3 software/layer1_sensor_hub/testing/run_live_hub.py \
   --mmwave on \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --presence mock \
   --thermal on \
   --max-frames 0 \
@@ -121,7 +121,7 @@ python3 software/layer1_sensor_hub/testing/run_live_hub.py \
 python3 software/layer1_sensor_hub/testing/capture_mmwave_json.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test1.json
 ```
@@ -150,7 +150,7 @@ python3 -m pytest -q \
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
@@ -168,7 +168,7 @@ sudo fuser -k /dev/ttyUSB0 /dev/ttyUSB1
 ```
 
 ```bash
-python3 software/layer1_sensor_hub/testing/capture_all_sensors.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg --frames 300 --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json --thermal-device 0 --presence ifx
+python3 software/layer1_sensor_hub/testing/capture_all_sensors.py --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg --frames 300 --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json --thermal-device 0 --presence ifx
 ```
 
 ## 12) Clean stale processes/ports + run capture (stable config)
@@ -182,7 +182,7 @@ sleep 1 && \
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
@@ -198,7 +198,7 @@ With explicit ports:
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
@@ -210,7 +210,7 @@ Recommended (auto-detect ports + recovery):
 
 ```bash
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \
@@ -232,7 +232,7 @@ Use those IDs instead of `/dev/ttyUSB*`:
 python3 software/layer1_sensor_hub/testing/capture_all_sensors.py \
   --cli-port "/dev/serial/by-id/TU_ID_CLI" \
   --data-port "/dev/serial/by-id/TU_ID_DATA" \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
   --frames 300 \
   --video /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.mp4 \
   --output /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/view/test2.json \

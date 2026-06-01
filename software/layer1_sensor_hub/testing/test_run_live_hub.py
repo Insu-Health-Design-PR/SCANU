@@ -34,7 +34,7 @@ def test_build_parser_defaults():
     assert args.presence == "mock"
     assert args.thermal == "on"
     assert args.max_frames == 0
-    assert args.config.endswith("software/layer1_sensor_hub/testing/configs/mmwave_main.cfg")
+    assert args.config.endswith("software/layer1_sensor_hub/examples/configs/mmwave_main.cfg")
 
 
 def test_summarize_frame_contains_sensor_sections():

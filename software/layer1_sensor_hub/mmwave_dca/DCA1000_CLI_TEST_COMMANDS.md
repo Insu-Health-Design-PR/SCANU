@@ -98,7 +98,7 @@ from pathlib import Path
 from software.layer1_sensor_hub.mmwave_dca.radar_cli import RadarCliConfig, configure_radar_from_file
 
 cli_port = "/dev/ttyACM0"
-cfg = Path("software/layer1_sensor_hub/testing/configs/dca1000_adc_capture.cfg")
+cfg = Path("software/layer1_sensor_hub/examples/configs/dca1000_adc_capture.cfg")
 
 responses = configure_radar_from_file(
     RadarCliConfig(port=cli_port),

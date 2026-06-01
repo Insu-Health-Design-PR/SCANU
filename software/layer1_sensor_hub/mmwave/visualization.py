@@ -3,11 +3,52 @@
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from collections import defaultdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 from .normalized import NormalizedMmwaveFrame, NormalizedMmwaveObject
+from .zone_config import ZoneConfig
+
+
+@dataclass
+class MovementTrail:
+    track_id: str
+    positions: list[tuple[float, float, float]] = field(default_factory=list)
+    max_length: int = 15
+
+
+class MovementTrailTracker:
+    """Tracks object positions across frames per track_id for trail rendering."""
+
+    def __init__(self, max_trail_length: int = 15) -> None:
+        self._trails: dict[str, MovementTrail] = {}
+        self._max_length = max_trail_length
+
+    def update(self, frame: NormalizedMmwaveFrame) -> None:
+        seen: set[str] = set()
+        for obj in frame.objects:
+            tid = obj.track_id
+            if tid is None:
+                continue
+            seen.add(tid)
+            if tid not in self._trails:
+                self._trails[tid] = MovementTrail(track_id=tid, max_length=self._max_length)
+            trail = self._trails[tid]
+            trail.positions.append((obj.x, obj.y, obj.range_m))
+            if len(trail.positions) > self._max_length:
+                trail.positions.pop(0)
+        for tid in list(self._trails.keys()):
+            if tid not in seen:
+                self._trails.pop(tid, None)
+
+    def get_trail(self, track_id: str) -> list[tuple[float, float, float]]:
+        trail = self._trails.get(track_id)
+        return list(trail.positions) if trail is not None else []
+
+    def clear(self) -> None:
+        self._trails.clear()
 
 
 @dataclass
@@ -97,14 +138,120 @@ def project_frame_to_camera(frame: NormalizedMmwaveFrame, cfg: CameraProjectionC
     }
 
 
-def render_top_down_jpeg(frame: NormalizedMmwaveFrame, output_path: str | Path, *, max_range_m: float = 12.0) -> Path:
+def _in_any_zone(rng_m: float, zones: list[ZoneConfig]) -> bool:
+    return any(z.contains(rng_m) for z in zones)
+
+
+def _zone_color(rng_m: float, vel: float, zones: list[ZoneConfig]) -> tuple[int, int, int]:
+    for z in zones:
+        if z.contains(rng_m):
+            return z.color
+    if abs(vel) > 0.3:
+        return (50, 200, 50)
+    return (200, 200, 50)
+
+
+def _zone_label(rng_m: float, zones: list[ZoneConfig]) -> str:
+    for z in zones:
+        if z.contains(rng_m):
+            return z.label
+    return ""
+
+
+def render_mmwave_camera_overlay(
+    camera_bgr: Any,
+    frame: NormalizedMmwaveFrame,
+    cfg: CameraProjectionConfig,
+    *,
+    show_trails: bool = True,
+    trail_tracker: MovementTrailTracker | None = None,
+    show_labels: bool = True,
+    show_velocity_arrows: bool = True,
+    zones: list[ZoneConfig] | None = None,
+    trail_color: tuple[int, int, int] = (200, 200, 80),
+) -> Any:
+    """Overlay mmWave projected objects onto a camera frame (BGR)."""
+    import cv2
+    import numpy as np
+
+    zones = zones or [ZoneConfig(name="weapon", range_min_m=1.17, range_max_m=1.95, color=(50, 50, 220), label="W")]
+    out = camera_bgr.copy()
+    overlay = project_frame_to_camera(frame, cfg)
+    h, w = out.shape[:2]
+
+    # draw trails
+    if show_trails and trail_tracker is not None:
+        for obj in frame.objects:
+            tid = obj.track_id
+            if tid is None:
+                continue
+            trail_positions = trail_tracker.get_trail(tid)
+            if len(trail_positions) < 2:
+                continue
+            trail_px: list[tuple[int, int]] = []
+            for tx, ty, _ in trail_positions:
+                theta = math.radians(cfg.rotation_deg)
+                xr = (tx * math.cos(theta)) - (ty * math.sin(theta))
+                yr = (tx * math.sin(theta)) + (ty * math.cos(theta))
+                u = int((cfg.width / 2.0) + cfg.x_offset_px + (xr * cfg.x_scale_px_per_m))
+                v = int(cfg.height - cfg.y_offset_px - (yr * cfg.y_scale_px_per_m))
+                u = max(0, min(int(w), u))
+                v = max(0, min(int(h), v))
+                trail_px.append((u, v))
+            for i in range(1, len(trail_px)):
+                alpha = i / max(1, len(trail_px))
+                thickness = max(1, int(3 * alpha))
+                cv2.line(out, trail_px[i - 1], trail_px[i], trail_color, thickness, cv2.LINE_AA)
+
+    # draw projected points
+    for pt in overlay["points"]:
+        u = int(round(pt["x_px"]))
+        v = int(round(pt["y_px"]))
+        if u < 0 or u >= w or v < 0 or v >= h:
+            continue
+        conf = float(pt.get("confidence", 0.5))
+        vel = float(pt.get("velocity_mps", 0.0))
+        rng_m = float(pt.get("range_m", 0.0))
+        color = _zone_color(rng_m, vel, zones)
+
+        radius = max(3, int(6 * conf))
+        cv2.circle(out, (u, v), radius, color, -1)
+        cv2.circle(out, (u, v), radius + 1, (255, 255, 255), 1)
+
+        if show_velocity_arrows and abs(vel) > 0.05:
+            dx = int(vel * 30)
+            cv2.arrowedLine(out, (u, v), (u + dx, v), (0, 200, 255), 2, tipLength=0.3)
+
+        if show_labels:
+            label = ""
+            if pt.get("track_id"):
+                label = str(pt["track_id"])
+            zl = _zone_label(rng_m, zones)
+            if zl:
+                label = (label + " " + zl if label else zl)
+            if label:
+                cv2.putText(out, label, (u + radius + 3, v - 3), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
+
+    return out
+
+
+def render_top_down_jpeg(
+    frame: NormalizedMmwaveFrame,
+    output_path: str | Path,
+    *,
+    max_range_m: float = 12.0,
+    trail_tracker: MovementTrailTracker | None = None,
+    zones: list[ZoneConfig] | None = None,
+) -> Path:
     """Render a headless-safe top-down mmWave preview image."""
 
+    zones = zones or [ZoneConfig(name="weapon", range_min_m=1.17, range_max_m=1.95, color=(50, 50, 220), label="W")]
     out = Path(output_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
+    weapon_zone_m = (zones[0].range_min_m, zones[0].range_max_m) if zones else (1.17, 1.95)
     try:
-        return _render_top_down_jpeg_cv2(frame, out, max_range_m=max_range_m)
+        return _render_top_down_jpeg_cv2(frame, out, max_range_m=max_range_m, trail_tracker=trail_tracker, weapon_zone_m=weapon_zone_m)
     except Exception:
         pass
 
@@ -162,7 +309,14 @@ def render_top_down_jpeg(frame: NormalizedMmwaveFrame, output_path: str | Path, 
     return out
 
 
-def _render_top_down_jpeg_cv2(frame: NormalizedMmwaveFrame, out: Path, *, max_range_m: float) -> Path:
+def _render_top_down_jpeg_cv2(
+    frame: NormalizedMmwaveFrame,
+    out: Path,
+    *,
+    max_range_m: float,
+    trail_tracker: MovementTrailTracker | None = None,
+    weapon_zone_m: tuple[float, float] = (1.17, 1.95),
+) -> Path:
     import cv2
     import numpy as np
 
@@ -173,6 +327,12 @@ def _render_top_down_jpeg_cv2(frame: NormalizedMmwaveFrame, out: Path, *, max_ra
     left, right = 70, width - 28
     top, bottom = 52, height - 54
     cv2.rectangle(img, (left, top), (right, bottom), (66, 49, 42), 1)
+
+    # weapon zone highlight (range band)
+    zone_top = int(bottom - (weapon_zone_m[1] / max_range_m) * (bottom - top))
+    zone_bottom_val = int(bottom - (weapon_zone_m[0] / max_range_m) * (bottom - top))
+    if zone_top < zone_bottom_val:
+        cv2.rectangle(img, (left, zone_top), (right, zone_bottom_val), (30, 30, 80), -1)
 
     for i in range(1, 5):
         y = int(bottom - (i / 4.0) * (bottom - top))
@@ -196,13 +356,38 @@ def _render_top_down_jpeg_cv2(frame: NormalizedMmwaveFrame, out: Path, *, max_ra
         v = int(bottom - max(0.0, min(1.0, y_norm)) * (bottom - top))
         return u, v
 
+    # draw trails
+    if trail_tracker is not None:
+        for obj in frame.objects:
+            tid = obj.track_id
+            if tid is None:
+                continue
+            trail = trail_tracker.get_trail(tid)
+            if len(trail) < 2:
+                continue
+            trail_px: list[tuple[int, int]] = []
+            for tx, ty, _ in trail:
+                xn = (tx + (max_range_m / 2.0)) / max(0.1, max_range_m)
+                yn = ty / max(0.1, max_range_m)
+                tu = int(left + max(0.0, min(1.0, xn)) * (right - left))
+                tv = int(bottom - max(0.0, min(1.0, yn)) * (bottom - top))
+                trail_px.append((tu, tv))
+            for i in range(1, len(trail_px)):
+                alpha = i / max(1, len(trail_px))
+                thickness = max(1, int(3 * alpha))
+                cv2.line(img, trail_px[i - 1], trail_px[i], (80, 200, 200), thickness, cv2.LINE_AA)
+
     if not frame.objects:
         cv2.putText(img, "No mmWave objects", (left + 180, top + 180), cv2.FONT_HERSHEY_SIMPLEX, 0.72, (168, 149, 139), 2)
 
     for obj in frame.objects:
         u, v = px(obj)
         speed = max(-1.5, min(1.5, obj.velocity_mps))
-        if speed > 0.15:
+        in_weapon_zone = weapon_zone_m[0] <= obj.range_m <= weapon_zone_m[1]
+
+        if in_weapon_zone:
+            color = (50, 50, 220)
+        elif speed > 0.15:
             color = (76, 170, 255)
         elif speed < -0.15:
             color = (245, 120, 91)
@@ -211,11 +396,28 @@ def _render_top_down_jpeg_cv2(frame: NormalizedMmwaveFrame, out: Path, *, max_ra
         radius = int(5 + max(0.0, min(1.0, obj.confidence)) * 8)
         cv2.circle(img, (u, v), radius, color, -1)
         cv2.circle(img, (u, v), radius, (238, 241, 247), 1)
-        if abs(obj.velocity_mps) > 0.01:
-            dv = int(max(-28, min(28, obj.velocity_mps * -22)))
-            cv2.arrowedLine(img, (u, v), (u, v + dv), (10, 159, 255), 2, tipLength=0.35)
+
+        # velocity arrow: 2D using doppler as proxy for range-rate
+        if abs(obj.velocity_mps) > 0.05:
+            dx = int((obj.x / max(0.1, max_range_m)) * obj.velocity_mps * -28)
+            dy = int(obj.velocity_mps * -22)
+            if abs(dx) + abs(dy) > 3:
+                cv2.arrowedLine(img, (u, v), (u + dx, v + dy), (10, 159, 255), 2, tipLength=0.3)
+
+        # weapon zone marker
+        if in_weapon_zone:
+            cv2.putText(img, "W", (u + 9, v - 14), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (50, 50, 220), 1)
+
         if obj.track_id:
-            cv2.putText(img, str(obj.track_id), (u + 9, v - 9), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (238, 241, 247), 1)
+            cv2.putText(img, str(obj.track_id), (u + 9, v - 3), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (238, 241, 247), 1)
+
+    # scale bar
+    scale_x = left
+    scale_y = height - 18
+    scale_len_px = int(70)
+    cv2.line(img, (scale_x, scale_y), (scale_x + scale_len_px, scale_y), (168, 149, 139), 2)
+    scale_m = (scale_len_px / (right - left)) * max_range_m
+    cv2.putText(img, f"{scale_m:.1f}m", (scale_x + scale_len_px + 4, scale_y + 4), cv2.FONT_HERSHEY_SIMPLEX, 0.38, (168, 149, 139), 1)
 
     tmp = out.with_suffix(out.suffix + ".tmp")
     ok, buf = cv2.imencode(".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 88])

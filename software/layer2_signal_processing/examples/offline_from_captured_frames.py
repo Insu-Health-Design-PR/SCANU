@@ -4,7 +4,7 @@ Offline Layer 1 capture -> Layer 2 feature generation.
 
 Input:
   A `captured_frames.json` file produced by:
-  `software/layer1_radar/examples/capture_frames.py`
+  `software/layer1_sensor_hub/examples/capture_frames.py`
 
 Output:
   A compact JSON containing per-frame Layer 2 heatmap features:
@@ -56,7 +56,7 @@ def main(argv: list[str] | None = None) -> int:
         "-i",
         type=str,
         required=True,
-        help="Path to captured_frames.json produced by layer1_radar capture script",
+        help="Path to captured_frames.json produced by layer1_sensor_hub capture script",
     )
     parser.add_argument(
         "--output",

@@ -77,7 +77,7 @@ setup_cmd() {
 
   python3 -m pip install --upgrade pip setuptools wheel
   python3 -m pip install -r "$SOFTWARE_DIR/layer8_ui/requirements.txt"
-  python3 -m pip install -r "$SOFTWARE_DIR/layer1_radar/requirements.txt"
+  python3 -m pip install -r "$SOFTWARE_DIR/layer1_sensor_hub/requirements.txt"
 
   if [[ "$INSTALL_LAYER4_FULL" == "1" ]]; then
     python3 -m pip install -r "$SOFTWARE_DIR/layer4_inference/requirements.txt"

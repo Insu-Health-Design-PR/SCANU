@@ -1,5 +1,6 @@
-"""
-Serial port management for IWR6843 radar.
+from __future__ import annotations
+
+"""Serial port management for IWR6843 radar.
 
 Handles discovery and connection to the radar's two UART ports:
 - Config port: Send CLI commands (115200 baud)

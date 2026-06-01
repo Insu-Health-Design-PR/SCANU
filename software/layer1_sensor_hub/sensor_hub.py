@@ -6,7 +6,7 @@ import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Optional
 
-from .infeneon import PresenceSource
+from .infineon import PresenceSource
 
 if TYPE_CHECKING:
     from .thermal import ThermalCameraSource

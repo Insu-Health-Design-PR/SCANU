@@ -39,7 +39,7 @@ cd /home/insu/Desktop/SCANU-dev_adrian/software
 
 CLI_PORT=/dev/ttyUSB0 \
 DURATION_S=5 \
-RADAR_CFG=/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/configs/weapon_detection_dca1000.cfg \
+RADAR_CFG=/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/examples/configs/weapon_detection_dca1000.cfg \
 DCA_CFG=/home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/mmwave_dca/ti_cli/configFile.json \
 OUTPUT=/home/insu/Desktop/SCANU-dev_adrian/captures/adc_data.bin \
 ./layer1_sensor_hub/mmwave_dca/run_jetson_native_capture.sh
@@ -65,7 +65,7 @@ cd /home/insu/Desktop/SCANU-dev_adrian/software
 
 PYTHONPATH=. python3 -m layer1_sensor_hub.mmwave_dca.run_dca_capture \
   --cli-port /dev/ttyUSB0 \
-  --config layer1_sensor_hub/testing/configs/weapon_detection_dca1000.cfg \
+  --config layer1_sensor_hub/examples/configs/weapon_detection_dca1000.cfg \
   --dca-config layer1_sensor_hub/mmwave_dca/ti_cli/configFile.json \
   --output /home/insu/Desktop/SCANU-dev_adrian/captures/adc_data.bin \
   --duration-s 5 \

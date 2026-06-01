@@ -21,7 +21,7 @@ Example:
 ```bash
 python3 software/layer1_sensor_hub/testing/run_live_hub.py \
   --mmwave on \
-  --config software/layer1_sensor_hub/testing/configs/mmwave_main.cfg \
+  --config software/layer1_sensor_hub/examples/configs/mmwave_main.cfg \
   --presence mock --thermal on --max-frames 0 --interval-s 0.1
 ```
 
@@ -67,7 +67,7 @@ Example:
 ```bash
 python3 software/layer1_sensor_hub/testing/capture_mmwave_json.py \
   --cli-port /dev/ttyUSB0 --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/mmwave_main.cfg \
+  --config software/layer1_sensor_hub/examples/configs/mmwave_main.cfg \
   --frames 300 --output /tmp/mmwave_capture.json
 ```
 
@@ -89,7 +89,7 @@ python3 software/layer1_sensor_hub/testing/capture_thermal_video.py \
 ## Recommended Execution Order
 
 1. Run `device_check_hub.py`
-2. Add your mmWave `.cfg` under `testing/configs/`
+2. Add your mmWave `.cfg` under `examples/configs/`
 3. Run `sensor_approval_hub.py`
 4. Run `run_live_hub.py`
 5. Run `capture_mmwave_json.py` and `capture_thermal_video.py` as needed
@@ -110,8 +110,8 @@ Purpose:
 Example:
 ```bash
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_indoor4.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_indoor4.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 300 \
   --interval-s 0.1 \
   --video software/layer1_sensor_hub/testing/view/concealed_screening.mp4 \

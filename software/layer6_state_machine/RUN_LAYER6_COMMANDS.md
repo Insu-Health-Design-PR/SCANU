@@ -9,7 +9,7 @@ cd ~/SCANU
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -U pip
-pip install -r software/layer1_radar/requirements.txt
+pip install -r software/layer1_sensor_hub/requirements.txt
 ```
 
 ## 2) Smoke Test (No Hardware)
@@ -39,7 +39,7 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --config software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --config software/layer1_sensor_hub/examples/configs/full_config.cfg \
   reconfig
 ```
 
@@ -112,7 +112,7 @@ PYTHONPATH=. python3 -m software.layer6_state_machine.run_layer6 \
   --radar-id radar_main \
   --cli-port /dev/ttyUSB0 \
   --data-port /dev/ttyUSB1 \
-  --aux-radar radar_aux_1:/dev/ttyUSB2:/dev/ttyUSB3:software/layer1_sensor_hub/testing/configs/full_config.cfg \
+  --aux-radar radar_aux_1:/dev/ttyUSB2:/dev/ttyUSB3:software/layer1_sensor_hub/examples/configs/full_config.cfg \
   status
 ```
 

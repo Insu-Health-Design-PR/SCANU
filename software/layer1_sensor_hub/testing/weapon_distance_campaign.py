@@ -26,9 +26,9 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 SCREENING_SCRIPT = REPO_ROOT / "software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py"
-DEFAULT_CFG = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg"
-DEFAULT_RISK = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json"
-DEFAULT_PLAN = REPO_ROOT / "software/layer1_sensor_hub/testing/configs/weapon_distance_campaign_plan.json"
+DEFAULT_CFG = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg"
+DEFAULT_RISK = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json"
+DEFAULT_PLAN = REPO_ROOT / "software/layer1_sensor_hub/examples/configs/weapon_distance_campaign_plan.json"
 DEFAULT_OUT = REPO_ROOT / "software/layer1_sensor_hub/testing/view/weapon_distance_campaign"
 
 

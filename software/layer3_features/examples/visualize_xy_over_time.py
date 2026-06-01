@@ -3,7 +3,7 @@
 Visualize x/y trajectory over time from Layer1-style radar capture JSON.
 
 This consumes JSON produced by:
-  software/layer1_radar/examples/capture_frames.py
+  software/layer1_sensor_hub/examples/capture_frames.py
 
 It then estimates a single "target" point per frame (by max SNR or top-k
 average), and plots:

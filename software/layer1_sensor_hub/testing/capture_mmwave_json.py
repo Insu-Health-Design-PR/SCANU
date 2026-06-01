@@ -38,7 +38,7 @@ def main() -> int:
     p.add_argument("--data-port", default=None, help="Optional explicit DATA port")
     p.add_argument(
         "--config",
-        default="software/layer1_sensor_hub/testing/configs/mmwave_main.cfg",
+        default="software/layer1_sensor_hub/examples/configs/mmwave_main.cfg",
         help="Path to mmWave .cfg file",
     )
     p.add_argument("--skip-config", action="store_true", help="Skip RadarConfigurator.configure()")
@@ -57,7 +57,7 @@ def main() -> int:
             if not cfg_path.exists():
                 raise RuntimeError(
                     f"mmWave config file not found: {cfg_path}. "
-                    "Add a .cfg under testing/configs or pass --config explicitly."
+                    "Add a .cfg under examples/configs or pass --config explicitly."
                 )
             cfg = RadarConfigurator(mgr).configure_from_file(cfg_path)
             if not cfg.success:

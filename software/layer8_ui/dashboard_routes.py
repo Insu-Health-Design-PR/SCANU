@@ -29,9 +29,11 @@ from layer8_ui.settings_store import DEFAULT_SETTINGS, load, reset_webcam_weapon
 
 from layer1_sensor_hub.mmwave import (
     CameraProjectionConfig,
+    MovementTrailTracker,
     load_normalized_mmwave_frames,
     normalize_mmwave_frame,
     project_frame_to_camera,
+    render_mmwave_camera_overlay,
     render_top_down_jpeg,
 )
 
@@ -289,6 +291,7 @@ def build_router(layer8_dir: Path) -> APIRouter:
         "snapshot": None,
         "action_request": None,
     }
+    mmwave_trail_tracker = MovementTrailTracker(max_trail_length=15)
 
     def _iso_now() -> str:
         return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
@@ -473,6 +476,9 @@ def build_router(layer8_dir: Path) -> APIRouter:
         frames = load_normalized_mmwave_frames(path)
         if limit > 0:
             frames = frames[-limit:]
+        # update trail tracker with latest frame
+        if frames:
+            mmwave_trail_tracker.update(frames[-1])
         return [frame.to_dict() for frame in frames]
 
     def _read_last_mmwave_raw_frame() -> dict[str, Any] | None:
@@ -1363,6 +1369,23 @@ def build_router(layer8_dir: Path) -> APIRouter:
                 await asyncio.sleep(0.08)
         return StreamingResponse(event_generator(), media_type="text/event-stream")
 
+    @router.get("/api/mmwave/camera-overlay/stream")
+    async def stream_mmwave_camera_overlay() -> StreamingResponse:
+        async def overlay_generator():
+            last_frame_id = -1
+            while True:
+                frame = _read_last_mmwave_frame()
+                if frame is not None:
+                    fn = frame.get("frame_id", 0)
+                    if fn != last_frame_id:
+                        last_frame_id = fn
+                        norm_frame = normalize_mmwave_frame(frame)
+                        cfg = _mmwave_projection_config()
+                        overlay = project_frame_to_camera(norm_frame, cfg)
+                        yield f"data: {json.dumps(overlay)}\n\n"
+                await asyncio.sleep(0.08)
+        return StreamingResponse(overlay_generator(), media_type="text/event-stream")
+
     @router.get("/api/mmwave/frames")
     def get_mmwave_frames(limit: int = 250) -> dict[str, Any]:
         frames = _read_mmwave_frames_normalized(limit=max(1, min(int(limit), 1000)))
@@ -1392,7 +1415,11 @@ def build_router(layer8_dir: Path) -> APIRouter:
         out = resolved_artifact_path(s, relative_to_software=str(rel), layer8_dir=layer8_dir)
         if out is None:
             return {"ok": False, "error": "invalid_live_frame_path"}
-        render_top_down_jpeg(frame, out, max_range_m=_mmwave_projection_config().max_range_m)
+        render_top_down_jpeg(
+            frame, out,
+            max_range_m=_mmwave_projection_config().max_range_m,
+            trail_tracker=mmwave_trail_tracker,
+        )
         return {"ok": True, "path": str(out), "frame_id": frame.frame_id}
 
     @router.get("/api/devices")

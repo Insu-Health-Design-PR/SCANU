@@ -14,7 +14,15 @@ from .normalized import (
     normalize_mmwave_frames,
     normalize_mmwave_object,
 )
-from .visualization import CameraProjectionConfig, project_frame_to_camera, render_top_down_jpeg
+from .visualization import (
+    CameraProjectionConfig,
+    MovementTrailTracker,
+    project_frame_to_camera,
+    render_mmwave_camera_overlay,
+    render_top_down_jpeg,
+)
+from .zone_config import ZoneConfig, ZoneAlert, ZoneMonitor
+from .heatmap import HeatmapConfig, HeatmapGenerator
 
 __all__ = [
     "TLVType",
@@ -35,6 +43,13 @@ __all__ = [
     "load_normalized_mmwave_frames",
     "dump_normalized_mmwave_frames",
     "CameraProjectionConfig",
+    "MovementTrailTracker",
     "project_frame_to_camera",
+    "render_mmwave_camera_overlay",
     "render_top_down_jpeg",
+    "ZoneConfig",
+    "ZoneAlert",
+    "ZoneMonitor",
+    "HeatmapConfig",
+    "HeatmapGenerator",
 ]

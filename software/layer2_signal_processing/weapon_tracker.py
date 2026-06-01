@@ -1,7 +1,7 @@
 """Temporal point-cloud tracker for weapon motion-pattern detection.
-
-Tracks clusters across frames using nearest-neighbour association and detects
-weapon-characteristic motion patterns:
+ 
+Tracks clusters across frames using DBSCAN + nearest-neighbour association and
+detects weapon-characteristic motion patterns:
   - High doppler variance (hand tremor / micro-Doppler)
   - Rapid radial displacement (draw / swing)
   - Small spatial extent (< 0.4 m)  —  weapon-sized
@@ -15,6 +15,7 @@ from collections import deque
 from dataclasses import dataclass, field
 
 import numpy as np
+from sklearn.cluster import DBSCAN
 
 
 @dataclass
@@ -89,36 +90,23 @@ class WeaponTracker:
             return None
         return max(alive, key=lambda c: c.weapon_confidence)
 
-    # ── clustering ──────────────────────────────────────────────────────
+    # ── clustering (DBSCAN) ─────────────────────────────────────────────
 
     def _cluster_points(
         self, cloud: np.ndarray, radius_m: float
     ) -> list[np.ndarray]:
         if cloud.size == 0 or cloud.shape[0] == 0:
             return []
+        if cloud.shape[0] < 3:
+            return [cloud]
 
-        n = cloud.shape[0]
         xy = cloud[:, :2]
-        labels = np.full(n, -1, dtype=np.int32)
-        cid = 0
-
-        for i in range(n):
-            if labels[i] != -1:
-                continue
-            labels[i] = cid
-            queue = [i]
-            while queue:
-                idx = queue.pop()
-                d = xy - xy[idx]
-                dist = np.sqrt(np.sum(d * d, axis=1))
-                neighbours = np.where((dist <= radius_m) & (labels == -1))[0]
-                if neighbours.size > 0:
-                    labels[neighbours] = cid
-                    queue.extend(neighbours.tolist())
-            cid += 1
+        clustering = DBSCAN(eps=radius_m, min_samples=1).fit(xy)
+        labels = clustering.labels_
+        n_clusters = int(labels.max()) + 1 if labels.size > 0 else 0
 
         clusters: list[np.ndarray] = []
-        for c in range(cid):
+        for c in range(n_clusters):
             mask = labels == c
             clusters.append(cloud[mask])
         return clusters

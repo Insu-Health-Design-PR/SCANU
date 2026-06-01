@@ -10,10 +10,10 @@ Important:
 ## 1) Recommended Config Files
 
 - mmWave profile:
-  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg`
-  - `software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg` (fallback)
+  - `software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg`
+  - `software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg` (fallback)
 - Risk profile:
-  - `software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json`
+  - `software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json`
 
 ## 2) Preflight (Connectivity)
 
@@ -34,8 +34,8 @@ python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py \
 
 ```bash
 python3 software/layer1_sensor_hub/testing/capture_all_sensors_rich.py \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 300 \
   --interval-s 0.1 \
   --video software/layer1_sensor_hub/testing/view/weapon_screening_rich.mp4 \
@@ -46,8 +46,8 @@ python3 software/layer1_sensor_hub/testing/capture_all_sensors_rich.py \
 
 ```bash
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 300 \
   --interval-s 0.1 \
   --mmwave-risk-th 0.45 \
@@ -91,8 +91,8 @@ Use this when the presence sensor is unavailable or unstable.
 ```bash
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 450 \
   --interval-s 0.1 \
   --video software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx.mp4 \
@@ -127,8 +127,8 @@ python3 software/layer1_sensor_hub/testing/sensor_approval_hub.py --skip-infineo
 
 python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json
 
 cat software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_report.json
 ```
@@ -138,8 +138,8 @@ cat software/layer1_sensor_hub/testing/view/weapon_screening_no_ifx_report.json
 ```bash
 python3 /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
-  --config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 450 \
   --interval-s 0.1 \
   --video /Users/adriancordero/Desktop/SCANU-dev_adrian/SCANU/software/layer1_sensor_hub/testing/view/weapon_screening_sens.mp4 \
@@ -159,8 +159,8 @@ The script pauses before each scenario (press Enter to continue), and generates 
 ```bash
 python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --mode no_ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 350 \
   --interval-s 0.1 \
   --output-prefix school_airport_trial
@@ -180,8 +180,8 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_temporal \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 450 \
   --interval-s 0.1 \
   --video software/layer1_sensor_hub/testing/view/weapon_screening_temporal.mp4 \
@@ -196,8 +196,8 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_temporal \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 350 \
   --interval-s 0.1 \
   --output-prefix school_airport_trial_temporal
@@ -216,8 +216,8 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --mmwave-risk-th 0.06 \
   --thermal-delta-th 3.5 \
   --min-consecutive 3 \
@@ -231,8 +231,8 @@ python3 software/layer1_sensor_hub/testing/three_scenario_comparison_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --frames 350 \
   --interval-s 0.1 \
   --output-prefix school_airport_trial_v2
@@ -248,11 +248,11 @@ You will press Enter before each run.
 ```bash
 python3 software/layer1_sensor_hub/testing/weapon_distance_campaign.py \
   --mode no_ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \[CAPTURING]
-/usr/bin/python3 /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/capture_all_sensors_rich.py --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json --frames 200 --interval-s 0.1 --mmwave-timeout-ms 200 --presence off --thermal-device 0 --thermal-width 640 --thermal-height 480 --thermal-fps 30 --video /home/insu/Desktop/collecting_data/unsafe/concealed_weapon/unsafe_concealed_weapon_5ft_r01_20260406T153402.mp4 --output /home/insu/Desktop/collecting_data/unsafe/concealed_weapon/unsafe_concealed_weapon_5ft_r01_20260406T153402_capture.json
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg \[CAPTURING]
+/usr/bin/python3 /home/insu/Desktop/SCANU-dev_adrian/software/layer1_sensor_hub/testing/capture_all_sensors_rich.py --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json --frames 200 --interval-s 0.1 --mmwave-timeout-ms 200 --presence off --thermal-device 0 --thermal-width 640 --thermal-height 480 --thermal-fps 30 --video /home/insu/Desktop/collecting_data/unsafe/concealed_weapon/unsafe_concealed_weapon_5ft_r01_20260406T153402.mp4 --output /home/insu/Desktop/collecting_data/unsafe/concealed_weapon/unsafe_concealed_weapon_5ft_r01_20260406T153402_capture.json
                                                                                                                                                                        
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
-  --plan software/layer1_sensor_hub/testing/configs/weapon_distance_campaign_plan.json \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
+  --plan software/layer1_sensor_hub/examples/configs/weapon_distance_campaign_plan.json \
   --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
   --mmwave-risk-th 0.06 \
@@ -286,8 +286,8 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_v2.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_v2.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --mmwave-risk-th 0.06 \
   --thermal-delta-th 3.5 \
   --min-consecutive 3 \
@@ -311,8 +311,8 @@ python3 software/layer1_sensor_hub/testing/concealed_weapon_screening_test.py \
   --mode no_ifx \
   --fusion-mode mm_primary_score_boost \
   --thermal-support-window 12 \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --mmwave-risk-th 0.06 \
   --thermal-delta-th 3.5 \
   --min-consecutive 3 \
@@ -360,8 +360,8 @@ Current `UNSAFE` scenarios in the menu:
 
 ```bash
 python3 software/layer1_sensor_hub/testing/interactive_dataset_collector.py \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
-  --risk-config software/layer1_sensor_hub/testing/configs/risk_concealed_game_prop.json \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --risk-config software/layer1_sensor_hub/examples/configs/risk_concealed_game_prop.json \
   --out-base /home/insu/Desktop/collecting_data \
   --frames 350 \
   --interval-s 0.1 \
@@ -463,7 +463,7 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --rgb-device /dev/video2 \
   --thermal-device 0 \
   --presence ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
   --capture-seconds 8 \
   --interval-s 0.1
 ```
@@ -499,7 +499,7 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --rgb-device /dev/video2 \
   --thermal-device 0 \
   --presence ifx \
-  --config software/layer1_sensor_hub/testing/configs/stable_tracking_weapon_detection_sensitivity.cfg \
+  --config software/layer1_sensor_hub/examples/configs/stable_tracking_weapon_detection_sensitivity.cfg \
   --capture-mode video \
   --video-fps 10 \
   --capture-seconds 10
@@ -515,7 +515,7 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --rgb-device /dev/video2 \
   --thermal-device 0 \
   --presence off \
-  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
+  --config software/layer1_sensor_hub/examples/configs/high_sensitivity_presence.cfg \
   --capture-mode video \
   --capture-seconds 20 \
   --mmwave-trail-frames 18 \
@@ -534,7 +534,7 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --rgb-device /dev/video2 \
   --thermal-device 0 \
   --presence off \
-  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
+  --config software/layer1_sensor_hub/examples/configs/high_sensitivity_presence.cfg \
   --capture-mode video \
   --combined-video /home/insu/Desktop/collecting_data/four_scenario_multisensor/run_all_scenarios.mp4 \
   --combined-video-only \
@@ -556,7 +556,7 @@ PYTHONPATH=. python3 software/layer1_sensor_hub/testing/four_scenario_multisenso
   --rgb-fourcc auto \
   --thermal-device 0 \
   --presence off \
-  --config software/layer1_sensor_hub/testing/configs/high_sensitivity_presence.cfg \
+  --config software/layer1_sensor_hub/examples/configs/high_sensitivity_presence.cfg \
   --capture-mode video \
   --combined-video /home/insu/Desktop/collecting_data/four_scenario_multisensor/run_all_scenarios.mp4 \
   --combined-video-only \

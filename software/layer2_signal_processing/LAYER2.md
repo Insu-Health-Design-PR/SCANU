@@ -4,8 +4,8 @@
 Transform Layer 1 radar outputs into calibrated spectral outputs and heatmap-ready features.
 
 ## Inputs
-- Raw `bytes` directly from `layer1_radar.UARTSource.read_frame()`.
-- Parsed `ParsedFrame` objects from `layer1_radar.TLVParser.parse()`.
+- Raw `bytes` directly from `layer1_sensor_hub.UARTSource.read_frame()`.
+- Parsed `ParsedFrame` objects from `layer1_sensor_hub.TLVParser.parse()`.
 
 ## Outputs
 - `ProcessedFrame(frame_number, timestamp_ms, range_doppler, point_cloud)`.
@@ -34,7 +34,7 @@ Transform Layer 1 radar outputs into calibrated spectral outputs and heatmap-rea
 - Deterministic behavior with lightweight numerical operations.
 
 
-from software.layer1_radar import SerialManager, RadarConfigurator, UARTSource, TLVParser
+from software.layer1_sensor_hub import SerialManager, RadarConfigurator, UARTSource, TLVParser
 from software.layer2_signal_processing import SignalProcessor, FeatureExtractor
 
 serial_mgr = SerialManager()
