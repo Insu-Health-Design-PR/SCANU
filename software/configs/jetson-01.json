@@ -1,0 +1,42 @@
+{
+  "jetson_id": "jetson-01",
+  "mode": "serve",
+  "main_url": "http://127.0.0.1:8080",
+  "location": "Main Entrance",
+  "software_root": "..",
+  "layer8_dir": "layer8_ui",
+  "artifacts_dir": "layer8_ui/artifacts",
+  "logs_dir": "layer8_ui/logs",
+  "send_interval_s": 0.5,
+  "sensors": {
+    "webcam": {
+      "enabled": true
+    },
+    "thermal": {
+      "enabled": true
+    },
+    "mmwave": {
+      "enabled": true
+    }
+  },
+  "layer8_settings": {
+    "webcam": {
+      "webcam_device": 0,
+      "webcam_width": 1280,
+      "webcam_height": 720,
+      "live_frame": "layer8_ui/artifacts/live_webcam.jpg"
+    },
+    "thermal": {
+      "thermal_device": 0,
+      "thermal_width": 160,
+      "thermal_height": 120,
+      "live_frame": "layer8_ui/artifacts/live_thermal.jpg"
+    },
+    "mmwave": {
+      "cli_port": "/dev/ttyUSB0",
+      "data_port": "/dev/ttyUSB1",
+      "output": "layer8_ui/artifacts/mmwave_frames.json",
+      "layer3_output": "layer8_ui/artifacts/layer3_features.json"
+    }
+  }
+}

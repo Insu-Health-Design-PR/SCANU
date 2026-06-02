@@ -40,7 +40,7 @@ def register_device_routes(
 
     @router.post("/api/operator/mode/{mode}")
     def set_operator_mode(
-        mode: Literal["central", "fallback", "local"],
+        mode: Literal["central", "fallback", "local", "serve"],
     ) -> dict[str, Any]:
         s = load(ctx.layer8_dir)
         mmwave = dict(s.get("mmwave") or {})
